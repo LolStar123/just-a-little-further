@@ -1,0 +1,2 @@
+// Full supplied hour, served as sequential five-minute MP3 sections.
+export const musicParts=["assets/audio/music/peaceful-00.mp3", "assets/audio/music/peaceful-01.mp3", "assets/audio/music/peaceful-02.mp3", "assets/audio/music/peaceful-03.mp3", "assets/audio/music/peaceful-04.mp3", "assets/audio/music/peaceful-05.mp3", "assets/audio/music/peaceful-06.mp3", "assets/audio/music/peaceful-07.mp3", "assets/audio/music/peaceful-08.mp3", "assets/audio/music/peaceful-09.mp3", "assets/audio/music/peaceful-10.mp3", "assets/audio/music/peaceful-11.mp3"];
