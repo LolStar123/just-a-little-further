@@ -9,7 +9,7 @@ export const projects={
     "description": "Search for a topic, collect paper metadata, then deduplicate by DOI or title. The reading list keeps titles, dates and source links together so an interesting idea can become a testable strategy.",
     "scene": "scraper",
     "note": "",
-    "detail": "Less time reopening the same papers. More time checking the idea.",
+    "detail": "Less time reopening the same papers. More time checking the idea. Search 320 real papers, collect live Crossref results and export a saved reading list.",
     "github": "https://github.com/LolStar123/quant-research-scraper",
     "demo": "https://lolstar123.github.io/quant-research-scraper/",
     "url": "https://github.com/LolStar123/quant-research-scraper",
@@ -23,7 +23,9 @@ export const projects={
         "label": "github / code",
         "url": "https://github.com/LolStar123/quant-research-scraper"
       }
-    ]
+    ],
+    "demoDescription": "Search 320 real papers, collect live Crossref results and export a saved reading list.",
+    "demoScope": "Real Crossref metadata; full papers stay with their publishers."
   },
   "pipeline": {
     "title": "market backtesting pipeline",
@@ -35,7 +37,7 @@ export const projects={
     "note": "",
     "url": "https://github.com/LolStar123/markets-backtesting",
     "link": "github / code",
-    "detail": "An attractive backtest has to survive the next window.",
+    "detail": "An attractive backtest has to survive the next window. Run a walk-forward strategy on 5,351 SPY observations and inspect 50 archived research results.",
     "github": "https://github.com/LolStar123/markets-backtesting",
     "demo": "https://lolstar123.github.io/markets-backtesting/",
     "links": [
@@ -47,17 +49,19 @@ export const projects={
         "label": "github / code",
         "url": "https://github.com/LolStar123/markets-backtesting"
       }
-    ]
+    ],
+    "demoDescription": "Run a walk-forward strategy on 5,351 SPY observations and inspect 50 archived research results.",
+    "demoScope": "Actual historical data; costs and training choices are editable. Historical results do not promise future returns."
   },
   "poe": {
     "title": "poe item pricer",
     "short": "PoE statistics",
     "category": "GAME ECONOMIES / STATISTICS",
-    "caption": "Prices 50,000 item variants and turns market logs into expected value and risk sheets.",
+    "caption": "Turns item variants and market observations into expected-value and risk sheets.",
     "description": "Residential-proxy collection logs item prices for the wider pipeline. Variant probabilities and buy-in costs feed linked sheets for expected value, dispersion and profit factor. Missing prices stay visible instead of becoming invented bargains.",
     "scene": "poe",
     "note": "",
-    "detail": "A game got me into statistics. The cheapest listing is not always a usable price.",
+    "detail": "A game got me into statistics. The cheapest listing is not always a usable price. Inspect three original spreadsheets, recalculate 114 historical outcomes and browse 3,741 modifier pairs.",
     "github": "https://github.com/LolStar123/poe-item-pricer",
     "demo": "https://lolstar123.github.io/poe-item-pricer/",
     "url": "https://github.com/LolStar123/poe-item-pricer",
@@ -71,19 +75,21 @@ export const projects={
         "label": "github / code",
         "url": "https://github.com/LolStar123/poe-item-pricer"
       }
-    ]
+    ],
+    "demoDescription": "Inspect three original spreadsheets, recalculate 114 historical outcomes and browse 3,741 modifier pairs.",
+    "demoScope": "Original workbook assumptions and real modifier catalogue. No live trade or proxy connection."
   },
   "tfl": {
     "title": "tube reliability",
     "short": "Tube ratings",
     "category": "DATA / LONDON",
-    "caption": "Logs Tube service changes and turns the history into an Elo-style reliability table.",
-    "description": "Poll TfL status feeds, save timestamped snapshots in SQLite and replay the history into line ratings. Delays, cancellations, service changes and recovery all contribute to the ranking.",
+    "caption": "Ranks all eleven Tube lines from sampled arrival evidence, with a live rating history.",
+    "description": "Built with Benjamin Toze at QuantiHack 2026. Collect timestamped TfL arrival predictions, identify sampled stop outcomes and update bounded line ratings. Compare the live history with the original hackathon archive.",
     "scene": "tfl",
     "note": "",
     "url": "https://github.com/LolStar123/tfl-reliability",
     "link": "github / code",
-    "detail": "A leaderboard backed by the service history, rather than one bad commute.",
+    "detail": "A leaderboard backed by the service history, rather than one bad commute. Follow all 11 Tube ratings on a live history chart, compare the leaderboard and inspect the original QuantiHack archive.",
     "github": "https://github.com/LolStar123/tfl-reliability",
     "demo": "https://lolstar123.github.io/tfl-reliability/",
     "links": [
@@ -95,7 +101,9 @@ export const projects={
         "label": "github / code",
         "url": "https://github.com/LolStar123/tfl-reliability"
       }
-    ]
+    ],
+    "demoDescription": "Follow all 11 Tube ratings on a live history chart, compare the leaderboard and inspect the original QuantiHack archive.",
+    "demoScope": "Sampled TfL arrival predictions with durable history; Elo stays between 100 and 3500. Not official punctuality statistics."
   },
   "commute": {
     "title": "commute calculator",
@@ -105,7 +113,7 @@ export const projects={
     "description": "Enter your journey and working pattern, then compare ticket costs with daily and weekly caps. The full calculator also handles zones, peak times, Railcards, annual leave and break-even points.",
     "scene": "commute",
     "note": "",
-    "detail": "Working from home changes which ticket is worth buying.",
+    "detail": "Working from home changes which ticket is worth buying. Choose from the full station database and compare PAYG, caps, Travelcards and working patterns.",
     "github": "https://github.com/LolStar123/london-commute-calculator",
     "demo": "https://lolstar123.github.io/london-commute-calculator/",
     "url": "https://github.com/LolStar123/london-commute-calculator",
@@ -119,7 +127,9 @@ export const projects={
         "label": "github / code",
         "url": "https://github.com/LolStar123/london-commute-calculator"
       }
-    ]
+    ],
+    "demoDescription": "Choose from the full station database and compare PAYG, caps, Travelcards and working patterns.",
+    "demoScope": "Original complete calculator with March 2026 fare tables; dated fare basis is visible."
   },
   "smoothtato": {
     "title": "smoothtato",
@@ -131,7 +141,7 @@ export const projects={
     "note": "",
     "url": "https://github.com/LolStar123/smoothtato-preview",
     "link": "github / code",
-    "detail": "Fewer particles competing with the thing about to kill you.",
+    "detail": "Fewer particles competing with the thing about to kill you. Edit 68 real visual categories across five presets and export a desktop-compatible STATO1 configuration.",
     "github": "https://github.com/LolStar123/smoothtato-preview",
     "demo": "https://lolstar123.github.io/smoothtato-preview/",
     "links": [
@@ -143,7 +153,9 @@ export const projects={
         "label": "github / code",
         "url": "https://github.com/LolStar123/smoothtato-preview"
       }
-    ]
+    ],
+    "demoDescription": "Edit 68 real visual categories across five presets and export a desktop-compatible STATO1 configuration.",
+    "demoScope": "Actual app settings and share-code format. The browser does not patch game files."
   },
   "mtxtato": {
     "title": "mtxtato",
@@ -155,7 +167,7 @@ export const projects={
     "note": "",
     "url": "https://github.com/LolStar123/mtxtato-catalogue",
     "link": "github / code",
-    "detail": "Same skill. A completely different wardrobe.",
+    "detail": "Same skill. A completely different wardrobe. Browse 1,489 skill effects with real previews, build a loadout and export its app configuration.",
     "github": "https://github.com/LolStar123/mtxtato-catalogue",
     "demo": "https://lolstar123.github.io/mtxtato-catalogue/",
     "links": [
@@ -167,7 +179,9 @@ export const projects={
         "label": "github / code",
         "url": "https://github.com/LolStar123/mtxtato-catalogue"
       }
-    ]
+    ],
+    "demoDescription": "Browse 1,489 skill effects with real previews, build a loadout and export its app configuration.",
+    "demoScope": "Actual catalogue, mapping confidence and asset paths. No game-file patching in the browser."
   },
   "deadlock": {
     "title": "deadlock match analysis",
@@ -177,7 +191,7 @@ export const projects={
     "description": "Collect match data, take comparable checkpoints and split matches by a condition. Compare win rates for economy, damage, objectives and other stats, with sample sizes and uncertainty beside each result.",
     "scene": "deadlock",
     "note": "",
-    "detail": "The urn was one question. The bigger question was what actually matters.",
+    "detail": "The urn was one question. The bigger question was what actually matters. Explore 11,423 matches, compare conditional outcomes and inspect uncertainty and individual observations.",
     "github": "https://github.com/LolStar123/deadlock-match-analysis",
     "demo": "https://lolstar123.github.io/deadlock-match-analysis/",
     "url": "https://github.com/LolStar123/deadlock-match-analysis",
@@ -191,7 +205,9 @@ export const projects={
         "label": "github / code",
         "url": "https://github.com/LolStar123/deadlock-match-analysis"
       }
-    ]
+    ],
+    "demoDescription": "Explore 11,423 matches, compare conditional outcomes and inspect uncertainty and individual observations.",
+    "demoScope": "Historical match data; associations and end-state measurements are labelled, not presented as causal forecasts."
   },
   "baxter": {
     "title": "baxter",
@@ -203,7 +219,7 @@ export const projects={
     "note": "",
     "url": "https://github.com/LolStar123/baxter",
     "link": "github / code",
-    "detail": "A worker saying finished is not the same as proof.",
+    "detail": "A worker saying finished is not the same as proof. Run ten real jobs, inspect generated reports and watch independent verification stop a broken workflow.",
     "github": "https://github.com/LolStar123/baxter",
     "demo": "https://lolstar123.github.io/baxter/",
     "links": [
@@ -215,7 +231,9 @@ export const projects={
         "label": "github / code",
         "url": "https://github.com/LolStar123/baxter"
       }
-    ]
+    ],
+    "demoDescription": "Run ten real jobs, inspect generated reports and watch independent verification stop a broken workflow.",
+    "demoScope": "Deterministic browser workers over synthetic data; original orchestration source is included. No live inbox or paid agent calls."
   },
   "botato": {
     "title": "botato",
@@ -225,7 +243,7 @@ export const projects={
     "description": "Read the current terrain and target, choose a traversable route and advance along it. If an obstacle changes the route, recalculate before moving; navigation feeds the wider automation loop.",
     "scene": "botato",
     "note": "",
-    "detail": "Getting somewhere is easy until the straight line goes through a wall.",
+    "detail": "Getting somewhere is easy until the straight line goes through a wall. Navigate three terrains, draw obstacles and inspect collision-checked replanning in motion.",
     "github": "https://github.com/LolStar123/botato-navigation",
     "demo": "https://lolstar123.github.io/botato-navigation/",
     "url": "https://github.com/LolStar123/botato-navigation",
@@ -239,7 +257,9 @@ export const projects={
         "label": "github / code",
         "url": "https://github.com/LolStar123/botato-navigation"
       }
-    ]
+    ],
+    "demoDescription": "Navigate three terrains, draw obstacles and inspect collision-checked replanning in motion.",
+    "demoScope": "Standalone terrain sandbox with original C# routing references. No game process or account access."
   },
   "halo": {
     "title": "halo",
@@ -251,7 +271,7 @@ export const projects={
     "note": "",
     "url": "https://github.com/LolStar123/halo",
     "link": "github / code",
-    "detail": "Keep the thread when your brain briefly leaves the meeting.",
+    "detail": "Keep the thread when your brain briefly leaves the meeting. Load meeting notes, find matching evidence and read or edit one sentence at a time.",
     "github": "https://github.com/LolStar123/halo",
     "demo": "https://lolstar123.github.io/halo/",
     "links": [
@@ -263,7 +283,9 @@ export const projects={
         "label": "github / code",
         "url": "https://github.com/LolStar123/halo"
       }
-    ]
+    ],
+    "demoDescription": "Load meeting notes, find matching evidence and read or edit one sentence at a time.",
+    "demoScope": "Local text retrieval and four fictional packs. The full desktop AI application uses your own authenticated backend."
   },
   "liquidation": {
     "title": "the hardware hunt",
@@ -273,7 +295,7 @@ export const projects={
     "description": "Track the lot, identify the hardware and estimate recoverable resale value. Include faults, buyer fees, VAT, transport and selling costs before setting a maximum hammer bid.",
     "scene": "liquidation",
     "note": "",
-    "detail": "A cheap GPU stops being cheap surprisingly quickly.",
+    "detail": "A cheap GPU stops being cheap surprisingly quickly. Browse 770 actual auction lots and build a bid sheet with editable fees, fault risk and resale assumptions.",
     "github": "https://github.com/LolStar123/hardware-hunt",
     "demo": "https://lolstar123.github.io/hardware-hunt/",
     "url": "https://github.com/LolStar123/hardware-hunt",
@@ -287,6 +309,8 @@ export const projects={
         "label": "github / code",
         "url": "https://github.com/LolStar123/hardware-hunt"
       }
-    ]
+    ],
+    "demoDescription": "Browse 770 actual auction lots and build a bid sheet with editable fees, fault risk and resale assumptions.",
+    "demoScope": "Historical public lot observations; illustrative resale inputs and private bid limits excluded."
   }
 };
