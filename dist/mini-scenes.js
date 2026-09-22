@@ -34,7 +34,7 @@ export function miniScene(scene,canvas,wake,sfx){
  state.ratings=[1000,1000,1000];state.ratingTargets=[1000,1000,1000];state.lastTrainEvent=-1;
  function caption(){
   const n=state.choice;
-  note.textContent=({poe:["Watcher's Eye",'Timeless jewels','Sublime Vision'][n%3]+' / prices to risk sheets.',scraper:paperTitles[n]+' / collecting paper '+(state.cycles+1)+'.',pipeline:'clean market data. test on the next unseen period.',smoothtato:presets[n]+': '+['all effects visible.','particles and bloom off.','decorative props and skill FX off.','shadows, reflections and fog off.'][n],mtxtato:auraStyles[n%3].name,tfl:['Central','Victoria','Northern'][n%3]+' is delayed. each checkpoint updates the ratings.',commute:(n%5+1)+' days: '+((n%5+1)*6===24?'both cost the same in this example.':((n%5+1)*6<24?'single journeys':'the weekly ticket')+' cost less in this example.'),deadlock:'Compare '+deadlockStats[n]+', holding the game stage fixed.',baxter:['sort the request','make a plan','do the work','check the result'][Math.min(3,Math.floor(state.elapsed/2.4))]})[scene];
+  note.textContent=({poe:["Watcher's Eye",'Timeless jewels','Sublime Vision'][n%3]+' / prices to risk sheets.',scraper:paperTitles[n]+' / collecting paper '+(state.cycles+1)+'.',pipeline:'clean market data. test on the next unseen period.',smoothtato:presets[n]+': '+['all effects visible.','particles and bloom off.','decorative props and skill FX off.','shadows, reflections and fog off.'][n],mtxtato:auraStyles[n%3].name,tfl:['Central','Victoria','Northern'][n%3]+' is delayed. each checkpoint updates the ratings.',commute:(n%5+1)+' days: '+((n%5+1)*6===24?'both cost the same in this example.':((n%5+1)*6<24?'single journeys':'the weekly ticket')+' cost less in this example.'),deadlock:'Compare '+deadlockStats[n]+', holding the game stage fixed.',baxter:['baxter sorts the request','the product manager scopes it','the developer builds it','the verifier checks it'][Math.min(3,Math.floor(state.elapsed/2.4))]})[scene];
  }
  function change(manual=false){
   previous=document.createElement('canvas');previous.width=a.el.width;previous.height=a.el.height;previous.getContext('2d').drawImage(a.el,0,0);
@@ -241,7 +241,7 @@ export function miniScene(scene,canvas,wake,sfx){
    state.distribution={...d,metric:metric.name,unit:metric.unit,values:matches.slice(0,sample).map(m=>m.value),points,windowUpdates,densityScale:peak};
    if(sample===total)note.textContent=(d.excess>1?'a few very weird games. ':'mostly the usual suspects. ')+'green wins. rust loses. grey: outside the filter.';
   }else{
-   const names=['sort','plan','build','check'],home=[49,174,299,424],leg=Math.min(2,Math.floor(t/2.4)),q=Math.min(1,(t-leg*2.4)/2.4),travel=Math.min(1,q/.78),ease=travel*travel*(3-2*travel),done=t>=7.2;
+   const names=['baxter','product manager','developer','verifier'],home=[49,174,299,424],leg=Math.min(2,Math.floor(t/2.4)),q=Math.min(1,(t-leg*2.4)/2.4),travel=Math.min(1,q/.78),ease=travel*travel*(3-2*travel),done=t>=7.2;
    const carrier=done?3:leg,positions=[...home];
    // Each helper walks back to their desk after passing the sheet wing to wing.
    for(let i=0;i<carrier;i++){const returned=Math.min(1,Math.max(0,(t-(i+1)*2.4)/1.2));positions[i]=home[i+1]-42+(home[i]-(home[i+1]-42))*returned;}
@@ -249,8 +249,8 @@ export function miniScene(scene,canvas,wake,sfx){
    for(let i=0;i<4;i++){
     const carrying=i===carrier,walking=!done&&i===carrier&&travel<1||i<carrier&&t-(i+1)*2.4<1.2;
     const reach=carrying&&!done?Math.max(0,Math.min(1,(q-.80)/.20))*42/.65:0;
-    owl(c,positions[i],235,'worker'+i,65,{mode:carrying?'carry':walking?'walk':'watch',speed:walking?65:0,facing:i<carrier&&walking?-1:1,cargoOffset:reach,cargo:carrying?(ctx,grip)=>page(ctx,grip.x-15,grip.y-28,30,37):null});
-    label(c,names[i],home[i],276,18);
+    owl(c,positions[i],235,'worker'+i,65,{costume:['baxter','product-manager','developer','verifier'][i],mode:carrying?'carry':walking?'walk':'watch',speed:walking?65:0,facing:i<carrier&&walking?-1:1,cargoOffset:reach,cargo:carrying?(ctx,grip)=>page(ctx,grip.x-15,grip.y-28,30,37):null});
+    if(i===1){label(c,'product',home[i],271,15);label(c,'manager',home[i],288,15);}else label(c,names[i],home[i],276,i===0?18:15);
    }
    state.relay={carrier,positions,sheetOwner:carrier,handOff:!done&&travel===1};
 

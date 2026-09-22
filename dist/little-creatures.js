@@ -202,6 +202,35 @@ function wing(c,shoulder,tip,bend,near){
     for(let i=0;i<3;i++)curve(c,[length*.22+i*5,-breadth*.37],[length*.52+i*3,-2],[length-18+i*7,12-i*3],.7,'#8c7e66');
     c.restore();
 }
+function workCostume(c,p,role,t){
+    c.save();c.translate(...p.head);c.rotate(p.tilt);
+    const pen=(pts,w=1.25,col=ink)=>stroke(c,pts,w,col);
+    if(role==='baxter'){
+        c.beginPath();c.moveTo(-23,-18);c.bezierCurveTo(-29,-15,29,-13,25,-19);c.lineTo(15,-21);c.lineTo(13,-47);c.bezierCurveTo(4,-51,-11,-49,-15,-46);c.lineTo(-14,-21);c.closePath();c.fillStyle='#44433b';c.fill();c.strokeStyle=ink;c.lineWidth=1.3;c.stroke();
+        pen([[-14,-25],[-5,-24],[5,-24],[15,-26]],3,'#b09b69');pen([[-10,-43],[-9,-31]],.8,'#928a75');
+    }else if(role==='product-manager'){
+        pen([[-20,-1],[-17,-8],[-6,-7],[-6,1],[-16,2],[-20,-1],[-6,-2],[4,-2],[5,-8],[17,-8],[20,-1],[17,2],[5,1],[4,-2]],1.15);
+        pen([[20,-3],[29,-7]],1.1);
+    }else if(role==='developer'){
+        c.beginPath();c.moveTo(-25,-1);c.bezierCurveTo(-34,-37,32,-41,28,-1);c.strokeStyle=ink;c.lineWidth=2;c.stroke();
+        for(const side of [-1,1]){c.beginPath();c.ellipse(side*26,-1,5,11,side*.1,0,Math.PI*2);c.fillStyle='#767e77';c.fill();c.strokeStyle=ink;c.lineWidth=1.2;c.stroke();}
+        pen([[-13,1],[-6,1]],1.8);pen([[6,1],[13,1]],1.8);
+    }else if(role==='verifier'){
+        c.beginPath();c.moveTo(-23,-17);c.lineTo(-19,-31);c.quadraticCurveTo(0,-40,20,-30);c.lineTo(23,-17);c.closePath();c.fillStyle='#737d7c';c.fill();c.strokeStyle=ink;c.lineWidth=1.3;c.stroke();
+        c.beginPath();c.moveTo(-24,-17);c.quadraticCurveTo(17,-12,31,-19);c.quadraticCurveTo(12,-23,-24,-17);c.fillStyle=ink;c.fill();
+        pen([[-4,-29],[3,-31],[7,-27],[3,-22],[-3,-24],[-4,-29]],1,'#d0b973');
+    }
+    c.restore();c.save();c.translate(...p.chest);
+    if(role==='product-manager'){
+        stroke(c,[[-13,-2],[0,5],[12,-3]],1.2);stroke(c,[[0,5],[-3,10],[2,22],[6,10],[0,5]],1.25,'#a08a57');
+        stroke(c,[[-11,1],[-9,18],[0,20]],.8);c.fillStyle=paper;c.fillRect(-15,17,11,13);stroke(c,[[-15,17],[-4,17],[-4,30],[-15,29],[-15,17]],.8);stroke(c,[[-12,22],[-7,22],[-12,25],[-8,25]],.7);
+    }else if(role==='developer'){
+        curve(c,[-17,-1],[-8,13],[0,6],1.2);curve(c,[0,6],[9,13],[16,-1],1.2);stroke(c,[[-5,9],[-7,21]],.8);stroke(c,[[6,9],[8,19]],.8);curve(c,[-12,26],[0,22],[12,26],1);
+    }else if(role==='verifier'){
+        stroke(c,[[-16,1],[0,8],[16,1]],1.1);stroke(c,[[6,10],[13,8],[18,12],[15,21],[10,23],[6,18],[6,10]],1.1,'#a08a57');stroke(c,[[-14,16],[-9,15],[-7,26],[-13,27],[-14,16]],1.2);stroke(c,[[-12,15],[-13,8]],1.1);
+    }
+    c.restore();
+}
 export function drawMeowl(c,x,y,size,o={}){
     if(o.mode==='flattened')return pancake(c,x,y,size,o.time||0,o.splatAge||0,o.ground,o.voice||0);
     const t=o.time||0,seed=o.seed||0,scale=size/100;
@@ -285,6 +314,7 @@ export function drawMeowl(c,x,y,size,o={}){
     silhouette(c,p,t,effort);
     drawFace(c,p,t,mode,effort,o.look||0,seed,o.emotion,o.emotionAge||0,o.voice||0,o.drool||0);
     if(o.hat==='goldrim')goldrim(c,p);
+    if(o.costume)workCostume(c,p,o.costume,t);
     wing(c,shoulders[1],hands[1],-1,true);
     if(o.cargo){
         o.cargo(c,{x:(hands[0][0]+hands[1][0])/2,y:(hands[0][1]+hands[1][1])/2});
