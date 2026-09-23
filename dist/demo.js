@@ -85,7 +85,7 @@ if(scene==='halo'){
     draw=()=>{a.clear();drawMeowl(a.c,a.w*.5,a.h-4,89,{id:'interview',time,mode:halo.done&&halo.hold>.26?'happy':'nervous',look:halo.done?2:0,voice:sfx.mouth('interview'),drool:halo.done?Math.max(0,1-halo.hold/.26):Math.min(1,halo.elapsed/2.8)});const x=a.w*.76,y=a.h-15;toyProp(a.c,'cue-note',x,y,30,28,(c)=>{line(c,[[x-14,y-28],[x+14,y-27],[x+13,y],[x-15,y],[x-14,y-28]],'#a19986',1);line(c,[[x-8,y-19],[x+8,y-19],[x-7,y-13],[x+5,y-13]],'#a19986',.8);});};
 }else if(scene==='botato'||scene==='liquidation'){
     const bot=scene==='botato';$('.caption').textContent=bot?'a tiny detour of its own':'the hunt, in miniature';
-    $('#scene').innerHTML=`<canvas class="toy" id="${bot?'botato-art':'liquidation-art'}" tabindex="0" aria-label="${bot?'Meowl pathfinder. Tap the floor or move the divine orb.':'A meowl inspects hardware from a liquidation lot.'}"></canvas><p class="toy-note" id="toy-note"></p>${bot?'<div class="controls"><button id="next">move the divine orb</button></div>':''}`;
+    $('#scene').innerHTML=`<canvas class="toy" id="${bot?'botato-art':'liquidation-art'}" tabindex="0" aria-label="${bot?'Meowl pathfinder. Tap the floor or move the divine orb.':'A meowl inspects hardware from a liquidation lot.'}"></canvas><p class="toy-note" id="toy-note"></p>`;
     const a=canvas(bot?'botato-art':'liquidation-art'),note=$('#toy-note');
     if(bot){
         robot={x:40,y:220,cameraX:240,cameraY:320,target:[885,560],route:[],blocked:[],rocks:rocks.map(r=>r.points),routeMs:0};
@@ -129,7 +129,7 @@ if(scene==='halo'){
         }
         route(885,560);let target=0;const goals=[[840,55],[60,555],[660,440],[400,35],[900,590]];
         function nextLoot(){let moved=false;for(let i=0;i<goals.length&&!moved;i++){const goal=goals[target++%goals.length];if(Math.hypot(goal[0]-robot.x,goal[1]-robot.y)>70)moved=route(...goal);}return moved;}
-        $('#next').onclick=nextLoot;let down;
+        let down;
         a.el.onpointerdown=e=>down=[e.clientX,e.clientY];a.el.onpointerup=e=>{
             const start=down;down=null;if(!start||Math.hypot(e.clientX-start[0],e.clientY-start[1])>12)return;
             const r=a.el.getBoundingClientRect(),m=map();route((e.clientX-r.left-m.ox)/m.scale,(e.clientY-r.top-m.oy)/m.scale);
