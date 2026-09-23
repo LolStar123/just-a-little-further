@@ -56,7 +56,7 @@ export function miniScene(scene,canvas,wake,sfx){
  }
 
  function path(c,pts,color=ink,width=1.3){inkPath(c,pts,color,width);}
- function label(c,text,x,y,size=15){text=String(text).toLowerCase();const scale=Math.min(a.w/480,a.h/artHeight);c.fillStyle=ink;c.font=Math.max(size,14/Math.max(.1,scale))+'px Reader,Georgia,serif';c.textAlign='center';const half=c.measureText(text).width/2;x=Math.max(half+4,Math.min(476-half,x));c.fillText(text,x,y);}
+ function label(c,text,x,y,size=15){text=String(text).toLowerCase();const scale=Math.min(a.w/480,a.h/artHeight);c.fillStyle=ink;c.font=Math.max(size*1.06,15/Math.max(.1,scale))+'px Reader,Georgia,serif';c.textAlign='center';const half=c.measureText(text).width/2;x=Math.max(half+4,Math.min(476-half,x));c.fillText(text,x,y);}
  let paperIndex=0;
  function page(c,x,y,w=52,h=64){const id='paper-'+paperIndex++;toyProp(c,id,x+w/2,y+h,w,h,(c)=>{path(c,[[x,y],[x+w,y+2],[x+w-2,y+h],[x+1,y+h-2],[x,y]]);for(let j=0;j<4;j++)path(c,[[x+9,y+15+j*9],[x+w-10-j%2*9,y+14+j*9]],soft,.7);});}
  function urn(c,x,y){

@@ -17,7 +17,7 @@ export function personalScene(scene,canvas,wake,sfx){
  }
 
  const inputs=['Adds cold damage','GrAnd Des1gn','Adds fire damage','Remarkab|e'];
- function text(c,str,x,y,size=17){const scale=Math.min(a.w/480,a.h/350);c.font=Math.max(size,14/Math.max(.1,scale))+'px Reader,Georgia,serif';c.fillStyle=ink;c.textAlign='center';c.fillText(str,x,y);}
+ function text(c,str,x,y,size=17){const scale=Math.min(a.w/480,a.h/350);c.font=Math.max(size*1.06,15/Math.max(.1,scale))+'px Reader,Georgia,serif';c.fillStyle=ink;c.textAlign='center';c.fillText(str,x,y);}
  function line(c,p,color=ink,w=1.2){inkPath(c,p,color,w);}
  function draw(){
   if(!a.w||!a.h)return;a.clear();const c=a.c,s=Math.min(a.w/480,a.h/350),ox=(a.w-480*s)/2,oy=(a.h-350*s)/2;c.save();c.translate(ox,oy);c.scale(s,s);

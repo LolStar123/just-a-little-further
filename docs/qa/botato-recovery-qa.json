@@ -1,0 +1,44 @@
+[
+  {
+    "width": 1440,
+    "cases": [
+      {
+        "returned": true,
+        "throw": 1,
+        "walkingResumed": true
+      },
+      {
+        "returned": true,
+        "throw": 2,
+        "walkingResumed": true
+      },
+      {
+        "returned": true,
+        "throw": 3,
+        "walkingResumed": true
+      }
+    ],
+    "errors": []
+  },
+  {
+    "width": 390,
+    "cases": [
+      {
+        "returned": true,
+        "throw": 1,
+        "walkingResumed": true
+      },
+      {
+        "returned": true,
+        "throw": 2,
+        "walkingResumed": true
+      },
+      {
+        "returned": true,
+        "throw": 3,
+        "walkingResumed": true
+      }
+    ],
+    "errors": []
+  }
+]

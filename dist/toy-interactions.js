@@ -89,7 +89,7 @@ export function toyPose(c,id,x,y,size,options,painter){
     const local=new DOMPoint(item.x,item.y).matrixTransform(matrix.inverse());
     return{x:local.x,y:local.y,options:{...options,mode:item.held?'held':item.vy<-30?'spring':item.mode,air:item.held||Math.abs(item.vy)>30,ground:undefined,speed:item.vx,facing:item.vx<0?-1:1,emotion:item.held?'panic':'determined'}};
 }
-export function toyBusy(canvas){const world=worlds.get(canvas);return !!world&&(!!world.held||[...world.props.values()].some(p=>p.active&&performance.now()-p.lastFrame<200));}
+export function toyBusy(canvas){const world=worlds.get(canvas);return !!world&&(!!world.held||[...world.props.values(),...world.actors.values()].some(p=>p.active&&performance.now()-p.lastFrame<200));}
 export function toyProp(c,id,x,y,w,h,paint){
     const result=itemFor(c,id,x,y,w,h,false);
     if(result){

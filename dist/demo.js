@@ -128,6 +128,7 @@ if(scene==='halo'){
         a.el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();nextLoot();}};
         advance=dt=>{
             if(draggedLoot?.held&&time-lastLootRoute>.25){lastLootRoute=time;route(draggedLoot.x,draggedLoot.y);}
+            if(toyBusy(a.el))return;
             if(!robot.route.length){robot.idle=(robot.idle||0)+dt;if(robot.idle>.8){robot.idle=0;nextLoot();}}else robot.idle=0;
             let remaining=dt*125;
             while(robot.route.length&&remaining>0){const [x,y]=robot.route[0],dx=x-robot.x,dy=y-robot.y,d=Math.hypot(dx,dy);

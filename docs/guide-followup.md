@@ -63,3 +63,11 @@ Replaced both uncertain attributions with exact excerpts from Marcus Aurelius in
 - [x] Removed researcher and all three Poetato arrows. Researcher aside uses the readable 15/16px body font; mascots, squish controls and links remain.
 
 Six-second route watches at three scroll positions on desktop and mobile are recorded in `docs/qa/corner-routing-qa.json`. Intended attention-hop reversals remain. Train handoffs are in `docs/qa/train-recovery-qa.json`.
+
+## Botato and type follow-up
+
+- [x] Busy-scene detection includes thrown actors as well as props. Botato pauses its route and camera during recovery, then resumes walking. Three repeated throws pass at desktop and mobile sizes.
+- [x] Off the clock uses the standard section-heading rules.
+- [x] CSS text sizes increased by 6%, with illustration-label sizes increased too. Heading parity and zero horizontal overflow checked at 1440, 390 and 360 pixels.
+
+Evidence: `docs/qa/botato-recovery-qa.json` and `docs/qa/type-qa.json`.
