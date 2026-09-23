@@ -19,7 +19,8 @@ export function threadLife(svg,path){
     const speechSizer=document.createElement('span'),speechInk=document.createElement('span');
     speechSizer.className='speech-size';speechInk.className='speech-ink';speechSizer.setAttribute('aria-hidden','true');speechInk.setAttribute('aria-hidden','true');words.setAttribute('role','note');words.append(speechSizer,speechInk);
     let speechText='',speechLetters=[],speechCount=0,typeAt=0;
-    let tugStart=0,base=[],lengths=[],total=0,travel=0,time=0,last=0,raf=0,drag=null,anchor=0,dx=0,dy=0,vx=0,vy=0,pullX=0,pullY=0,shape=[],handles=[],sceneRects=[];
+    let guideEntries={},tubeEntryDone=false,tugStart=0,base=[],lengths=[],total=0,travel=0,time=0,last=0,raf=0,drag=null,anchor=0,dx=0,dy=0,vx=0,vy=0,pullX=0,pullY=0,shape=[],handles=[],sceneRects=[];
+    const thinkingDots=document.querySelector('.thinking-dots');let dotCount=-1;
     const reduced=matchMedia('(prefers-reduced-motion: reduce)');
     function wake(){if(!raf&&!document.hidden)raf=requestAnimationFrame(tick);}
     function pointAt(distance){let lo=0,hi=lengths.length-1;while(lo<hi){const mid=(lo+hi)>>1;if(lengths[mid]<distance)lo=mid+1;else hi=mid;}const i=Math.max(1,lo),a=shape[i-1]||base[0],b=shape[i]||a,f=(distance-lengths[i-1])/(lengths[i]-lengths[i-1]||1);return{x:a[0]+(b[0]-a[0])*f,y:a[1]+(b[1]-a[1])*f,angle:Math.atan2(b[1]-a[1],b[0]-a[0]),i};}
@@ -56,12 +57,23 @@ export function threadLife(svg,path){
     },true);
     function tick(now){
         raf=0;const dt=Math.min(.035,(now-(last||now))/1000);last=now;time+=dt;if(!base.length)return;
+        const nextDots=[0,1,2,3,2,1][Math.floor(time/.55)%6];if(thinkingDots&&nextDots!==dotCount){dotCount=nextDots;thinkingDots.textContent='.'.repeat(dotCount);thinkingDots.style.opacity=String(.45+dotCount*.18);}
         if(drag||Math.abs(dx)+Math.abs(dy)+Math.abs(vx)+Math.abs(vy)>.05){let left=dt;while(left>0){const h=Math.min(left,1/120),stiffness=drag?240:95,damping=drag?30:17;vx+=((pullX-dx)*stiffness-vx*damping)*h;vy+=((pullY-dy)*stiffness-vy*damping)*h;dx+=vx*h;dy+=vy*h;left-=h;}render();}
         if(!actor){const index=nearest(innerWidth-100,innerHeight-55);actor=new GuideMotion({x:base[index][0],y:base[index][1]});}
+        const viewLeft=visualViewport?.offsetLeft||0,viewWidth=visualViewport?.width||innerWidth;const viewTop=scrollY+(visualViewport?.offsetTop||0),viewHeight=visualViewport?.height||innerHeight,viewBottom=viewTop+viewHeight;
         if(now>targetAt||!routeCache){
-            const landing=scrollY<90,wantedY=landing?innerHeight-55:scrollY+innerHeight*.68;
+            const landing=scrollY<90;if(landing)tubeEntryDone=false;const wantedY=viewTop+viewHeight*.91;
             let best=Infinity;
             for(let i=0;i<base.length;i+=2){const score=Math.abs(base[i][1]-wantedY)+Math.abs(base[i][0]-(landing?innerWidth-100:innerWidth*.78))*(landing?.8:.14);if(score<best){targetIndex=i;best=score;}}
+            // The large arrival loop is decoration, not a place to pace forever.
+            // Once the reader scrolls, commit to the first scene's entrance below it.
+            const tubeEntry=guideEntries.tfl;
+            let crossingTubeLoop=false;
+            if(!landing&&Number.isInteger(tubeEntry)){
+                const entry=pointAt(lengths[tubeEntry]);entry.y=Math.max(viewTop+viewHeight*.83,Math.min(viewBottom-32,entry.y));
+                if(Math.hypot(actor.x-entry.x,actor.y-entry.y)<38)tubeEntryDone=true;
+                if(targetIndex<tubeEntry){targetIndex=tubeEntry;crossingTubeLoop=!tubeEntryDone;}
+            }
             // Nearby branches of a loop are not interchangeable footholds.
             // Stay on the current stretch unless flight has deliberately crossed it.
             let j=nearest(actor.x,actor.y);
@@ -76,13 +88,14 @@ export function threadLife(svg,path){
             // Loops offer real shortcuts: select a reachable future foothold, then leap through space.
             let shortcut=null;
             for(let distance=170;distance<=480;distance+=50){const candidate=pointAt(Math.max(0,Math.min(total,travel+direction*distance))),gap=Math.hypot(candidate.x-actor.x,candidate.y-actor.y);if(gap>65&&gap<230&&candidate.y>actor.y-80&&candidate.y<actor.y+155){shortcut=candidate;}}
-            for(const p of[near,ahead,target,shortcut])if(p)p.x=Math.max(42,Math.min(innerWidth-42,p.x));
-            routeCache={near,ahead,target,shortcut};
+            for(const p of[near,ahead,target,shortcut])if(p)p.x=Math.max(viewLeft+42,Math.min(viewLeft+viewWidth-42,p.x));
+            target.y=Math.max(viewTop+viewHeight*.83,Math.min(viewBottom-32,target.y));
+            routeCache={near,ahead,target,shortcut,committedExit:crossingTubeLoop?target:null};
             sceneCache=sceneRects.find(r=>actor.y>=r.top-100&&actor.y<r.bottom+130)||null;
             targetAt=now+90;
         }
         const paused=document.body.classList.contains('panel-open')||!!document.querySelector('#little-boot:not(.finished)');
-        if(!paused)actor.tick(dt,routeCache,{top:scrollY,bottom:scrollY+innerHeight,width:innerWidth},sceneCache,reduced.matches);
+        if(!paused)actor.tick(dt,routeCache,{top:viewTop,bottom:viewBottom,width:viewWidth,left:viewLeft},sceneCache,reduced.matches);
         const active=actor.y>scrollY-140&&actor.y<scrollY+innerHeight+140&&!paused;
         guide.hidden=!active;sound.active(active);
         if(active){
@@ -105,7 +118,8 @@ export function threadLife(svg,path){
         }
         wake();
     }
-    function update(points,startIndex=0){
+    function update(points,startIndex=0,entries={}){
+        guideEntries=entries;
         tugStart=startIndex;
         worldHeight=document.querySelector('#world').offsetHeight;
         base=points.map(p=>p.slice());lengths=[0];for(let i=1;i<base.length;i++)lengths[i]=lengths[i-1]+Math.hypot(base[i][0]-base[i-1][0],base[i][1]-base[i-1][1]);total=lengths.at(-1);anchor=Math.min(anchor,base.length-1);render();
@@ -113,7 +127,8 @@ export function threadLife(svg,path){
         if(!handles.length){for(let i=0;i<sceneRects.length;i++){const b=document.createElement('button');b.className='thread-grab';b.setAttribute('aria-label','Tug the thread after project '+(i+1));b.title='tug the thread';b.addEventListener('pointerdown',e=>start(e,Number(b.dataset.point)));b.addEventListener('pointermove',move);b.addEventListener('pointerup',release);b.addEventListener('pointercancel',release);b.addEventListener('lostpointercapture',release);b.addEventListener('keydown',e=>{if(e.code==='Space'||e.key==='Enter'){e.preventDefault();anchor=Number(b.dataset.point);dy=45;vy=-90;wake();}});document.body.append(b);handles.push(b);}}
         handles.forEach((b,i)=>{const r=sceneRects[i],j=nearest(innerWidth*.5,r.bottom+60),p=base[j];b.dataset.point=j;b.style.left=p[0]-19+'px';b.style.top=p[1]-19+'px';});wake();
     }
+    visualViewport?.addEventListener('resize',()=>{targetAt=0;wake();});visualViewport?.addEventListener('scroll',()=>{targetAt=0;wake();});
     addEventListener('scroll',wake,{passive:true});document.addEventListener('visibilitychange',()=>{last=0;if(document.hidden){cancelAnimationFrame(raf);raf=0;sound.active(false);}else wake();});
-    window.__threadLife=()=>({points:base.length,tugStart,total,travel,dragging:!!drag,offset:[dx,dy],guideVisible:!guide.hidden,handles:handles.length,actor:actor?{x:actor.x,y:actor.y,vx:actor.vx,vy:actor.vy,mode:actor.mode,kind:actor.kind,text:actor.text,history:actor.history}:null});
+    window.__threadLife=()=>({points:base.length,tugStart,tubeEntryDone,committedExit:routeCache?.committedExit,total,travel,dragging:!!drag,offset:[dx,dy],guideVisible:!guide.hidden,handles:handles.length,actor:actor?{x:actor.x,y:actor.y,vx:actor.vx,vy:actor.vy,mode:actor.mode,kind:actor.kind,text:actor.text,history:actor.history}:null});
     return {update};
 }

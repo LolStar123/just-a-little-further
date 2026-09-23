@@ -1,0 +1,284 @@
+[
+  {
+    "width": 1440,
+    "cases": [
+      {
+        "scroll": 120,
+        "entryReached": true,
+        "position": {
+          "x": 1269.8775551597123,
+          "y": 922.4975418479377
+        },
+        "recentStates": [
+          {
+            "mode": "flutter",
+            "kind": "flutter",
+            "at": 0.19409999999999994
+          },
+          {
+            "mode": "land",
+            "kind": "land",
+            "at": 1.7212000000000025
+          },
+          {
+            "mode": "run",
+            "kind": "run",
+            "at": 1.9031000000000033
+          },
+          {
+            "mode": "crouch",
+            "kind": "crouch",
+            "at": 2.5212999999999997
+          },
+          {
+            "mode": "air",
+            "kind": "peek",
+            "at": 2.703099999999998
+          }
+        ]
+      },
+      {
+        "scroll": 180,
+        "entryReached": true,
+        "position": {
+          "x": 1246.129018035623,
+          "y": 894.9479068985728
+        },
+        "recentStates": [
+          {
+            "mode": "run",
+            "kind": "run",
+            "at": 1.9031000000000033
+          },
+          {
+            "mode": "crouch",
+            "kind": "crouch",
+            "at": 2.5212999999999997
+          },
+          {
+            "mode": "air",
+            "kind": "peek",
+            "at": 2.703099999999998
+          },
+          {
+            "mode": "flutter",
+            "kind": "flutter",
+            "at": 3.1090999999999935
+          },
+          {
+            "mode": "land",
+            "kind": "land",
+            "at": 4.690899999999979
+          },
+          {
+            "mode": "run",
+            "kind": "run",
+            "at": 4.872699999999976
+          },
+          {
+            "mode": "crouch",
+            "kind": "crouch",
+            "at": 5.496899999999971
+          },
+          {
+            "mode": "air",
+            "kind": "starhop",
+            "at": 5.678799999999968
+          }
+        ]
+      },
+      {
+        "scroll": 260,
+        "entryReached": true,
+        "position": {
+          "x": 1267.3660640684977,
+          "y": 922.8937567933134
+        },
+        "recentStates": [
+          {
+            "mode": "run",
+            "kind": "run",
+            "at": 4.872699999999976
+          },
+          {
+            "mode": "crouch",
+            "kind": "crouch",
+            "at": 5.496899999999971
+          },
+          {
+            "mode": "air",
+            "kind": "starhop",
+            "at": 5.678799999999968
+          },
+          {
+            "mode": "flutter",
+            "kind": "flutter",
+            "at": 6.121199999999959
+          },
+          {
+            "mode": "land",
+            "kind": "land",
+            "at": 7.727199999999943
+          },
+          {
+            "mode": "run",
+            "kind": "run",
+            "at": 7.908999999999939
+          },
+          {
+            "mode": "crouch",
+            "kind": "crouch",
+            "at": 8.533299999999944
+          },
+          {
+            "mode": "air",
+            "kind": "hello",
+            "at": 8.715099999999943
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  {
+    "width": 390,
+    "cases": [
+      {
+        "scroll": 120,
+        "entryReached": true,
+        "position": {
+          "x": 347.2522236493115,
+          "y": 946.4846628566255
+        },
+        "recentStates": [
+          {
+            "mode": "flutter",
+            "kind": "flutter",
+            "at": 0.19390000000000016
+          },
+          {
+            "mode": "land",
+            "kind": "land",
+            "at": 1.739300000000003
+          },
+          {
+            "mode": "run",
+            "kind": "run",
+            "at": 1.921100000000004
+          },
+          {
+            "mode": "crouch",
+            "kind": "crouch",
+            "at": 2.5393999999999988
+          },
+          {
+            "mode": "air",
+            "kind": "peek",
+            "at": 2.721099999999997
+          }
+        ]
+      },
+      {
+        "scroll": 180,
+        "entryReached": true,
+        "position": {
+          "x": 332.68167983606264,
+          "y": 936.1946709822059
+        },
+        "recentStates": [
+          {
+            "mode": "run",
+            "kind": "run",
+            "at": 1.921100000000004
+          },
+          {
+            "mode": "crouch",
+            "kind": "crouch",
+            "at": 2.5393999999999988
+          },
+          {
+            "mode": "air",
+            "kind": "peek",
+            "at": 2.721099999999997
+          },
+          {
+            "mode": "flutter",
+            "kind": "flutter",
+            "at": 3.1940999999999935
+          },
+          {
+            "mode": "land",
+            "kind": "land",
+            "at": 4.739299999999974
+          },
+          {
+            "mode": "run",
+            "kind": "run",
+            "at": 4.921099999999972
+          },
+          {
+            "mode": "crouch",
+            "kind": "crouch",
+            "at": 5.545299999999961
+          },
+          {
+            "mode": "air",
+            "kind": "starhop",
+            "at": 5.727199999999958
+          }
+        ]
+      },
+      {
+        "scroll": 260,
+        "entryReached": true,
+        "position": {
+          "x": 346.7515333335253,
+          "y": 972.2372134381018
+        },
+        "recentStates": [
+          {
+            "mode": "run",
+            "kind": "run",
+            "at": 4.921099999999972
+          },
+          {
+            "mode": "crouch",
+            "kind": "crouch",
+            "at": 5.545299999999961
+          },
+          {
+            "mode": "air",
+            "kind": "starhop",
+            "at": 5.727199999999958
+          },
+          {
+            "mode": "flutter",
+            "kind": "flutter",
+            "at": 6.199899999999948
+          },
+          {
+            "mode": "land",
+            "kind": "land",
+            "at": 7.787699999999924
+          },
+          {
+            "mode": "run",
+            "kind": "run",
+            "at": 7.969599999999921
+          },
+          {
+            "mode": "crouch",
+            "kind": "crouch",
+            "at": 8.593799999999913
+          },
+          {
+            "mode": "air",
+            "kind": "hello",
+            "at": 8.775599999999915
+          }
+        ]
+      }
+    ],
+    "errors": []
+  }
+]

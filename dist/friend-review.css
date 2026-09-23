@@ -79,11 +79,8 @@ body.tugging-thread,body.tugging-thread *{user-select:none!important;cursor:grab
 .knot:is(:hover,:focus-visible) .card-border{animation-duration:var(--ink-speed,.39s)}
 
 
-.thinking-dots{display:inline-block;min-width:1.1em}.thinking-dots>span{animation:thought-one 3.6s ease-in-out infinite}.thinking-dots>span:nth-child(2){animation-name:thought-two}.thinking-dots>span:nth-child(3){animation-name:thought-three}
-@keyframes thought-one{0%,9%,100%{opacity:0}17%,83%{opacity:1}92%{opacity:0}}
-@keyframes thought-two{0%,25%,75%,100%{opacity:0}34%,66%{opacity:1}}
-@keyframes thought-three{0%,42%,59%,100%{opacity:0}50%{opacity:1}}
-@media(prefers-reduced-motion:reduce){.thinking-dots>span{animation:none;opacity:1}}
+.thinking-dots{display:inline-block;width:1.05em;min-width:1.05em;text-align:left;transition:opacity .16s ease;white-space:pre}
+@media(prefers-reduced-motion:reduce){.thinking-dots{transition:none}}
 
 /* Three equal play controls; reset keeps its quiet second row. */
 #world .toys{display:grid;grid-template-columns:repeat(3,max-content);gap:2px 22px;justify-content:start}

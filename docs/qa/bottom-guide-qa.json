@@ -1,0 +1,110 @@
+[
+  {
+    "width": 1440,
+    "height": 900,
+    "countdown": [
+      "help meowl by clicking 3 times",
+      "help meowl by clicking 2 times",
+      "help meowl by clicking 1 time"
+    ],
+    "cases": [
+      {
+        "scroll": 0,
+        "screenFraction": 0.9231764403292178,
+        "mode": "run",
+        "loopExited": false
+      },
+      {
+        "scroll": 180,
+        "screenFraction": 0.9242470416823965,
+        "mode": "run",
+        "loopExited": false
+      },
+      {
+        "scroll": 600,
+        "screenFraction": 0.830006139399789,
+        "mode": "run",
+        "loopExited": false
+      },
+      {
+        "scroll": 1600,
+        "screenFraction": 0.9230952969790824,
+        "mode": "run",
+        "loopExited": false
+      }
+    ],
+    "errors": []
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "countdown": [
+      "help meowl by clicking 3 times",
+      "help meowl by clicking 2 times",
+      "help meowl by clicking 1 time"
+    ],
+    "cases": [
+      {
+        "scroll": 0,
+        "screenFraction": 0.9289785193959837,
+        "mode": "run",
+        "loopExited": false
+      },
+      {
+        "scroll": 180,
+        "screenFraction": 0.9620863834273216,
+        "mode": "run",
+        "loopExited": true
+      },
+      {
+        "scroll": 600,
+        "screenFraction": 0.892556350558632,
+        "mode": "run",
+        "loopExited": true
+      },
+      {
+        "scroll": 1600,
+        "screenFraction": 0.9011046619271446,
+        "mode": "run",
+        "loopExited": true
+      }
+    ],
+    "errors": []
+  },
+  {
+    "width": 1920,
+    "height": 650,
+    "countdown": [
+      "help meowl by clicking 3 times",
+      "help meowl by clicking 2 times",
+      "help meowl by clicking 1 time"
+    ],
+    "cases": [
+      {
+        "scroll": 0,
+        "screenFraction": 0.9104370317597947,
+        "mode": "run",
+        "loopExited": false
+      },
+      {
+        "scroll": 180,
+        "screenFraction": 0.950771916259306,
+        "mode": "run",
+        "loopExited": true
+      },
+      {
+        "scroll": 600,
+        "screenFraction": 0.880495576240968,
+        "mode": "run",
+        "loopExited": true
+      },
+      {
+        "scroll": 1600,
+        "screenFraction": 0.9116517205906474,
+        "mode": "run",
+        "loopExited": true
+      }
+    ],
+    "errors": []
+  }
+]

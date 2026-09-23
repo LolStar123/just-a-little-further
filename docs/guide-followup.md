@@ -71,3 +71,12 @@ Six-second route watches at three scroll positions on desktop and mobile are rec
 - [x] CSS text sizes increased by 6%, with illustration-label sizes increased too. Heading parity and zero horizontal overflow checked at 1440, 390 and 360 pixels.
 
 Evidence: `docs/qa/botato-recovery-qa.json` and `docs/qa/type-qa.json`.
+
+## Loop exit and screen-following correction
+
+- [x] The guide has an explicit first-scene entrance checkpoint, rather than treating the arrival loop as an endless destination. Landing and movement remain continuous.
+- [x] His destination follows the bottom fifth of the visual viewport, including zoom offsets and short/wide screens. Throws and deliberate jumps may briefly leave that band. Ledge hangs yield when they leave the target band.
+- [x] Loading hint counts down from clicking 3 times to 2 times to 1 time.
+- [x] Off-the-clock dots use an explicit 0,1,2,3,2,1 count with reserved width and a slight fade; reduced motion removes the fade, not the count.
+
+`docs/qa/bottom-guide-qa.json` checks screen position at four scroll offsets in three viewport shapes. `docs/qa/dots-zoom-qa.json` records the actual dot sequence and a 1.5x visual-viewport zoom check. `docs/qa/loop-exit-qa.json` covers first-scene checkpoint arrivals before the subsequent viewport anchoring pass.

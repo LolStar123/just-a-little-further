@@ -27,9 +27,9 @@ export class GuideMotion{
  release(){this.held=false;this.state('thrown');this.text='wheeeee!';this.sayAt=this.time+3;}
  cheer(){if(this.held)return;this.cheerBounced=false;this.cheerFloor=this.y;this.vx=0;this.vy=-650;this.state('cheer');this.text='GO LITTLE GUYYYY!!';this.contextText=this.text;this.sayAt=this.time+4;}
  hop(){if(this.held)return;this.vy=-330;this.state('air','leap');this.airTarget=null;}
- jump(target,kind){target={...target,x:clamp(target.x,45,(this.pageWidth||1440)-45)};this.airTarget={...target};const duration=['hello','starhop','peek'].includes(kind)?(this.reboundJump?.68:1.08+(this.moveCount%3)*.12):clamp(Math.hypot(target.x-this.x,target.y-this.y)/320,.5,1.15);this.vx=clamp((target.x-this.x)/duration,-620,620);this.vy=(target.y-this.y)/duration-460*duration;this.jumpDuration=duration;this.reboundJump=false;this.state('air',kind);}
+ jump(target,kind){target={...target,x:clamp(target.x,(this.pageLeft||0)+45,(this.pageLeft||0)+(this.pageWidth||1440)-45)};this.airTarget={...target};const duration=['hello','starhop','peek'].includes(kind)?(this.reboundJump?.68:1.08+(this.moveCount%3)*.12):clamp(Math.hypot(target.x-this.x,target.y-this.y)/320,.5,1.15);this.vx=clamp((target.x-this.x)/duration,-620,620);this.vy=(target.y-this.y)/duration-460*duration;this.jumpDuration=duration;this.reboundJump=false;this.state('air',kind);}
  tick(dt,route,viewport,scene,reduced=false){
-  this.time+=dt;this.age+=dt;this.rotation=0;this.pageWidth=viewport.width;
+  this.time+=dt;this.age+=dt;this.rotation=0;this.pageWidth=viewport.width;this.pageLeft=viewport.left||0;
   const scrolling=Math.abs(viewport.top-this.lastScroll)>2;this.idleTime=scrolling?0:this.idleTime+dt;this.lastScroll=viewport.top;
   if(scrolling)this.attentionBounce=0;
   if(this.held)return;
@@ -40,10 +40,15 @@ export class GuideMotion{
   }
   const {near,ahead,target,shortcut}=route,sceneKey=viewport.top<90?'landing':scene?.key||'travel';
   if(this.time>this.sayAt||sceneKey!==this.lastScene){this.say(sceneKey==='landing'?'landing':sceneKey!==this.lastScene?sceneKey:(this.moveCount%3?'travel':sceneKey));this.lastScene=sceneKey;}
+  if(route.committedExit&&!['held','thrown','cheer','flutter','fly'].includes(this.mode)){
+   this.attentionBounce=0;this.triplet=0;this.airTarget=null;this.landingPoint=null;this.state('flutter');this.text='this loop? shortcut. follow me!';this.sayAt=this.time+5;
+  }
+  const bandTop=viewport.top+(viewport.bottom-viewport.top)*.8;
   const offscreen=this.y<viewport.top-130||this.y>viewport.bottom+130;
+  if(!['held','thrown','air','crouch','cheer','flutter','fly','hang'].includes(this.mode)&&(this.y<bandTop-12||this.y>viewport.bottom-16)){this.attentionBounce=0;this.landingPoint=null;this.state('fly');}
   const distance=Math.hypot(target.x-this.x,target.y-this.y);
-  const ledge=scene?.key==='botato'&&!this.releasedLedges.has(scene.top)&&viewport.top<scene.top+180;
-  if(this.mode==='hang'&&!scene){this.releasedLedges.add(this.hangPoint?.y);this.state('flutter');}
+  const ledge=scene?.key==='botato'&&!this.releasedLedges.has(scene.top)&&viewport.top<scene.top+180&&scene.top+64>=bandTop&&scene.top+64<viewport.bottom-16;
+  if(this.mode==='hang'&&(!scene||!ledge)){this.releasedLedges.add(this.hangPoint?.y);this.state('flutter');}
   if(this.mode==='hang'){
    // The grips stay on the same physical ledge until the reader moves on.
    if(viewport.top>scene.bottom-120||viewport.top>this.hangScroll+100){this.releasedLedges.add(scene.top);this.vx=35;this.vy=45;this.state('flutter');this.text='dropping in!';this.sayAt=this.time+5;}
@@ -74,7 +79,7 @@ export class GuideMotion{
   }else if(this.mode==='land'){
    const foot=this.landingPoint||near;this.vx+=(foot.x-this.x)*65*dt-this.vx*16*dt;this.vy+=(foot.y-this.y)*80*dt-this.vy*16*dt;
    if(this.age>.18){
-    if(this.attentionBounce&&!reduced&&this.idleTime>1){this.attentionBounce=0;this.reboundJump=true;this.jump({x:clamp(this.x-this.facing*28,48,viewport.width-48),y:foot.y},'starhop');}
+    if(this.attentionBounce&&!reduced&&this.idleTime>1){this.attentionBounce=0;this.reboundJump=true;this.jump({x:clamp(this.x-this.facing*28,this.pageLeft+48,this.pageLeft+viewport.width-48),y:foot.y},'starhop');}
     else if(this.triplet>0&&this.triplet<3){this.triplet++;this.jump({x:this.x+this.facing*(38+this.triplet*17),y:near.y},'triple');this.vy-=this.triplet*35;}
     else{this.triplet=0;this.state('run');}
    }
@@ -86,7 +91,7 @@ export class GuideMotion{
     this.kind='wave';const perch=this.landingPoint&&Math.hypot(this.landingPoint.x-this.x,this.landingPoint.y-this.y)<100?this.landingPoint:near;this.vx*=Math.exp(-dt*12);this.vy+=(perch.y-this.y)*60*dt-this.vy*14*dt;
     if(!reduced&&this.time>this.nextMove){
      this.moveCount++;const kind=['hello','peek','starhop'][this.moveCount%3],side=this.moveCount%2?1:-1;
-     this.planned={kind,target:{x:clamp(this.x+side*(52+this.moveCount%3*19),48,viewport.width-48),y:perch.y}};
+     this.planned={kind,target:{x:clamp(this.x+side*(52+this.moveCount%3*19),this.pageLeft+48,this.pageLeft+viewport.width-48),y:perch.y}};
      this.attentionBounce=this.moveCount%2===0?1:0;this.state('crouch');this.nextMove=this.time+.55;
      if(sceneKey==='landing'&&this.time>this.sayAt-.8)this.say('landing');
     }
@@ -117,8 +122,8 @@ export class GuideMotion{
   if(Math.abs(this.vx)>12)this.facing=this.vx<0?-1:1;
   // No position snaps, even on scroll, resize, route changes or recovery.
   this.x+=this.vx*dt;this.y+=this.vy*dt;
-  if(this.x<38&&this.vx<0)this.vx=Math.abs(this.vx)*.45;
-  if(this.x>viewport.width-38&&this.vx>0)this.vx=-Math.abs(this.vx)*.45;
+  if(this.x<this.pageLeft+38&&this.vx<0)this.vx=Math.abs(this.vx)*.45;
+  if(this.x>this.pageLeft+viewport.width-38&&this.vx>0)this.vx=-Math.abs(this.vx)*.45;
  }
  get pose(){return {kind:['air','crouch','land','hang','flutter','fly'].includes(this.mode)?this.mode==='air'?this.kind:this.mode:this.kind,phase:this.age/(this.jumpDuration||1)};}
 }
