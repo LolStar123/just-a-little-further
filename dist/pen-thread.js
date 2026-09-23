@@ -171,6 +171,7 @@ function layout(){
             const pen=(...v)=>curve(...v.map((n,i)=>i%2?oy+n*sy:ox+n*sx));
             curve(edge,ceiling+room*.32,ox-42*sx,oy+8*sy,ox-18*sx,oy+53*sy);
             curve(ox+6*sx,oy+98*sy,ox-18*sx,oy+80*sy,ox,oy+92*sy);
+            guideEntries.signatureStart=points.length-1;
             // a t u l
             pen(18,106,57,49,42,48);pen(18,46,5,100,35,99);
             pen(51,98,54,57,56,60);pen(50,103,67,108,83,78);
@@ -198,6 +199,7 @@ function layout(){
             // The name folds back into a loose underline, then flicks away.
             pen(720,46,637,157,475,140);pen(293,119,62,160,72,130);
             pen(87,95,419,148,649,119);
+            guideEntries.signatureEnd=points.length-1;
             return;
         }
         if(kind==='pipeline'||kind==='deadlock'){

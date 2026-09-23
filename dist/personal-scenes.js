@@ -54,8 +54,27 @@ export function personalScene(scene,canvas,wake,sfx){
     if(selected){const spread=20+Math.sin(phase*Math.PI)*23;line(c,[[x-spread,y+26],[x-7,y+28],[x+spread,y+25]],olive,1.1);}
    }
    c.restore();
-   line(c,[[0,308],[122,307],[139,283],[153,268],[172,258],[167,254],[161,260],[174,269],[194,246]],olive,1);
-   drawMeowl(c,141,307,59,{id:'thoughtful',time,mode:'watch',parkour:{kind:'point'},look:Math.sin(time*.7),voice:sfx.mouth('thoughtful')});
+   // A tiny desk grown out of the same floor. Deliberately uneven, never blurry.
+   const typing=time%6<4.8,clank=reduced.matches?0:[0,.8,-.5][Math.floor(time*5)%3];
+   line(c,[[112,307],[114,293],[145,292],[145,305]],olive,1);
+   line(c,[[126,291],[126,310],[118,311]],ink,1.4);
+   drawMeowl(c,140,294,59,{id:'thoughtful',time,mode:'watch',parkour:{kind:typing?'typing':'wave'},look:typing?3:Math.sin(time*.7),voice:sfx.mouth('thoughtful')});
+   line(c,[[154,305],[157,282],[252,283],[255,307]],ink,1.3);
+   c.save();c.translate(0,clank);
+   line(c,[[199,275],[215,273],[210,264],[210,258]],ink,1.1);
+   c.beginPath();c.moveTo(180,233);c.lineTo(239,230);c.lineTo(242,262);c.lineTo(181,264);c.closePath();c.fillStyle=paper;c.fill();c.strokeStyle=ink;c.lineWidth=1.5;c.stroke();
+   line(c,[[186,238],[234,236],[235,256],[186,258],[186,238]],olive,.8);
+   // Tiny stars, a wandering kitten cursor and stepped loading bars.
+   const screenPhase=Math.floor(time/3)%3;state.screenPhase=screenPhase;state.typing=typing;
+   if(screenPhase===0){for(let i=0;i<3;i++)line(c,[[191,242+i*5],[191+((Math.floor(time*5)+i*4)%28),242+i*5]],olive,1.2);}
+   else if(screenPhase===1){const x=210+Math.sin(time*2)*8;line(c,[[x-6,250],[x-6,240],[x-2,244],[x+2,242],[x+6,239],[x+7,250],[x-6,250]],ink,1);c.fillRect(x-3,246,1.3,1.3);c.fillRect(x+3,245,1.3,1.3);}
+   else{line(c,[[195,253],[219,251],[226,241]],olive,1.4);for(let i=0;i<2;i++){const x=194+i*30;line(c,[[x-2,242],[x+2,242],[x,239],[x,245]],ink,.8);}}
+   c.restore();
+   line(c,[[158,276],[192,277],[196,282],[156,281],[158,276]],ink,1.2);
+   for(let i=0;i<7;i++){const press=typing&&!reduced.matches&&Math.floor(time*9)%7===i?1.7:0;line(c,[[160+i*4,277+press],[162+i*4,277+press]],ink,1.1);}
+   line(c,[[210,282],[215,293],[229,299],[229,308]],olive,.8);
+   line(c,[[243,280],[250,279],[251,272],[244,272],[243,280]],ink,1);line(c,[[250,273],[255,274],[254,277],[250,277]],ink,.8);
+   if(typing)sfx.beat('desk-keys',Math.floor(time*5.5),'click',{id:'thoughtful-keys',level:.22});
    note.textContent='a few things taking up brain space.';state.atoms=atoms;
    sfx.chirp('thoughtful',time,[13,19]);
   }else{

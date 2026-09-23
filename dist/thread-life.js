@@ -43,7 +43,7 @@ export function threadLife(svg,path){
             return[p[0]+dx*weight,p[1]+dy*weight];
         });
         window.__inkPhysicsPoints=shape;
-        const exit=shape.slice(tugStart);hillInk.setAttribute('d',exit.map(([x,y],i)=>`${i?'L':'M'}${x.toFixed(2)},${y.toFixed(2)}`).join(' '));
+        const exitEnd=shape.findIndex((p,i)=>i>tugStart&&p[1]>hillWire.clientHeight+64);const exit=shape.slice(tugStart,exitEnd<0?undefined:exitEnd+1);hillInk.setAttribute('d',exit.map(([x,y],i)=>`${i?'L':'M'}${x.toFixed(2)},${y.toFixed(2)}`).join(' '));
         const d=shape.map(([x,y],i)=>`${i?'L':'M'}${x.toFixed(2)},${y.toFixed(2)}`).join(' ');path.setAttribute('d',d);hit.setAttribute('d',d);
     }
     function nearest(x,y){let result=0,best=Infinity;for(let i=0;i<base.length;i++){const d=(base[i][0]-x)**2+(base[i][1]-y)**2;if(d<best){best=d;result=i;}}return result;}
@@ -82,6 +82,9 @@ export function threadLife(svg,path){
                 if(Math.hypot(actor.x-entry.x,actor.y-entry.y)<38)tubeEntryDone=true;
                 if(targetIndex<tubeEntry&&entry.y>viewTop+90&&entry.y<viewBottom-22&&entry.x>viewLeft+42&&entry.x<viewLeft+viewWidth-42){targetIndex=tubeEntry;crossingTubeLoop=!tubeEntryDone;}
             }
+            const signatureStart=guideEntries.signatureStart,signatureEnd=guideEntries.signatureEnd;
+            const goodbye=Number.isInteger(signatureEnd)&&shape.slice(signatureStart,signatureEnd+1).some(p=>p[1]>viewTop+45&&p[1]<viewBottom-25);
+            if(goodbye){targetIndex=signatureEnd;crossingTubeLoop=false;}
             // Nearby branches of a loop are not interchangeable footholds.
             // Stay on the current stretch unless flight has deliberately crossed it.
             let j=nearest(actor.x,actor.y);
@@ -98,7 +101,7 @@ export function threadLife(svg,path){
             for(let distance=170;distance<=480;distance+=50){const candidate=pointAt(Math.max(0,Math.min(total,travel+direction*distance))),gap=Math.hypot(candidate.x-actor.x,candidate.y-actor.y);if(gap>65&&gap<230&&candidate.y>actor.y-80&&candidate.y<actor.y+155){shortcut=candidate;}}
             // The viewport chooses a real perch. Never move the perch off its wire.
             const perchAt=(x,y)=>{let best=Infinity,pick=target;for(const p of shape){if(p[0]<viewLeft+45||p[0]>viewLeft+viewWidth-45||p[1]<viewTop+70||p[1]>viewBottom-22)continue;const score=Math.hypot(p[0]-x,p[1]-y);if(score<best){best=score;pick={x:p[0],y:p[1]};}}return {...pick};};
-            routeCache={near,ahead,target,shortcut,perchAt,remaining:Math.abs(destination-travel),committedExit:crossingTubeLoop?target:null};
+            routeCache={near,ahead,target,shortcut,perchAt,goodbye,remaining:Math.abs(destination-travel),committedExit:crossingTubeLoop?target:null};
             sceneCache=sceneRects.find(r=>actor.y>=r.top-100&&actor.y<r.bottom+130)||null;
             targetAt=now+90;
         }
@@ -136,6 +139,6 @@ export function threadLife(svg,path){
     }
     visualViewport?.addEventListener('resize',()=>{targetAt=0;wake();});visualViewport?.addEventListener('scroll',()=>{targetAt=0;wake();});
     addEventListener('scroll',wake,{passive:true});document.addEventListener('visibilitychange',()=>{last=0;if(document.hidden){cancelAnimationFrame(raf);raf=0;sound.active(false);}else wake();});
-    window.__threadLife=()=>({points:base.length,tugStart,tubeEntryDone,committedExit:routeCache?.committedExit,total,travel,dragging:!!drag,offset:[dx,dy],guideVisible:!guide.hidden,handles:handles.length,actor:actor?{x:actor.x,y:actor.y,vx:actor.vx,vy:actor.vy,mode:actor.mode,kind:actor.kind,text:actor.text,history:actor.history}:null});
+    window.__threadLife=()=>({points:base.length,tugStart,tubeEntryDone,goodbye:routeCache?.goodbye,guideEntries,committedExit:routeCache?.committedExit,total,travel,dragging:!!drag,offset:[dx,dy],guideVisible:!guide.hidden,handles:handles.length,actor:actor?{x:actor.x,y:actor.y,vx:actor.vx,vy:actor.vy,mode:actor.mode,kind:actor.kind,text:actor.text,history:actor.history}:null});
     return {update};
 }

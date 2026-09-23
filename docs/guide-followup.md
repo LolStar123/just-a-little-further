@@ -113,3 +113,8 @@ Copy audit: retained the user-supplied top-100 claim; no invented performance im
 - [x] Guide progress watchdog: after 1.8 seconds without gaining ground toward a distant perch, leap over a nearby loop or flutter to a fixed wire landing. Four-second cooldown; no position assignment/teleport.
 
 - [x] Probability plinks and happy-outlier plinks 20% quieter; comedic blink plinks unchanged.
+
+- [x] Off-the-clock meowl sits at a scribbled computer with alternating wing taps, stepped screen variants, a mug and pauses to wave. Keyboard clicks at .22 level, four times the guide's .055 typing level; existing visibility gating stops offscreen playback.
+- [x] When the signature lettering is visible, guide targets its final flourish directly and settles into a waving goodbye pose. Leaving that area restores the normal route.
+
+Verified at 1440px and 390px: no scene exceptions, 17 desk key events sampled per view, guide landed within 1px of signature endpoint. Inspected desktop desk and mobile goodbye screenshots.

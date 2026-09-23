@@ -1,0 +1,22 @@
+[
+  {
+    "width": 1440,
+    "typingClicks": 17,
+    "end": {
+      "mode": "goodbye",
+      "distance": 1.0189207803819361e-10,
+      "goodbye": true,
+      "text": "byeeee! come back soon!"
+    }
+  },
+  {
+    "width": 390,
+    "typingClicks": 17,
+    "end": {
+      "mode": "goodbye",
+      "distance": 1.637889628707843e-11,
+      "goodbye": true,
+      "text": "byeeee! come back soon!"
+    }
+  }
+]

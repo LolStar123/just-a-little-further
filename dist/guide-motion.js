@@ -39,7 +39,13 @@ export class GuideMotion{
    return;
   }
   const {near,ahead,shortcut}=route;let target=route.target;const sceneKey=viewport.top<90?'landing':scene?.key||'travel';
-  if(this.time>this.sayAt||sceneKey!==this.lastScene){this.say(sceneKey==='landing'?'landing':sceneKey!==this.lastScene?sceneKey:(this.moveCount%3?'travel':sceneKey));this.lastScene=sceneKey;}
+  if(route.goodbye&&!['held','thrown','cheer'].includes(this.mode)){
+   const d=Math.hypot(target.x-this.x,target.y-this.y);
+   if(!this.sayingGoodbye){this.sayingGoodbye=true;this.text='byeeee! come back soon!';this.contextText=this.text;this.sayAt=this.time+6;this.bypassTarget=null;}
+   if(d<23){this.mode='goodbye';this.kind='wave';this.vx+=(target.x-this.x)*65*dt-this.vx*16*dt;this.vy+=(target.y-this.y)*65*dt-this.vy*16*dt;this.x+=this.vx*dt;this.y+=this.vy*dt;if(this.time>this.sayAt){this.text=this.text.startsWith('byeee')?'thanks for coming. little wave!':'byeeee! come back soon!';this.sayAt=this.time+6;}return;}
+   if(!['flutter','fly'].includes(this.mode))this.state('flutter');
+  }else if(this.sayingGoodbye){this.sayingGoodbye=false;this.state('run');this.sayAt=0;}
+  if(!route.goodbye&&(this.time>this.sayAt||sceneKey!==this.lastScene)){this.say(sceneKey==='landing'?'landing':sceneKey!==this.lastScene?sceneKey:(this.moveCount%3?'travel':sceneKey));this.lastScene=sceneKey;}
   if(route.committedExit&&!['held','thrown','cheer','flutter','fly'].includes(this.mode)){
    this.attentionBounce=0;this.triplet=0;this.airTarget=null;this.landingPoint=null;this.state('flutter');this.text='this loop? shortcut. follow me!';this.sayAt=this.time+5;
   }

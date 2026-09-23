@@ -251,6 +251,7 @@ export function drawMeowl(c,x,y,size,o={}){
         if(kind==='wave'||kind==='hello'||kind==='peek'){target.left=[-36,-65];target.right=[40+Math.sin(t*15)*17,-100+Math.cos(t*15)*10];target.turn=0;target.tilt=Math.sin(t*7)*.06;target.head=[0,-77];}
         if(kind==='hello'){target.left=[-48+Math.sin(t*19)*15,-103+Math.cos(t*19)*13];target.right=[48+Math.cos(t*21)*16,-100+Math.sin(t*21)*15];target.feet=[-22,22];target.turn=0;target.tilt=Math.sin(t*9)*.11;}
         if(kind==='starhop'){target.left=[-64,-94];target.right=[64,-94];target.feet=[-24,24];target.turn=0;target.tilt=Math.sin(t*10)*.07;}
+        if(kind==='typing'){const tap=Math.sin(Math.floor(t*10)*1.7);target.hip=[-5,-8];target.chest=[-1,-38];target.head=[4,-66+Math.sin(t*3)*1.4];target.left=[23,-32+tap*4];target.right=[43,-32-tap*4];target.feet=[-20,12];target.turn=.45;target.tilt=.08;}
         if(kind==='point'){target.left=[-28,-35];target.right=[61,-65];target.turn=.5;target.tilt=-.08;}
         if(kind==='balance'){target.left=[-60,-48+Math.sin(t*8)*8];target.right=[57,-49-Math.sin(t*8)*8];target.tilt=Math.sin(t*6)*.13;}
         if(kind==='tiptoe'){target.left=[-31,-29];target.right=[34,-31];target.chest=[-9,-48];target.head=[-7,-74];target.tilt=.14;}
