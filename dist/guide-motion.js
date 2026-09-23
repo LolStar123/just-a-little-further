@@ -46,9 +46,6 @@ export class GuideMotion{
    if(!['flutter','fly'].includes(this.mode))this.state('flutter');
   }else if(this.sayingGoodbye){this.sayingGoodbye=false;this.state('run');this.sayAt=0;}
   if(!route.goodbye&&(this.time>this.sayAt||sceneKey!==this.lastScene)){this.say(sceneKey==='landing'?'landing':sceneKey!==this.lastScene?sceneKey:(this.moveCount%3?'travel':sceneKey));this.lastScene=sceneKey;}
-  if(route.committedExit&&!['held','thrown','cheer','flutter','fly'].includes(this.mode)){
-   this.attentionBounce=0;this.triplet=0;this.airTarget=null;this.landingPoint=null;this.state('flutter');this.text='this loop? shortcut. follow me!';this.sayAt=this.time+5;
-  }
   const bandTop=viewport.top+(viewport.bottom-viewport.top)*.8;
   const offscreen=this.y<viewport.top-130||this.y>viewport.bottom+130;
   // Watch actual progress, not repeated state changes around the same curl.
@@ -63,8 +60,7 @@ export class GuideMotion{
   if((this.stalledFor>1.8||this.junctionWait>.7)&&this.time>(this.bypassAfter||0)&&!this.held){
    this.stalledFor=0;this.junctionWait=0;this.bypassAfter=this.time+2;this.attentionBounce=0;this.triplet=0;
    this.text=['this curl? taking a shortcut!','tiny wings. big shortcut.','coming! hopping over this bit.'][this.moveCount++%3];this.contextText=this.text;this.sayAt=this.time+4;
-   if(routeDistance<310&&Math.abs(target.y-this.y)<160){this.landingPoint=null;this.jump(target,'kong');}
-   else{this.bypassTarget={...target};this.state('flutter');}
+   const foothold=shortcut||route.cornerExit||ahead;this.landingPoint=null;this.jump(foothold,'kong');
   }
   if(this.bypassTarget){if(Math.hypot(this.bypassTarget.x-route.target.x,this.bypassTarget.y-route.target.y)>350)this.bypassTarget=null;else target=this.bypassTarget;}
   const distance=Math.hypot(target.x-this.x,target.y-this.y);
@@ -107,7 +103,8 @@ export class GuideMotion{
    }
   }else{
    const dx=ahead.x-this.x,dy=ahead.y-this.y,d=Math.hypot(dx,dy),slope=dy/(Math.abs(dx)+8);
-   if(offscreen&&distance>300||Math.hypot(near.x-this.x,near.y-this.y)>100){this.state('fly');}
+   if(offscreen&&distance>850){this.state('fly');}
+   else if(Math.hypot(near.x-this.x,near.y-this.y)>100){this.jump(near,'leap');}
    else if(!ledge&&distance<32&&(route.remaining??0)<60&&this.idleTime>.35){
     // A local attention routine: full-body wave, high hop, then an occasional rebound.
     this.kind='wave';const perch=route.perchAt(this.x,this.y);this.vx+=(perch.x-this.x)*60*dt-this.vx*14*dt;this.vy+=(perch.y-this.y)*60*dt-this.vy*14*dt;
@@ -120,6 +117,14 @@ export class GuideMotion{
    }
    else if(ledge&&Math.abs(this.y-scene.top)<150){this.state('flutter');}
    else{
+    const exitPoint=route.cornerExit;
+    const ax=ahead.x-near.x,ay=ahead.y-near.y,ex=(exitPoint?.x??ahead.x)-ahead.x,ey=(exitPoint?.y??ahead.y)-ahead.y;
+    const bend=(ax*ex+ay*ey)/(Math.hypot(ax,ay)*Math.hypot(ex,ey)||1);
+    if(bend<-.12&&this.time>(this.cornerAfter||0)&&route.remaining>90){
+     this.cornerAfter=this.time+1.25;this.attentionBounce=0;this.triplet=0;
+     this.jump(shortcut||exitPoint,'kong');this.nextMove=this.time+1.3;
+     this.x+=this.vx*dt;this.y+=this.vy*dt;return;
+    }
     const previousTerrain=this.kind;
     // Hold the slide through hand-drawn bumps; leave only for a sustained exit.
     const descending=dy>8&&Math.abs(dx)<18;
@@ -145,7 +150,7 @@ export class GuideMotion{
      else if(sceneKey==='halo'){kind='leap';this.text="shh. he's concentrating.";}
      else if(sceneKey==='baxter'){kind='kong';this.text='under the paperwork. local shortcut.';}
      else if(sceneKey==='liquidation'){kind='kong';this.text='i know a way up the pile.';}
-     else if(sceneKey==='smoothtato'&&this.moveCount%2===0){this.state('flutter');this.nextMove=this.time+4;return;}
+     else if(sceneKey==='smoothtato'&&this.moveCount%2===0){kind='starhop';goal=shortcut||ahead;}
      else if(this.kind==='climb'){kind='kong';goal=ahead;this.text='one wing. other wing. up.';}
      else if(this.moveCount%3===0){kind='triple';this.triplet=1;goal={x:this.x+this.facing*45,y:near.y};this.text='one... two...';}
      else if(this.moveCount%3===1)kind='kong';

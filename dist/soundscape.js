@@ -6,8 +6,7 @@ export class Soundscape {
         this.enabled=true;this.sfxVolume=.48;this.context=null;this.buses=new Map();this.buffers=[];this.recorded=null;this.envelopes=new Map();this.loading=null;
         this.history=[];this.choices=new Map();this.voices=new Map();this.nodes=new Set();this.sampleError=false;
         document.addEventListener('visibilitychange',()=>{
-            if(document.hidden){this.context?.suspend();this.voices.clear();}
-            else if(this.enabled)this.enable(true);
+            if(!document.hidden&&this.enabled)this.enable(true);
         });
         const refresh=()=>this.refresh();
         addEventListener('scroll',refresh,{passive:true});addEventListener('resize',refresh);

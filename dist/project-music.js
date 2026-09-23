@@ -47,14 +47,14 @@ export function renderThemeBar(a,out,key,at,bar=0,variation=0,track=()=>{}){
 export function projectMusic(mix,onChange){
  let key=null,gain=null,next=0,bar=0,volume=.0882,bank=null,entry=0,lastEvents=[],openedAt=0;const nodes=new Set();
  function ensure(){if(gain)return;const a=mix.initialize();gain=a.createGain();gain.gain.value=0;const filter=a.createBiquadFilter();filter.type='lowpass';filter.frequency.value=2300;gain.connect(filter);filter.connect(mix.limiter);}
- function level(){if(gain){const t=mix.context.currentTime;gain.gain.cancelScheduledValues(t);gain.gain.setTargetAtTime(key&&mix.enabled&&!document.hidden?volume*.24:0,t,.055);}}
+ function level(){if(gain){const t=mix.context.currentTime;gain.gain.cancelScheduledValues(t);gain.gain.setTargetAtTime(key&&mix.enabled?volume*.24:0,t,.055);}}
  function clear(){const a=mix.context;if(!a)return;for(const n of nodes){try{n.g.gain.cancelScheduledValues(a.currentTime);n.g.gain.setTargetAtTime(.0001,a.currentTime,.018);n.o.stop(a.currentTime+.09);}catch{}}nodes.clear();if(bank){const old=bank;bank=null;setTimeout(()=>old.disconnect(),120);}}
- function schedule(){if(!key||!mix.enabled||document.hidden||mix.context?.state!=='running')return;const a=mix.context,now=a.currentTime;if(next<now)next=now+.015;while(next<now+.12){if(!bank){bank=a.createGain();bank.connect(gain);}const result=renderThemeBar(a,bank,key,next,bar++,entry%2,(o,g)=>{const n={o,g};nodes.add(n);o.addEventListener('ended',()=>nodes.delete(n));});lastEvents=result.events;next+=result.duration;}}
+ function schedule(){if(!key||!mix.enabled||mix.context?.state!=='running')return;const a=mix.context,now=a.currentTime;if(next<now)next=now+.015;while(next<now+2.5){if(!bank){bank=a.createGain();bank.connect(gain);}const result=renderThemeBar(a,bank,key,next,bar++,entry%2,(o,g)=>{const n={o,g};nodes.add(n);o.addEventListener('ended',()=>nodes.delete(n));});lastEvents=result.events;next+=result.duration;}}
  const timer=setInterval(schedule,70);
  addEventListener('project-music',e=>{clear();key=musicThemes[e.detail]?e.detail:null;ensure();bar=0;entry++;openedAt=mix.context.currentTime;next=openedAt+.018;level();onChange(!!key);schedule();});
  addEventListener('sound-state',()=>{level();if(!mix.enabled)clear();else{if(!bank)next=mix.context.currentTime+.015;schedule();}});
- document.addEventListener('visibilitychange',()=>{level();if(document.hidden)clear();else{next=mix.context?.currentTime||0;schedule();}});
+ document.addEventListener('visibilitychange',()=>{level();schedule();});
  addEventListener('pagehide',()=>{clearInterval(timer);clear();});
- window.__projectMusic=()=>({key,active:!!key&&mix.enabled&&!document.hidden,nodes:nodes.size,step:bar,volume,name:musicThemes[key]?.name,openedAt,events:lastEvents});
+ window.__projectMusic=()=>({key,active:!!key&&mix.enabled,nodes:nodes.size,step:bar,volume,name:musicThemes[key]?.name,openedAt,events:lastEvents});
  return {volume(v){volume=v;level();}};
 }

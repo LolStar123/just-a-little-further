@@ -9,6 +9,11 @@ export function personalScene(scene,canvas,wake,sfx){
  document.querySelector('#scene').innerHTML='<canvas id="personal-art" class="toy mini-toy" aria-label="'+(interests?'A thought bubble of competitive games, poker and indomie':'OCR text normalisation example')+'"></canvas><p class="toy-note" id="personal-note"></p>';
  const a=canvas('personal-art'),state={clock:0,scene},note=document.querySelector('#personal-note');
  const labels=[['top 100','deadlock'],['wealthiest','path of exile player'],['top 5000','dota 2'],['bath poker','tourney winner'],['indomie','sandwich']];
+ const gameLinks=interests?['https://store.steampowered.com/app/1422450/Deadlock/','https://www.pathofexile.com/','https://www.dota2.com/'].map((href,i)=>{
+  const link=document.createElement('a');link.href=href;link.target='_blank';link.rel='noopener noreferrer';link.textContent=labels[i][1];link.className='interest-game-link';
+  Object.assign(link.style,{position:'absolute',zIndex:3,color:ink,fontFamily:'Reader,Georgia,serif',lineHeight:'1',whiteSpace:'nowrap',transform:'translate(-50%,-80%)',textDecoration:'underline',textDecorationThickness:'1px',textUnderlineOffset:'3px'});
+  a.el.parentElement.style.position='relative';a.el.parentElement.append(link);return link;
+ }):[];
  const atoms=labels.map((words,i)=>({words,x:94+(i%3)*145,y:70+Math.floor(i/3)*90,vx:(i%2?-1:1)*(21+i*3),vy:(i%3-1)*19,w:[116,165,116,158,112][i],h:48,spin:0}));
  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
  function moveAtoms(dt){
@@ -61,7 +66,8 @@ export function personalScene(scene,canvas,wake,sfx){
      for(let k=0;k<3;k++){const sway=reduced.matches?0:Math.sin(time*3+k)*4;line(c,[[-12+k*12,-24],[-15+k*12+sway,-30],[-10+k*12,-36]],ink,.9);}
     }
     },{rescue:true});
-    c.restore();atoms[j].words.forEach((word,i)=>text(c,word,x,y+i*20,18));
+    c.restore();atoms[j].words.forEach((word,i)=>{if(j>=3||i===0)text(c,word,x,y+i*20,18);});
+    if(gameLinks[j]){const link=gameLinks[j];link.style.left=(a.el.offsetLeft+ox+x*s)+'px';link.style.top=(a.el.offsetTop+oy+(y+20)*s)+'px';link.style.fontSize=Math.max(18*1.06*s,15)+'px';link.style.opacity=String(growth);link.style.visibility=growth>.98?'visible':'hidden';}
     if(selected){const spread=20+Math.sin(phase*Math.PI)*23;line(c,[[x-spread,y+26],[x-7,y+28],[x+spread,y+25]],olive,1.1);}
    }
    c.restore();

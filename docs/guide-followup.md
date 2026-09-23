@@ -171,3 +171,11 @@ Verification: three stamp stages measured centred within .01px on 1440px and 390
 - [x] Desktop and phone rendered review.
 
 Music references: https://viva.pressbooks.pub/openmusictheory/chapter/altered-and-extended-dominant-chords/ ; https://viva.pressbooks.pub/openmusictheory/chapter/substitutions/ ; https://developer.mozilla.org/en-US/docs/Web/API/OscillatorNode/detune ; https://developer.mozilla.org/en-US/docs/Web/API/OscillatorNode/setPeriodicWave
+
+## Recovery, curves and game links
+- [x] Sisyphus: committed rise/cross/land overtaking with moving downhill target; full collision masks retained. Faster takeoff; left-boundary bracing instead of indefinite hover.
+- [x] Test slow/medium/fast downhill rock at 390/900/1440 widths. Extreme impacts may still flatten; recovery resumes pushing. Real pointer drag test finished in backpush, no recovery lock.
+- [x] Guide: monotonic grounded route progress, short committed hairpin hops, local bailout jumps, fewer forced flight transitions. Three hairpin radii plus live scroll traversal checked.
+- [x] Below lettering curves and spaces gradually from b/e/l/o through shrinking w tail.
+- [x] Background audio no longer stops or suspends its clock on tab hiding. Theme scheduler buffers ahead; simulated hidden-tab playback and clock advance checked. Browser/OS suspension remains outside page control.
+- [x] Only Deadlock, Path of Exile and Dota text link out; poker/Indomie unchanged. All five throwable objects still recover.

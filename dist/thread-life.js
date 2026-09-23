@@ -92,12 +92,14 @@ export function threadLife(svg,path){
             // Nearby branches of a loop are not interchangeable footholds.
             // Stay on the current stretch unless flight has deliberately crossed it.
             let j=nearest(actor.x,actor.y);
-            if(routeCache&&!['fly','flutter','thrown','held','cheer'].includes(actor.mode)){
+            if(routeCache&&!['air','land','fly','flutter','thrown','held','cheer'].includes(actor.mode)){
                 let bestLocal=Infinity,local=j;
                 for(let i=tugStart;i<base.length;i++){const arc=Math.abs(lengths[i]-travel);if(arc>130)continue;if(routeCache.direction&&routeCache.direction*(lengths[i]-travel)<-20)continue;const score=Math.hypot(shape[i][0]-actor.x,shape[i][1]-actor.y)+arc*.12;if(score<bestLocal){bestLocal=score;local=i;}}
                 if(bestLocal<260)j=local;
             }
-            travel=lengths[j];
+            const proposed=lengths[j];
+            const sameDirection=routeCache&&Math.sign(lengths[targetIndex]-travel)===routeCache.direction;
+            travel=sameDirection&&actor.mode==='run'? (routeCache.direction>0?Math.max(travel,proposed):Math.min(travel,proposed)):proposed;
             const destination=lengths[targetIndex],direction=destination>=travel?1:-1;
             const ahead=pointAt(Math.max(0,Math.min(total,travel+direction*Math.min(24,Math.abs(destination-travel))))),near=pointAt(travel),target=pointAt(Math.max(0,Math.min(total,destination)));
             // Loops offer real shortcuts: select a reachable future foothold, then leap through space.
