@@ -27,7 +27,7 @@ export class GuideMotion{
  release(){this.held=false;this.state('thrown');this.text='wheeeee!';this.sayAt=this.time+3;}
  cheer(){if(this.held)return;this.cheerBounced=false;this.cheerFloor=this.y;this.vx=0;this.vy=-650;this.state('cheer');this.text='GO LITTLE GUYYYY!!';this.contextText=this.text;this.sayAt=this.time+4;}
  hop(){if(this.held)return;this.vy=-330;this.state('air','leap');this.airTarget=null;}
- jump(target,kind){target={...target};this.airTarget={...target};const duration=['hello','starhop','peek'].includes(kind)?(this.reboundJump?.68:1.08+(this.moveCount%3)*.12):clamp(Math.hypot(target.x-this.x,target.y-this.y)/320,.5,1.15);this.vx=clamp((target.x-this.x)/duration,-620,620);this.vy=(target.y-this.y)/duration-460*duration;this.jumpDuration=duration;this.reboundJump=false;this.state('air',kind);}
+ jump(target,kind){target={...target};this.airTarget={...target};const duration=['hello','starhop','peek'].includes(kind)?(this.reboundJump?.68:1.08+(this.moveCount%3)*.12):clamp(Math.hypot(target.x-this.x,target.y-this.y)/320,.5,1.15);this.vx=clamp((target.x-this.x)/duration,-620,620);this.vy=(target.y-this.y)/duration-460*duration;this.jumpDuration=duration;if(kind==='walljump'){this.wallKick=this.x<this.pageLeft+90?1:this.x>this.pageLeft+this.pageWidth-90?-1:(this.moveCount%2?1:-1);this.wallBaseVx=this.vx;this.vx+=this.wallKick*170;}this.reboundJump=false;this.state('air',kind);}
  tick(dt,route,viewport,scene,reduced=false){
   this.time+=dt;this.age+=dt;this.rotation=0;this.pageWidth=viewport.width;this.pageLeft=viewport.left||0;
   const scrolling=Math.abs(viewport.top-this.lastScroll)>2;this.idleTime=scrolling?0:this.idleTime+dt;this.lastScroll=viewport.top;
@@ -88,6 +88,7 @@ export class GuideMotion{
     else{this.bypassTarget=null;this.landingPoint={...goal};this.state('land');this.nextMove=this.time+.2;}
    }
   }else if(this.mode==='air'){
+   if(this.kind==='walljump')this.vx=this.wallBaseVx+this.wallKick*170*Math.cos(Math.PI*Math.min(1,this.age/this.jumpDuration));
    this.vy+=920*dt;
    const goal=this.airTarget||near;
    if(this.age>.2&&this.vy>0&&this.y>=goal.y-8&&Math.abs(this.x-goal.x)<42){this.landingPoint={...goal};this.state('land');this.nextMove=this.time+(sceneKey==='landing'?.28:.7);}
@@ -119,13 +120,14 @@ export class GuideMotion{
    }
    else if(ledge&&Math.abs(this.y-scene.top)<150){this.state('flutter');}
    else{
-    this.kind=slope<-.7?'climb':slope>.35&&(!scene||this.y>scene.bottom-15)?'grind':slope>.85?'scramble':['halo','baxter'].includes(sceneKey)?'tiptoe':sceneKey==='mtxtato'?'balance':'scamper';
+    this.kind=dy>12&&Math.abs(dx)<12?'pole':slope<-.7?'climb':slope>.35&&(!scene||this.y>scene.bottom-15)?'grind':slope>.85?'scramble':['halo','baxter'].includes(sceneKey)?'tiptoe':sceneKey==='mtxtato'?'balance':'scamper';
     // Footfalls drive travel: speed pulses at the planted steps instead of a constant glide.
-    const pace=(this.kind==='climb'?210:this.kind==='grind'?675:405)*(1+.32*Math.sin(this.time*16)),speed=Math.min(pace,d*8);
+    const pace=this.kind==='pole'?260*(1+.07*Math.sin(this.time*9)):(this.kind==='climb'?210:this.kind==='grind'?675:405)*(1+.32*Math.sin(this.time*16)),speed=Math.min(pace,d*8);
     this.vx+=(dx/(d||1)*speed-this.vx)*(1-Math.exp(-dt*12));this.vy+=(dy/(d||1)*speed-this.vy)*(1-Math.exp(-dt*12));
-    if(!reduced&&this.time>this.nextMove){
+    if(!reduced&&this.kind!=='pole'&&this.time>this.nextMove){
      this.moveCount++;let kind='leap',goal=shortcut||ahead;
-     if(sceneKey==='deadlock'){kind='leap';goal={x:ahead.x,y:ahead.y-2};this.text=['that peak looks friendly.','mind the outliers.','the floor is doing statistics.'][this.moveCount%3];}
+     if(slope< -1.25){kind='walljump';goal=ahead;this.text=['little kick. up we go!','one wall. two tiny feet.','boing. taking the upstairs route.'][this.moveCount%3];}
+     else if(sceneKey==='deadlock'){kind='leap';goal={x:ahead.x,y:ahead.y-2};this.text=['that peak looks friendly.','mind the outliers.','the floor is doing statistics.'][this.moveCount%3];}
      else if(['scraper','pipeline'].includes(sceneKey)&&shortcut){kind=this.moveCount%2?'leap':'kong';this.text='shortcut. watch my feet.';}
      else if(sceneKey==='tfl'){kind='leap';this.text='mind the gap. tiny feet.';}
      else if(sceneKey==='halo'){kind='leap';this.text="shh. he's concentrating.";}

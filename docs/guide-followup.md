@@ -130,3 +130,8 @@ Verified at 1440px and 390px: no scene exceptions, 17 desk key events sampled pe
 - [x] Measure stall progress using remaining distance along the wire rather than straight-line distance, which increases legitimately around a hairpin. Only settle once both physical and path distance are close.
 
 Verification: three stamp stages measured centred within .01px on 1440px and 390px viewports; full word fits the key. Deterministic guide traversal passed 12px, 25px and 55px radius 180-degree turns.
+
+## Vertical parkour
+- [x] Near-vertical descents select a two-wing pole grip, controlled sliding motion and tucked stance instead of running in midair. Walking sounds stop during the slide.
+- [x] Steep ascents select alternating wall jumps, with lateral kick velocity curving back to the real wire landing, plus a dedicated kick pose.
+- [x] Verified descending and ascending routes and visually inspected four pose frames. Tight/medium/wide hairpin regressions still pass.

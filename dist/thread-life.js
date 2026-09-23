@@ -112,7 +112,7 @@ export function threadLife(svg,path){
         if(active){
             guide.style.transform=`translate3d(${actor.x-72}px,${actor.y-scrollY-112}px,0)`;
             c.clearRect(0,0,144,144);c.save();c.translate(72,86);c.rotate(reduced.matches?0:actor.rotation);c.translate(-72,-86);
-            const airborne=['air','fly','flutter','thrown','held','hang','cheer'].includes(actor.mode),mode=actor.mode==='held'?'held':airborne?'air':actor.mode==='crouch'?'anticipate':actor.mode==='land'?'brace':'scurry';
+            const airborne=actor.kind==='pole'||['air','fly','flutter','thrown','held','hang','cheer'].includes(actor.mode),mode=actor.mode==='held'?'held':airborne?'air':actor.mode==='crouch'?'anticipate':actor.mode==='land'?'brace':'scurry';
             drawMeowl(c,72,112,55,{id:'guide',time,mode,air:airborne,parkour:actor.pose,effort:airborne||Math.hypot(actor.vx,actor.vy)>180?.88:.25,sweat:airborne||Math.hypot(actor.vx,actor.vy)>180,emotion:actor.mode==='thrown'?'panic':'relieved',speed:Math.hypot(actor.vx,actor.vy),facing:actor.facing,voice:sound.mouth('guide'),landed:actor.mode==='land'?1:0});c.restore();
             if(actor.kind==='grind'){c.strokeStyle='#a08a57';c.lineWidth=.8;for(let i=0;i<4;i++){const u=(time*4+i*.23)%1;c.globalAlpha=1-u;c.beginPath();c.moveTo(72-actor.facing*u*24,112+u*3);c.lineTo(72-actor.facing*(u*24+5),112+u*6);c.stroke();}c.globalAlpha=1;sound.beat('grind',Math.floor(time*2),'friction',{level:.2});}
             if(speechText!==actor.text){speechText=actor.text;speechLetters=Array.from(speechText);speechCount=0;typeAt=now;speechSizer.textContent=speechText;speechInk.textContent='';words.setAttribute('aria-label',speechText);}
@@ -124,7 +124,7 @@ export function threadLife(svg,path){
             const captionY=Math.max(scrollY+8,actor.y-152);
             words.style.bottom='auto';words.style.left=captionX-guideLeft+'px';words.style.top=captionY-guideTop+'px';
             if(!sound.nextMeows.has('guide'))sound.nextMeows.set('guide',time+1.5);sound.chirp('guide',time,[10,17],true,{level:.55});
-            if(actor.mode==='run')sound.beat('feet',Math.floor(time*3.4),'step',{level:.35});
+            if(actor.mode==='run'&&actor.kind!=='pole')sound.beat('feet',Math.floor(time*3.4),'step',{level:.35});
         }
         wake();
     }
