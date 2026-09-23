@@ -173,6 +173,8 @@ export function miniScene(scene,canvas,wake,sfx){
    const outbound=u<.65,travel=outbound?u/.65:1-(u-.65)/.35,x=105+220*travel*travel*(3-2*travel);state.runner={x,phase:u,outbound};
    owl(c,x,247,'mini',59,{mode:outbound?'carry':'scurry',overhead:outbound,effort:.84,speed:outbound?150:210,facing:outbound?1:-1,emotion:'worried',cargo:outbound?(ctx,grip)=>page(ctx,grip.x-35,grip.y-70,70,74):null});
    label(c,paperTitles[n],240,292,21);
+   state.papersCollected=Math.floor((state.routeTime+.875)/2.5);
+   label(c,state.papersCollected+' papers collected',240,318,15);
 
   }else if(scene==='pipeline'){
    const shuffle=Math.floor(t/.42),raw=[7,2,9,4,6,3].map((v,i)=>(v+n*(i+1))%10+1),rank=[...raw].map((v,i)=>({v,i})).sort((a,b)=>a.v-b.v);
