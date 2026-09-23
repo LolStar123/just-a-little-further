@@ -1,0 +1,22 @@
+[
+  {
+    "side": -1,
+    "pole": 190,
+    "kick": {
+      "direction": -1,
+      "vx": -350,
+      "kind": "wallkick"
+    },
+    "x": 174.26579937792656
+  },
+  {
+    "side": 1,
+    "pole": 190,
+    "kick": {
+      "direction": 1,
+      "vx": 350,
+      "kind": "wallkick"
+    },
+    "x": 731.4160188038871
+  }
+]

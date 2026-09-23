@@ -85,7 +85,7 @@ if(scene==='halo'){
     draw=()=>{a.clear();drawMeowl(a.c,a.w*.5,a.h-4,89,{id:'interview',time,mode:halo.done&&halo.hold>.26?'happy':'nervous',look:halo.done?2:0,voice:sfx.mouth('interview'),drool:halo.done?Math.max(0,1-halo.hold/.26):Math.min(1,halo.elapsed/2.8)});const x=a.w*.76,y=a.h-15;toyProp(a.c,'cue-note',x,y,30,28,(c)=>{line(c,[[x-14,y-28],[x+14,y-27],[x+13,y],[x-15,y],[x-14,y-28]],'#a19986',1);line(c,[[x-8,y-19],[x+8,y-19],[x-7,y-13],[x+5,y-13]],'#a19986',.8);});};
 }else if(scene==='botato'||scene==='liquidation'){
     const bot=scene==='botato';$('.caption').textContent=bot?'a tiny detour of its own':'the hunt, in miniature';
-    $('#scene').innerHTML=`<canvas class="toy" id="${bot?'botato-art':'liquidation-art'}" tabindex="0" aria-label="${bot?'Meowl pathfinder. Tap the floor or move the loot.':'A meowl inspects hardware from a liquidation lot.'}"></canvas><p class="toy-note" id="toy-note"></p>${bot?'<div class="controls"><button id="next">move the loot</button></div>':''}`;
+    $('#scene').innerHTML=`<canvas class="toy" id="${bot?'botato-art':'liquidation-art'}" tabindex="0" aria-label="${bot?'Meowl pathfinder. Tap the floor or move the divine orb.':'A meowl inspects hardware from a liquidation lot.'}"></canvas><p class="toy-note" id="toy-note"></p>${bot?'<div class="controls"><button id="next">move the divine orb</button></div>':''}`;
     const a=canvas(bot?'botato-art':'liquidation-art'),note=$('#toy-note');
     if(bot){
         robot={x:40,y:220,cameraX:240,cameraY:320,target:[885,560],route:[],blocked:[],rocks:rocks.map(r=>r.points),routeMs:0};
@@ -94,6 +94,16 @@ if(scene==='halo'){
             const scale=Math.max(a.w/WIDTH,a.h/HEIGHT),vw=a.w/scale,vh=a.h/scale;
             const cx=Math.max(vw/2,Math.min(WIDTH-vw/2,robot.cameraX)),cy=Math.max(vh/2,Math.min(HEIGHT-vh/2,robot.cameraY));
             return{scale,ox:a.w/2-cx*scale,oy:a.h/2-cy*scale};
+        }
+        function divineOrb(c,x,y){
+            c.save();c.translate(x,y);c.rotate(-.13);
+            c.beginPath();c.moveTo(-8,-17);c.bezierCurveTo(-2,-24,11,-21,14,-12);c.lineTo(15,-3);c.lineTo(11,10);c.lineTo(5,17);c.lineTo(-3,16);c.lineTo(-10,10);c.lineTo(-14,0);c.lineTo(-12,-12);c.closePath();c.fillStyle='#d4c08e';c.fill();c.strokeStyle='#786945';c.lineWidth=1.4;c.stroke();
+            line(c,[[-11,-10],[-5,-12],[-1,-8],[-6,-6],[-10,-8]],'#625741',1.3);
+            line(c,[[3,-8],[8,-10],[12,-6],[8,-3],[4,-5]],'#625741',1.3);
+            line(c,[[1,-9],[0,-1],[-3,3],[3,4],[5,1]],'#786945',1.2);
+            line(c,[[-5,9],[-1,6],[5,8],[7,12],[1,10],[-5,9]],'#625741',1.3);
+            line(c,[[-9,1],[-7,5],[-10,8]],'#97814e',.85);line(c,[[9,1],[7,5],[10,8]],'#97814e',.85);
+            line(c,[[-7,-17],[-2,-19],[5,-17],[10,-15]],'#97814e',.8);c.restore();
         }
         function outline(c,r,i){
             c.fillStyle='#eeeae0';c.fill(silhouettes[i]);c.strokeStyle='#55564e';c.lineWidth=1.2;c.stroke(silhouettes[i]);
@@ -115,7 +125,7 @@ if(scene==='halo'){
         function route(x,y){
             const start=performance.now(),path=routeThroughRocks([robot.x,robot.y],[x,y]);robot.routeMs=performance.now()-start;
             if(!path.length){note.textContent='that gap is a little too tight.';return false;}
-            robot.route=path;robot.target=path.at(-1).slice();note.textContent='tap a clearing, or move the loot.';robot.destinations=(robot.destinations||0)+1;draw();wake();return true;
+            robot.route=path;robot.target=path.at(-1).slice();note.textContent='tap a clearing, or move the divine orb.';robot.destinations=(robot.destinations||0)+1;draw();wake();return true;
         }
         route(885,560);let target=0;const goals=[[840,55],[60,555],[660,440],[400,35],[900,590]];
         function nextLoot(){let moved=false;for(let i=0;i<goals.length&&!moved;i++){const goal=goals[target++%goals.length];if(Math.hypot(goal[0]-robot.x,goal[1]-robot.y)>70)moved=route(...goal);}return moved;}
@@ -147,7 +157,7 @@ if(scene==='halo'){
             if(join){c.beginPath();c.moveTo(...entry);c.bezierCurveTo(entry[0]+28,entry[1]+9,join[0]-22,join[1]-14,...join);c.strokeStyle='#b0a795';c.lineWidth=.7;c.stroke();}
             c.drawImage(terrain,0,0,WIDTH,HEIGHT);
             if(robot.route.length){c.setLineDash([2,6]);line(c,[[robot.x,robot.y],...robot.route],'#89846e',1);c.setLineDash([]);}
-            const [tx,ty]=robot.target;draggedLoot=toyProp(c,'loot',tx,ty+8,28,24,(c)=>line(c,[[tx-6,ty],[tx,ty-8],[tx+6,ty],[tx,ty+8],[tx-6,ty]],'#786945',1.7));
+            const [tx,ty]=robot.target;draggedLoot=toyProp(c,'loot',tx,ty+20,36,44,(c)=>divineOrb(c,tx,ty));
             drawMeowl(c,robot.x,robot.y,74,{voice:sfx.mouth('bot'),id:'bot',chase:false,hat:'goldrim',time,speed:robot.route.length?60:0,facing:robot.route.length&&robot.route[0][0]<robot.x?-1:1});
             // Rock faces in front of his feet occlude him as he passes behind.
             rocks.forEach((r,i)=>{if(r.bottom>robot.y&&Math.abs(r.x-robot.x)<r.rx+40&&Math.abs(r.y-robot.y)<r.ry+65)outline(c,r,i);});
@@ -155,8 +165,8 @@ if(scene==='halo'){
             const screenX=tx*m.scale+m.ox,screenY=ty*m.scale+m.oy;
             if(screenX<15||screenX>a.w-15||screenY<15||screenY>a.h-15){
                 const x=Math.max(25,Math.min(a.w-35,screenX)),y=Math.max(32,Math.min(a.h-35,screenY));
-                line(c,[[x-6,y],[x,y-8],[x+6,y],[x,y+8],[x-6,y]],'#786945',1.6);
-                c.fillStyle='#66573c';c.font='16px Reader,Georgia,serif';c.textAlign='center';c.fillText('loot',x,y+24);c.textAlign='left';
+                divineOrb(c,x,y);
+                c.fillStyle='#66573c';c.font='16px Reader,Georgia,serif';c.textAlign='center';c.fillText('divine orb',x,y+35);c.textAlign='left';
             }
         };
     }else{

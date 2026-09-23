@@ -135,3 +135,7 @@ Verification: three stamp stages measured centred within .01px on 1440px and 390
 - [x] Near-vertical descents select a two-wing pole grip, controlled sliding motion and tucked stance instead of running in midair. Walking sounds stop during the slide.
 - [x] Steep ascents select alternating wall jumps, with lateral kick velocity curving back to the real wire landing, plus a dedicated kick pose.
 - [x] Verified descending and ascending routes and visually inspected four pose frames. Tight/medium/wide hairpin regressions still pass.
+
+## Pole exit and Divine Orb
+- [x] A pole descent turning into a horizontal run now plants a foot and kicks toward a real future point on the line, with seven short-lived ink dust puffs and recorded spring/contact sounds.
+- [x] Botato loot is an original rough Divine Orb face drawing, also used for the offscreen marker. Existing prop identity and retrieval remain intact. Icon reference: https://www.poewiki.net/wiki/Divine_Orb ; visual reference inspected via https://buyboost.com/data/products/2464/divine-orb-preview.webp (reference only, no downloaded artwork shipped).

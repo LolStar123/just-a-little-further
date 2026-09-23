@@ -25,7 +25,7 @@ export function threadLife(svg,path){
     const sound=new SceneSound('guide',guide),words=guide.querySelector('p');
     const speechSizer=document.createElement('span'),speechInk=document.createElement('span');
     speechSizer.className='speech-size';speechInk.className='speech-ink';speechSizer.setAttribute('aria-hidden','true');speechInk.setAttribute('aria-hidden','true');words.setAttribute('role','note');words.append(speechSizer,speechInk);
-    let speechText='',speechLetters=[],speechCount=0,typeAt=0;
+    let speechText='',speechLetters=[],speechCount=0,typeAt=0,lastKick=0;
     let guideEntries={},tubeEntryDone=false,tugStart=0,base=[],lengths=[],total=0,travel=0,time=0,last=0,raf=0,drag=null,anchor=0,dx=0,dy=0,vx=0,vy=0,pullX=0,pullY=0,shape=[],handles=[],sceneRects=[];
     const thinkingDots=document.querySelector('.thinking-dots');let dotCount=-1;
     const reduced=matchMedia('(prefers-reduced-motion: reduce)');
@@ -101,7 +101,7 @@ export function threadLife(svg,path){
             for(let distance=170;distance<=480;distance+=50){const candidate=pointAt(Math.max(0,Math.min(total,travel+direction*distance))),gap=Math.hypot(candidate.x-actor.x,candidate.y-actor.y);if(gap>65&&gap<230&&candidate.y>actor.y-80&&candidate.y<actor.y+155){shortcut=candidate;}}
             // The viewport chooses a real perch. Never move the perch off its wire.
             const perchAt=(x,y)=>{let best=Infinity,pick=target;for(const p of shape){if(p[0]<viewLeft+45||p[0]>viewLeft+viewWidth-45||p[1]<viewTop+70||p[1]>viewBottom-22)continue;const score=Math.hypot(p[0]-x,p[1]-y);if(score<best){best=score;pick={x:p[0],y:p[1]};}}return {...pick};};
-            routeCache={near,ahead,target,shortcut,perchAt,goodbye,direction,remaining:Math.abs(destination-travel),committedExit:crossingTubeLoop?target:null};
+            routeCache={near,ahead,target,shortcut,perchAt,goodbye,direction,cornerExit:pointAt(Math.max(0,Math.min(total,travel+direction*Math.min(96,Math.abs(destination-travel))))),remaining:Math.abs(destination-travel),committedExit:crossingTubeLoop?target:null};
             sceneCache=sceneRects.find(r=>actor.y>=r.top-100&&actor.y<r.bottom+130)||null;
             targetAt=now+90;
         }
@@ -110,6 +110,15 @@ export function threadLife(svg,path){
         const active=actor.y>scrollY-140&&actor.y<scrollY+innerHeight+140&&!paused;
         guide.hidden=!active;sound.active(active);
         if(active){
+            if(actor.kickCount&&actor.kickCount!==lastKick){
+                lastKick=actor.kickCount;sound.play('spring',{id:'wall-kick',level:.42});sound.play('step',{id:'wall-contact',level:.5});
+                if(!reduced.matches)for(let i=0;i<7;i++){
+                    const puff=document.createElementNS(ns,'svg');puff.setAttribute('viewBox','0 0 24 20');puff.innerHTML='<path d="M3 15 C-1 9 5 4 9 7 C10 0 20 1 19 8 C26 9 23 18 16 17 C11 22 5 20 3 15Z" fill="#eeeae0" stroke="#8c8472" stroke-width="1.1"/>';
+                    puff.style.cssText=`position:absolute;left:${actor.kickPoint.x-10}px;top:${actor.kickPoint.y-18}px;width:${13+i*2}px;height:22px;pointer-events:none;z-index:4`;document.body.append(puff);
+                    const away=-actor.kickDirection*(12+i*6),lift=-8-i*4;
+                    puff.animate([{translate:'0 0',scale:'.25',opacity:.85},{translate:`${away*.55}px ${lift}px`,scale:'1',opacity:.75,offset:.4},{translate:`${away}px ${lift-10}px`,scale:'1.3',opacity:0}],{duration:370+i*35,easing:'ease-out'}).onfinish=()=>puff.remove();
+                }
+            }
             guide.style.transform=`translate3d(${actor.x-72}px,${actor.y-scrollY-112}px,0)`;
             c.clearRect(0,0,144,144);c.save();c.translate(72,86);c.rotate(reduced.matches?0:actor.rotation);c.translate(-72,-86);
             const airborne=actor.kind==='pole'||['air','fly','flutter','thrown','held','hang','cheer'].includes(actor.mode),mode=actor.mode==='held'?'held':airborne?'air':actor.mode==='crouch'?'anticipate':actor.mode==='land'?'brace':'scurry';

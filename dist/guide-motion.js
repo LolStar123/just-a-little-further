@@ -27,7 +27,7 @@ export class GuideMotion{
  release(){this.held=false;this.state('thrown');this.text='wheeeee!';this.sayAt=this.time+3;}
  cheer(){if(this.held)return;this.cheerBounced=false;this.cheerFloor=this.y;this.vx=0;this.vy=-650;this.state('cheer');this.text='GO LITTLE GUYYYY!!';this.contextText=this.text;this.sayAt=this.time+4;}
  hop(){if(this.held)return;this.vy=-330;this.state('air','leap');this.airTarget=null;}
- jump(target,kind){target={...target};this.airTarget={...target};const duration=['hello','starhop','peek'].includes(kind)?(this.reboundJump?.68:1.08+(this.moveCount%3)*.12):clamp(Math.hypot(target.x-this.x,target.y-this.y)/320,.5,1.15);this.vx=clamp((target.x-this.x)/duration,-620,620);this.vy=(target.y-this.y)/duration-460*duration;this.jumpDuration=duration;if(kind==='walljump'){this.wallKick=this.x<this.pageLeft+90?1:this.x>this.pageLeft+this.pageWidth-90?-1:(this.moveCount%2?1:-1);this.wallBaseVx=this.vx;this.vx+=this.wallKick*170;}this.reboundJump=false;this.state('air',kind);}
+ jump(target,kind){target={...target};this.airTarget={...target};const duration=['hello','starhop','peek'].includes(kind)?(this.reboundJump?.68:1.08+(this.moveCount%3)*.12):clamp(Math.hypot(target.x-this.x,target.y-this.y)/320,.5,1.15);this.vx=clamp((target.x-this.x)/duration,-620,620);this.vy=(target.y-this.y)/duration-460*duration;this.jumpDuration=duration;if(kind==='walljump'||kind==='wallkick'){this.wallKick=kind==='wallkick'?Math.sign(target.x-this.x)||this.facing:this.x<this.pageLeft+90?1:this.x>this.pageLeft+this.pageWidth-90?-1:(this.moveCount%2?1:-1);this.wallBaseVx=this.vx;this.vx+=this.wallKick*170;}this.reboundJump=false;this.state('air',kind);}
  tick(dt,route,viewport,scene,reduced=false){
   this.time+=dt;this.age+=dt;this.rotation=0;this.pageWidth=viewport.width;this.pageLeft=viewport.left||0;
   const scrolling=Math.abs(viewport.top-this.lastScroll)>2;this.idleTime=scrolling?0:this.idleTime+dt;this.lastScroll=viewport.top;
@@ -88,7 +88,7 @@ export class GuideMotion{
     else{this.bypassTarget=null;this.landingPoint={...goal};this.state('land');this.nextMove=this.time+.2;}
    }
   }else if(this.mode==='air'){
-   if(this.kind==='walljump')this.vx=this.wallBaseVx+this.wallKick*170*Math.cos(Math.PI*Math.min(1,this.age/this.jumpDuration));
+   if(this.kind==='walljump'||this.kind==='wallkick')this.vx=this.wallBaseVx+this.wallKick*170*Math.cos(Math.PI*Math.min(1,this.age/this.jumpDuration));
    this.vy+=920*dt;
    const goal=this.airTarget||near;
    if(this.age>.2&&this.vy>0&&this.y>=goal.y-8&&Math.abs(this.x-goal.x)<42){this.landingPoint={...goal};this.state('land');this.nextMove=this.time+(sceneKey==='landing'?.28:.7);}
@@ -120,7 +120,15 @@ export class GuideMotion{
    }
    else if(ledge&&Math.abs(this.y-scene.top)<150){this.state('flutter');}
    else{
+    const previousTerrain=this.kind;
     this.kind=dy>12&&Math.abs(dx)<12?'pole':slope<-.7?'climb':slope>.35&&(!scene||this.y>scene.bottom-15)?'grind':slope>.85?'scramble':['halo','baxter'].includes(sceneKey)?'tiptoe':sceneKey==='mtxtato'?'balance':'scamper';
+    const exit=route.cornerExit;
+    if(previousTerrain==='pole'&&this.kind!=='pole'&&exit&&Math.abs(exit.x-this.x)>28&&Math.abs(exit.y-this.y)<100&&!reduced){
+     this.kickPoint={x:near.x,y:near.y};this.kickDirection=Math.sign(exit.x-this.x);this.kickCount=(this.kickCount||0)+1;
+     this.facing=this.kickDirection;this.attentionBounce=0;this.triplet=0;this.jump(exit,'wallkick');this.nextMove=this.time+1.1;
+     this.text=this.kickDirection<0?'and... left!':'and... right!';this.contextText=this.text;this.sayAt=this.time+3;
+     this.x+=this.vx*dt;this.y+=this.vy*dt;return;
+    }
     // Footfalls drive travel: speed pulses at the planted steps instead of a constant glide.
     const pace=this.kind==='pole'?260*(1+.07*Math.sin(this.time*9)):(this.kind==='climb'?210:this.kind==='grind'?675:405)*(1+.32*Math.sin(this.time*16)),speed=Math.min(pace,d*8);
     this.vx+=(dx/(d||1)*speed-this.vx)*(1-Math.exp(-dt*12));this.vy+=(dy/(d||1)*speed-this.vy)*(1-Math.exp(-dt*12));

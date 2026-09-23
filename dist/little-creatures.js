@@ -248,7 +248,7 @@ export function drawMeowl(c,x,y,size,o={}){
         if(kind==='fall'){target.left=[-48,-40];target.right=[48,-43];target.feet=[-12,13];target.tilt=Math.sin(t*5)*.1;}
         if(kind==='hang'){target.left=[-25,-115];target.right=[25,-115];target.feet=[-9,9];target.tilt=Math.sin(t*3)*.08;}
         if(kind==='pole'){const grip=Math.sin(t*9)*3;target.hip=[-13,-17];target.chest=[-10,-45];target.head=[-8,-74];target.left=[3,-69+grip];target.right=[11,-45-grip];target.feet=[-26,10];target.turn=.55;target.tilt=.1;}
-        if(kind==='walljump'){const kick=Math.sin(Math.min(1,q)*Math.PI);target.hip=[-8,-14];target.chest=[4,-46];target.head=[9,-75];target.left=[-34,-71];target.right=[43,-61];target.feet=[-28-kick*8,13];target.tilt=-.18+kick*.32;target.turn=.35;}
+        if(kind==='walljump'||kind==='wallkick'){const kick=Math.sin(Math.min(1,q)*Math.PI);target.hip=[-8,-14];target.chest=[4,-46];target.head=[9,-75];target.left=[-34,-71];target.right=[43,-61];target.feet=[-28-kick*8,13];target.tilt=-.18+kick*.32;target.turn=.35;}
         if(kind==='grind'){
 target.hip=[-12,-9];target.chest=[-4,-40];target.head=[2,-66];target.feet=[-26,17];target.left=[-60,-56];target.right=[53,-48];target.tilt=-.17+Math.sin(t*9)*.045;}
         if(kind==='wave'||kind==='hello'||kind==='peek'){target.left=[-36,-65];target.right=[40+Math.sin(t*15)*17,-100+Math.cos(t*15)*10];target.turn=0;target.tilt=Math.sin(t*7)*.06;target.head=[0,-77];}
