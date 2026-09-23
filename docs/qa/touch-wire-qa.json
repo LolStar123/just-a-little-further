@@ -1,0 +1,25 @@
+{
+  "vertical": {
+    "scroll": 1095,
+    "drag": false,
+    "offset": [
+      0,
+      0
+    ]
+  },
+  "horizontal": {
+    "scroll": 900,
+    "drag": false,
+    "offset": [
+      0,
+      0
+    ]
+  },
+  "mouse": {
+    "drag": true,
+    "offset": [
+      53.46561373572247,
+      17.714264004128573
+    ]
+  }
+}

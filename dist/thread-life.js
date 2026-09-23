@@ -4,7 +4,7 @@ import {SceneSound} from './soundscape.js';
 
 export function threadLife(svg,path){
     const ns='http://www.w3.org/2000/svg',hit=document.createElementNS(ns,'path');
-    hit.style.cssText='stroke:transparent;stroke-width:26px;fill:none;pointer-events:stroke;cursor:grab;touch-action:none';svg.append(hit);
+    hit.style.cssText='stroke:transparent;stroke-width:26px;fill:none;pointer-events:stroke;cursor:grab;touch-action:pan-y pinch-zoom';svg.append(hit);
     // The opaque hill canvas sits above the page wire. Show the SAME deformed
     // exit points over that canvas, clipped exactly to its bounds.
     const hillWire=document.createElementNS(ns,'svg'),hillInk=document.createElementNS(ns,'path');
@@ -48,6 +48,8 @@ export function threadLife(svg,path){
     }
     function nearest(x,y){let result=0,best=Infinity;for(let i=0;i<base.length;i++){const d=(base[i][0]-x)**2+(base[i][1]-y)**2;if(d<best){best=d;result=i;}}return result;}
     function start(e,index){
+        // Finger gestures scroll the page; mouse and pen retain the playful wire.
+        if(e.pointerType==='touch')return;
         const y=e.clientY+scrollY;
 
         anchor=index??nearest(e.clientX,y);if(anchor<=tugStart)return;
@@ -59,7 +61,7 @@ export function threadLife(svg,path){
     addEventListener('blur',release);
     for(const target of [hit]){target.addEventListener('pointerdown',e=>start(e));target.addEventListener('pointermove',move);target.addEventListener('pointerup',release);target.addEventListener('pointercancel',release);target.addEventListener('lostpointercapture',release);}
     document.addEventListener('pointerdown',e=>{
-        if(drag||e.target.closest?.('button,a,input,.line-guide')||(e.target.tagName==='CANVAS'&&e.target.id!=='playground')||!base.length)return;
+        if(e.pointerType==='touch'||drag||e.target.closest?.('button,a,input,.line-guide')||(e.target.tagName==='CANVAS'&&e.target.id!=='playground')||!base.length)return;
         const j=nearest(e.clientX,e.clientY+scrollY),p=shape[j]||base[j];
         if(j>tugStart&&Math.hypot(e.clientX-p[0],e.clientY+scrollY-p[1])<14){e.stopPropagation();start({...{clientX:e.clientX,clientY:e.clientY,pointerId:e.pointerId,currentTarget:hit},preventDefault:()=>e.preventDefault()},j);}
     },true);
