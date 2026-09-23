@@ -118,3 +118,5 @@ Copy audit: retained the user-supplied top-100 claim; no invented performance im
 - [x] When the signature lettering is visible, guide targets its final flourish directly and settles into a waving goodbye pose. Leaving that area restores the normal route.
 
 Verified at 1440px and 390px: no scene exceptions, 17 desk key events sampled per view, guide landed within 1px of signature endpoint. Inspected desktop desk and mobile goodbye screenshots.
+
+- [x] Research-paper rustles now follow the runner clock: pickup at lap start, notebook placement at 65% of the lap. Slightly louder varied paper recordings (.8 to 1 / 1.12 scene levels).

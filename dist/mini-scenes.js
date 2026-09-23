@@ -102,7 +102,7 @@ export function miniScene(scene,canvas,wake,sfx){
   const t=state.elapsed,clock=state.clock,n=state.choice;
   const voiceId={scraper:'mini',pipeline:'sort',poe:'research',smoothtato:'effect',mtxtato:'effect',commute:'commuter',deadlock:'analyst'}[scene];
   if(voiceId)sfx.chirp(scene+voiceId,clock,['poe','deadlock'].includes(scene)?18:13);
-  if(scene==='scraper')sfx.beat('paper',state.cycles+':'+Math.floor(t/1.25),'paper',{level:.8});
+  if(scene==='scraper'){const lap=Math.floor(state.routeTime/2.5),placing=state.routeTime%2.5>=1.625;sfx.beat('paper-handoff',lap+':'+(placing?'place':'grab'),'paper',{id:'paper-handoff',level:placing?1.12:1});}
   if(scene==='pipeline'&&t<3.3)sfx.beat('shuffle',state.cycles+':'+Math.floor(t/(t<.9?.42:.65)),'data',{level:.65});
   if(scene==='commute')sfx.beat('steps',Math.floor(clock*3.2),'step',{level:.55});
   if(scene==='tfl')sfx.beat('chug',Math.floor(clock/1.85),'train',{level:.85});
