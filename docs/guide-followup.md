@@ -162,3 +162,12 @@ Verification: three stamp stages measured centred within .01px on 1440px and 390
 - [x] Eroded fracture mouths regenerate in fresh material while preserving structural damage. Checked 180 repeated impacts and fully buried fracture renewal.
 
 - [x] Clipboard-inspired handwritten project invitation; descending, shrinking w letters become a small downward arrow. Responsive desktop/mobile layout, with guide speech avoiding the cue.
+
+## Music and lettering, 23 September
+- [x] Immediate project-specific extended harmony, microtonal bends and overtone palettes.
+- [x] Uneven meters, swing, syncopation, triplets and five-against-four rhythms.
+- [x] Offline rendering of every arrangement: finite non-silent samples, no clipping; rapid live theme switching and cleanup checked. This is signal validation, not a listening review.
+- [x] Separate title, invitation and control lettering; smaller controls with retained click/bounce behavior and touch targets.
+- [x] Desktop and phone rendered review.
+
+Music references: https://viva.pressbooks.pub/openmusictheory/chapter/altered-and-extended-dominant-chords/ ; https://viva.pressbooks.pub/openmusictheory/chapter/substitutions/ ; https://developer.mozilla.org/en-US/docs/Web/API/OscillatorNode/detune ; https://developer.mozilla.org/en-US/docs/Web/API/OscillatorNode/setPeriodicWave

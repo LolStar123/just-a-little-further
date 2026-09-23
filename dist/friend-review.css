@@ -142,3 +142,17 @@ body.tugging-thread,body.tugging-thread *{user-select:none!important;cursor:grab
 .projects-invitation svg{display:block;width:100%;height:160px;overflow:visible;fill:currentColor;font:32px Pen,'Comic Sans MS',cursive}
 .projects-invitation path{fill:none;stroke:currentColor;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:760px){.projects-invitation{width:300px;max-width:100%;height:105px;margin:-10px auto 20px}.projects-invitation svg{height:114px}}
+
+/* A storybook title, small pen-written controls, and a chunky margin invitation. */
+#world .introduction h1{font-family:"Serif",Georgia,serif;font-size:clamp(42px,4.4vw,64px);letter-spacing:-.035em;line-height:.98}
+#world .introduction h1 em{margin-left:.16em;font-family:inherit;font-style:italic;letter-spacing:-.045em}
+#world .bottom-edge{width:min(450px,86%)}
+#world .toys{gap:5px 16px;align-items:start}
+#world .toys :is(#help,#ruin,#encourage){font-size:22px;line-height:1.12;min-height:52px;padding:5px 2px 11px;-webkit-text-stroke:0}
+#world .toys #help{rotate:-1.5deg}#world .toys #ruin{rotate:1deg}#world .toys #encourage{rotate:-.8deg}
+#world .toys :is(#help,#ruin,#encourage)::after{left:12%;right:12%;height:7px;bottom:2px;opacity:.65}
+#world .toys #reset{font-size:12px;margin-top:7px}
+.projects-invitation svg{font-family:Plex,Arial,sans-serif;font-weight:650;font-size:25px;letter-spacing:-1px}
+.projects-invitation .w-tail{font-weight:550}
+@media(min-width:761px){#world .bottom-edge{top:272px;left:8%}}
+@media(max-width:760px){#world .introduction h1{font-size:clamp(30px,8.6vw,40px)}#world .bottom-edge{width:90%;left:5%;top:480px}#world .toys{gap:5px 10px}#world .toys :is(#help,#ruin,#encourage){font-size:18px;min-height:56px;padding-bottom:10px}}
