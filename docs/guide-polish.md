@@ -73,3 +73,7 @@ These observations are bounded tests, not a promise of perfect physics under eve
 - `output/card-polish/final-polish.json`: card hover/click animation active, landing invitations varied, 90 fixed-step downhill grinding frames, actual Botato hang/release, hardware stack advanced 30 to 35 with no position reset (maximum 130 px/s).
 - Final mobile speech placement checks avoid project-copy rectangles; current screenshots reviewed after font and guide sizing changes.
 - `npm run check` and `git diff --check` pass. The grinder route check is deterministic simulation; the other browser gestures described above use pointer/scroll input.
+
+## Published verification
+
+Version 36 is public. A fresh isolated Chrome session loaded the page, entered through the three-push screen and found the guide visible with no browser errors. Six deployed JavaScript assets matched the tested local files byte for byte. [Production check](qa/live-verification.json) and [test summaries](qa/) are included here; temporary recordings and private clipboard images are not.

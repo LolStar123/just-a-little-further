@@ -1,0 +1,29 @@
+{
+  "files": [
+    {
+      "file": "guide-motion.js",
+      "matchesLocal": true
+    },
+    {
+      "file": "page-toys.js",
+      "matchesLocal": true
+    },
+    {
+      "file": "thread-life.js",
+      "matchesLocal": true
+    },
+    {
+      "file": "little-creatures.js",
+      "matchesLocal": true
+    },
+    {
+      "file": "demo.bundle.js",
+      "matchesLocal": true
+    },
+    {
+      "file": "hill-physics.js",
+      "matchesLocal": true
+    }
+  ],
+  "errors": []
+}
