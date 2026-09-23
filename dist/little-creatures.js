@@ -1,3 +1,4 @@
+import {toyPose} from './toy-interactions.js';
 // Original articulated continuous-pen character. No image assets or sprite frames.
 export const art={ready:true,style:'scribble'};
 export const ready=Promise.resolve(true);
@@ -232,6 +233,7 @@ function workCostume(c,p,role,t){
     c.restore();
 }
 export function drawMeowl(c,x,y,size,o={}){
+    const toy=toyPose(c,o.id||'meowl',x,y,size,o);x=toy.x;y=toy.y;o=toy.options;
     if(o.mode==='flattened')return pancake(c,x,y,size,o.time||0,o.splatAge||0,o.ground,o.voice||0);
     const t=o.time||0,seed=o.seed||0,scale=size/100;
     const mode=o.mode||(o.air?'air':o.pet?'happy':o.nervous?'nervous':o.push?'push':Math.abs(o.speed||0)>5?'walk':'rest');
@@ -254,7 +256,7 @@ export function drawMeowl(c,x,y,size,o={}){
     p.hip[1]+=squish*6;p.chest[1]+=squish*28;p.head[1]+=headLag;p.head[0]+=sway*10;p.tilt+=sway;
     const face=o.facing===-1?-1:1,ground=o.ground||(()=>y);
     if(state.face!==undefined&&state.face!==face)state.feet=[];state.face=face;
-    if(o.ground&&!air)p.hip[1]=Math.max(p.hip[1],(ground(x+p.hip[0]*scale*face)-y)/scale-12);
+    if(o.ground&&!air)p.hip[1]=clamp(Math.max(p.hip[1],(ground(x+p.hip[0]*scale*face)-y)/scale-12),-22,-6);
     const local=(wx,wy)=>[(wx-x)/scale*face,(wy-y)/scale],world=([lx,ly])=>({x:x+lx*scale*face,y:y+ly*scale});
     if(o.rock?.contact&&o.rock.vertices.every(v=>Number.isFinite(v.x))&&mode==='backpush'){
         const contactY=y+(p.chest[1]+7)*scale;
@@ -296,6 +298,9 @@ export function drawMeowl(c,x,y,size,o={}){
             feet[i]=local(near,ground(near));state.feet[i].x=near;state.feet[i].age=1;
         }
     }
+    // Never let a distant terrain sample pull the feet through the body.
+    for(let i=0;i<2;i++){feet[i][0]=clamp(feet[i][0],p.hip[0]-23,p.hip[0]+23);feet[i][1]=clamp(feet[i][1],p.hip[1]+9,p.hip[1]+24);}
+    p.chest[1]=clamp(p.chest[1],p.hip[1]-43,p.hip[1]-26);p.head[1]=clamp(p.head[1],p.chest[1]-31,p.chest[1]-21);
     const hands=[p.left.slice(),p.right.slice()];
     if(o.cargoOffset)for(const hand of hands)hand[0]+=o.cargoOffset;
     if(o.rock?.contact&&face===1&&['push','brace','slide','heave'].includes(mode)){

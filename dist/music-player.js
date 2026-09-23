@@ -1,4 +1,5 @@
 import {musicParts} from './music-parts.js';
+import {projectMusic} from './project-music.js';
 
 // Native background audio. No embedded player, external runtime or video requests.
 export function musicPlayer(mix){
@@ -8,6 +9,7 @@ export function musicPlayer(mix){
     document.querySelector('#world header').after(controls);
     const status=controls.querySelector('#audio-status');
     let volume=.098,part=0,slot=0,blocked=false,error=null,switching=false,fadeEnd=0,fromSlot=0,prepared=-1;
+    let themed=false;const themes=projectMusic(mix,value=>{themed=value;level();});
     const media=[new Audio(),new Audio()],gains=[];
     for(const el of media){el.preload='none';el.controls=false;el.volume=1;el.playsInline=true;}
     function connect(){
@@ -23,7 +25,7 @@ export function musicPlayer(mix){
     }
     function level(){
         if(!gains.length)return;const t=mix.context.currentTime;
-        gains.forEach((gain,i)=>{gain.gain.cancelScheduledValues(t);gain.gain.setTargetAtTime(mix.enabled&&i===slot?volume:0,t,.06);});
+        gains.forEach((gain,i)=>{gain.gain.cancelScheduledValues(t);gain.gain.setTargetAtTime(mix.enabled&&i===slot&&!themed?volume:0,t,.35);});
     }
     function stop(){
         for(const el of media)el.pause();switching=false;fadeEnd=0;level();
@@ -50,8 +52,8 @@ export function musicPlayer(mix){
         media[target].play().then(()=>{
             if(!mix.enabled||document.hidden){media[target].pause();switching=false;return;}
             const t=mix.context.currentTime;fromSlot=slot;slot=target;part=(part+1)%musicParts.length;prepared=-1;
-            gains[fromSlot].gain.cancelScheduledValues(t);gains[fromSlot].gain.setValueAtTime(volume,t);gains[fromSlot].gain.linearRampToValueAtTime(0,t+.09);
-            gains[slot].gain.cancelScheduledValues(t);gains[slot].gain.setValueAtTime(0,t);gains[slot].gain.linearRampToValueAtTime(volume,t+.09);
+            gains[fromSlot].gain.cancelScheduledValues(t);gains[fromSlot].gain.setValueAtTime(themed?0:volume,t);gains[fromSlot].gain.linearRampToValueAtTime(0,t+.09);
+            gains[slot].gain.cancelScheduledValues(t);gains[slot].gain.setValueAtTime(0,t);gains[slot].gain.linearRampToValueAtTime(themed?0:volume,t+.09);
             fadeEnd=performance.now()+110;blocked=false;error=null;sync();
         }).catch(e=>{switching=false;blocked=e.name==='NotAllowedError';if(!blocked&&e.name!=='AbortError')error=e.message;sync();});
     }
@@ -65,7 +67,7 @@ export function musicPlayer(mix){
         const left=media[slot].duration-media[slot].currentTime;
         if(left<10)prepare();if(left<.10&&!switching)next();
     },50);
-    controls.querySelector('#music-volume').oninput=e=>{volume=Number(e.target.value)/100;level();};
+    controls.querySelector('#music-volume').oninput=e=>{volume=Number(e.target.value)/100;themes.volume(volume);level();};
     controls.querySelector('#sfx-volume').oninput=e=>mix.setEffectsVolume(Number(e.target.value)/100);
     addEventListener('sound-state',play);
     document.addEventListener('visibilitychange',()=>document.hidden?stop():play());

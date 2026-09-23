@@ -1,5 +1,8 @@
+import './button-feel.js';
+import {attachToys,toyProp,toyBusy} from './toy-interactions.js';
 import {SceneSound} from './soundscape.js';
 import {miniScene} from './mini-scenes.js';
+import {personalScene} from './personal-scenes.js';
 import {drawMeowl} from './little-creatures.js';
 import {rocks,rockPath,routeThroughRocks,WIDTH,HEIGHT} from './rocky-path.js';
 import {hardware,line} from './creatures.js';
@@ -29,7 +32,7 @@ addEventListener('message',e=>{if(e.origin===location.origin&&e.source===parent&
 document.addEventListener('visibilitychange',()=>document.hidden?stop():wake());
 addEventListener('keydown',e=>{if(e.key==='Escape')parent.postMessage({type:'close-project'},location.origin);});
 function canvas(id){
-    const el=$('#'+id),c=el.getContext('2d');let w=0,h=0;
+    const el=$('#'+id),c=el.getContext('2d');attachToys(el,wake,sfx);let w=0,h=0;
     new ResizeObserver(()=>{const r=el.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,1.5);const pw=Math.round(r.width*d),ph=Math.round(r.height*d);if(w===r.width&&h===r.height&&el.width===pw&&el.height===ph)return;w=r.width;h=r.height;el.width=pw;el.height=ph;c.setTransform(d,0,0,d,0,0);draw(0);}).observe(el);
     return {el,c,get w(){return w;},get h(){return h;},clear(){c.clearRect(0,0,w,h);}};
 }
@@ -79,14 +82,14 @@ if(scene==='halo'){
         bar.style.transform=`scaleX(${halo.elapsed/halo.duration})`;
         if(halo.elapsed>=halo.duration){halo.done=true;$('.call').classList.add('done');$('.answer').textContent=scenarios[halo.scenario].answer;$('#thought').textContent=scenarios[halo.scenario].after;click();}
     };
-    draw=()=>{a.clear();drawMeowl(a.c,a.w*.5,a.h-4,89,{id:'interview',time,mode:halo.done&&halo.hold>.26?'happy':'nervous',look:halo.done?2:0,voice:sfx.mouth('interview'),drool:halo.done?Math.max(0,1-halo.hold/.26):Math.min(1,halo.elapsed/2.8)});};
+    draw=()=>{a.clear();drawMeowl(a.c,a.w*.5,a.h-4,89,{id:'interview',time,mode:halo.done&&halo.hold>.26?'happy':'nervous',look:halo.done?2:0,voice:sfx.mouth('interview'),drool:halo.done?Math.max(0,1-halo.hold/.26):Math.min(1,halo.elapsed/2.8)});const x=a.w*.76,y=a.h-15;toyProp(a.c,'cue-note',x,y,30,28,()=>{line(a.c,[[x-14,y-28],[x+14,y-27],[x+13,y],[x-15,y],[x-14,y-28]],'#a19986',1);line(a.c,[[x-8,y-19],[x+8,y-19],[x-7,y-13],[x+5,y-13]],'#a19986',.8);});};
 }else if(scene==='botato'||scene==='liquidation'){
     const bot=scene==='botato';$('.caption').textContent=bot?'a tiny detour of its own':'the hunt, in miniature';
     $('#scene').innerHTML=`<canvas class="toy" id="${bot?'botato-art':'liquidation-art'}" tabindex="0" aria-label="${bot?'Meowl pathfinder. Tap the floor or move the loot.':'A meowl inspects hardware from a liquidation lot.'}"></canvas><p class="toy-note" id="toy-note"></p><div class="controls"><button id="next">${bot?'move the loot':'inspect the next lot'}</button></div>`;
     const a=canvas(bot?'botato-art':'liquidation-art'),note=$('#toy-note');
     if(bot){
         robot={x:40,y:220,cameraX:240,cameraY:320,target:[885,560],route:[],blocked:[],rocks:rocks.map(r=>r.points),routeMs:0};
-        const silhouettes=rocks.map(rockPath);let terrain=null,terrainWidth=0,terrainHeight=0;
+        const silhouettes=rocks.map(rockPath);let terrain=null,terrainWidth=0,terrainHeight=0,draggedLoot=null,lastLootRoute=-1;
         function map(){
             const scale=Math.max(a.w/WIDTH,a.h/HEIGHT),vw=a.w/scale,vh=a.h/scale;
             const cx=Math.max(vw/2,Math.min(WIDTH-vw/2,robot.cameraX)),cy=Math.max(vh/2,Math.min(HEIGHT-vh/2,robot.cameraY));
@@ -124,6 +127,7 @@ if(scene==='halo'){
         a.el.onpointercancel=()=>down=null;
         a.el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();nextLoot();}};
         advance=dt=>{
+            if(draggedLoot?.held&&time-lastLootRoute>.25){lastLootRoute=time;route(draggedLoot.x,draggedLoot.y);}
             if(!robot.route.length){robot.idle=(robot.idle||0)+dt;if(robot.idle>.8){robot.idle=0;nextLoot();}}else robot.idle=0;
             let remaining=dt*125;
             while(robot.route.length&&remaining>0){const [x,y]=robot.route[0],dx=x-robot.x,dy=y-robot.y,d=Math.hypot(dx,dy);
@@ -142,8 +146,8 @@ if(scene==='halo'){
             if(join){c.beginPath();c.moveTo(...entry);c.bezierCurveTo(entry[0]+28,entry[1]+9,join[0]-22,join[1]-14,...join);c.strokeStyle='#b0a795';c.lineWidth=.7;c.stroke();}
             c.drawImage(terrain,0,0,WIDTH,HEIGHT);
             if(robot.route.length){c.setLineDash([2,6]);line(c,[[robot.x,robot.y],...robot.route],'#89846e',1);c.setLineDash([]);}
-            const [tx,ty]=robot.target;line(c,[[tx-6,ty],[tx,ty-8],[tx+6,ty],[tx,ty+8],[tx-6,ty]],'#786945',1.7);
-            drawMeowl(c,robot.x,robot.y,74,{voice:sfx.mouth('bot'),id:'bot',hat:'goldrim',time,speed:robot.route.length?60:0,facing:robot.route.length&&robot.route[0][0]<robot.x?-1:1});
+            const [tx,ty]=robot.target;draggedLoot=toyProp(c,'loot',tx,ty+8,28,24,()=>line(c,[[tx-6,ty],[tx,ty-8],[tx+6,ty],[tx,ty+8],[tx-6,ty]],'#786945',1.7));
+            drawMeowl(c,robot.x,robot.y,74,{voice:sfx.mouth('bot'),id:'bot',chase:false,hat:'goldrim',time,speed:robot.route.length?60:0,facing:robot.route.length&&robot.route[0][0]<robot.x?-1:1});
             // Rock faces in front of his feet occlude him as he passes behind.
             rocks.forEach((r,i)=>{if(r.bottom>robot.y&&Math.abs(r.x-robot.x)<r.rx+40&&Math.abs(r.y-robot.y)<r.ry+65)outline(c,r,i);});
             c.restore();
@@ -157,7 +161,7 @@ if(scene==='halo'){
     }else{
         lot={index:0,elapsed:0,stage:0};note.textContent='catalogue. check. find a new home.';
         $('#next').onclick=()=>{lot.index++;lot.elapsed=0;wake();};
-        advance=dt=>{lot.elapsed+=dt;if(lot.elapsed>6.2){lot.index++;lot.elapsed=0;}lot.stage=lot.elapsed<1?1:lot.elapsed<3?2:3;};
+        advance=dt=>{lot.elapsed+=toyBusy(a.el)?0:dt;if(lot.elapsed>6.2){lot.index++;lot.elapsed=0;}lot.stage=lot.elapsed<1?1:lot.elapsed<3?2:3;};
         draw=()=>{
             if(!a.w||!a.h)return;
             a.clear();const c=a.c,scale=Math.min(1,a.w/400),floor=a.h*.8;
@@ -184,11 +188,15 @@ if(scene==='halo'){
         };
     }
 }
-else{mini=miniScene(scene,canvas,wake,sfx);draw=mini.draw;advance=mini.advance;}
+else{mini=(['ocr','interests'].includes(scene)?personalScene:miniScene)(scene,canvas,wake,sfx);draw=mini.draw;advance=mini.advance;}
 if(parent===window){const a=document.createElement('a');a.href='index.html';a.textContent='back to the little guy';a.style.cssText='display:block;margin:22px 0;font-size:13px;color:inherit';$('#demo').append(a);}
 sfx.mix.notify();
 window.__siteDiagnostics=()=>({...stats,audio:sfx.mix.diagnostics(),paused,time,phase:halo?(halo.done?3:1):0,halo,mini:mini?.state,game:robot?{...robot,position:[robot.x,robot.y]}:null,lot,activeCanvases:visible&&!paused?1:0,raf:!!frame});
 let reportedHeight=0;
-function reportLayout(){const height=Math.ceil(document.querySelector('#demo').getBoundingClientRect().height+2);if(height===reportedHeight)return;reportedHeight=height;parent.postMessage({type:'demo-layout',height},location.origin);}
+function reportLayout(){const height=Math.ceil(document.querySelector('#demo').getBoundingClientRect().height+4);if(height===reportedHeight)return;reportedHeight=height;parent.postMessage({type:'demo-layout',height},location.origin);}
 new ResizeObserver(reportLayout).observe(document.querySelector('#demo'));
 parent.postMessage({type:'demo-ready'},location.origin);document.fonts.ready.then(reportLayout);reportLayout();wake();
+
+// Parent IntersectionObserver can miss a notification during a mobile frame load.
+const visibilityPoll=setInterval(()=>{const next=onScreen();if(next&&!frame)wake();else if(!next&&frame)stop();},500);
+addEventListener('pagehide',()=>clearInterval(visibilityPoll));

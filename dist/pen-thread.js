@@ -1,3 +1,4 @@
+import {threadLife} from './thread-life.js';
 // One landscape-to-footer stroke, rebuilt only when layout changes.
 export const mountainPoints=[[0,.73],[.035,.724],[.07,.70],[.093,.68],[.112,.699],[.151,.65],[.181,.673],[.213,.61],[.242,.655],[.267,.634],[.304,.681],[.341,.67],[.38,.703],[.43,.705],[.47,.72]];
 export function sceneryCommands(w,h,offset,groundAt){
@@ -96,6 +97,7 @@ export function sceneryCommands(w,h,offset,groundAt){
 }
 const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg'),path=document.createElementNS(ns,'path');
 svg.classList.add('pen-thread');svg.setAttribute('aria-hidden','true');svg.append(path);document.body.prepend(svg);
+const life=threadLife(svg,path);
 let pending=0,hill=[],mountainOffset=0;
 export function setHillContour(points,offset=0){hill=points;mountainOffset=offset;schedule();}
 // Continue uphill out of the page, then let the pen wander down the sketchbook.
@@ -227,7 +229,7 @@ function layout(){
             const t=i/220,a=t*Math.PI*2;
             let px,py;
             if(motif==='spiral'){const angle=Math.PI+a*1.65,r=1-t*.77;px=cx+rx*r*Math.cos(angle);py=mid+ry*r*Math.sin(angle);}
-            else if(motif==='coil'){px=cx+rx*(t*1.65-.83+.28*Math.sin(a*3));py=mid+ry*Math.sin(a*3+.2)*(1-.18*t);}
+            else if(motif==='coil'){const angle=a*1.65;px=cx+rx*(t*1.15-.62+.48*Math.sin(angle));py=mid+ry*.72*Math.cos(angle);}
             else if(motif==='orbit'){const angle=-Math.PI/2+a*1.72,r=1-t*.29;px=cx+rx*r*Math.sin(angle);py=mid+ry*(r*Math.sin(angle+.65)+.17*Math.sin(a*3));}
             else if(motif==='switchback'){px=cx+rx*(t*1.65-.84+.33*Math.sin(a*2));py=mid+ry*Math.sin(a*2);}
             else {const commute=kind==='commute',angle=commute?-Math.PI*.27+a*.77:-Math.PI/2+a*1.08;px=cx+rx*Math.sin(angle);py=mid+ry*Math.sin(angle*2)*(commute?.90+.06*Math.cos(angle):.84+.12*Math.cos(angle));}
@@ -270,7 +272,7 @@ function layout(){
             else curve(lane,y+35,entry,top-55,entry,top-12);
             const out=fromLeft?-1:1,space=fromLeft?entry-5:w-5-entry,sway=Math.max(2,Math.min(w<760?10:32,space*.75));
             curve(entry+out*sway,top+30,entry+out*sway,top+(floor-top)*.38,entry,top+(floor-top)*.48);
-            curve(entry-out*3,top+(floor-top)*.64,entry+out*sway*.6,floor-42,entry,floor-14);
+            curve(entry-out*sway*.5,top+(floor-top)*.64,entry,floor-42,entry,floor-14);
             if(r.threadPoints?.length){
                 const samples=r.threadPoints.map(([px,py])=>[r.x+px,r.y+py]);if(!fromLeft)samples.reverse();
                 const first=samples[0];curve(entry,floor+2,first[0]- (fromLeft?5:-5),first[1],...first);
@@ -288,13 +290,13 @@ function layout(){
         // Only cross the page after the whole embedded document has ended.
         const edge=x,away=x>w/2?1:-1,sideRoom=away>0?w-x-6:x-6,bend=Math.min(w<760?8:24,Math.max(1,sideRoom*.65)),half=(y+gap)/2;
         curve(edge+away*bend,y+22,edge+away*bend,half-18,edge+away*bend*.25,half);
-        curve(edge-away*2,half+18,edge+away*bend*.7,gap-20,edge,gap);
+        curve(edge-away*bend*.5,half+18,edge,gap-20,edge,gap);
         const next=frames[index+1]?.closest('article'),limit=next?rect(next).y-18:rect(document.querySelector('.sketch-foot')).y-20;
         flourish(kind,x,nextLane,gap,Math.max(gap+36,limit),index);
         index++;
     }
     svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.style.height=h+'px';
-    path.setAttribute('d',points.map(([px,py],i)=>`${i?'L':'M'}${px.toFixed(2)},${py.toFixed(2)}`).join(' '));
+    life.update(points);
     svg.dataset.joins='mountains hill '+[...document.querySelectorAll('.sketch-demo')].map(f=>f.dataset.scene).join(' ');
 }
 const observer=new ResizeObserver(schedule);observer.observe(document.querySelector('.sketchbook'));
@@ -302,4 +304,4 @@ for(const f of document.querySelectorAll('.sketch-demo')){observer.observe(f);f.
 addEventListener('message',e=>{if(e.origin===location.origin&&['demo-ready','demo-layout','demo-anchors'].includes(e.data?.type))schedule();});
 addEventListener('resize',schedule);document.fonts.ready.then(schedule);
 
-addEventListener('ink-anchors',()=>{cancelAnimationFrame(pending);layout();});
+addEventListener('ink-anchors',schedule);

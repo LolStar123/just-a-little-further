@@ -16,7 +16,7 @@ export class HillPhysics {
         this.engine=Engine.create({positionIterations:12,velocityIterations:10,constraintIterations:6});
         this.engine.gravity.y=1;this.engine.gravity.scale=.001;
         this.radius=clamp(w*.058,35,80);this.segmentCount=52;
-        this.nodes=Array.from({length:53},(_,i)=>({x:i*w/52,y:0,v:0,eroded:0,damage:0}));this.segments=[];this.faults=[];this.terrainBreaks=0;this.terrainVersion=0;this.terrainChanging=false;
+        this.nodes=Array.from({length:53},(_,i)=>({x:i*w/52,y:0,v:0,eroded:0,damage:0}));this.segments=[];this.faults=[];this.slabs=[];this.terrainBreaks=0;this.terrainVersion=0;this.terrainChanging=false;
         for(let i=0;i<52;i++){
             const [x1,y1]=this.point(i),[x2,y2]=this.point(i+1);
             const body=Bodies.rectangle((x1+x2)/2,(y1+y2)/2+82,Math.hypot(x2-x1,y2-y1)+3,164,{isStatic:true,friction:.62,restitution:0,label:'soil'});
@@ -104,9 +104,9 @@ export class HillPhysics {
         }
     }
     dent(x,power){
-        const speed=power/9,width=Math.max(this.w/52*1.7,this.radius*.85),cap=Math.min(32,this.radius*.60);
+        x=clamp(x,0,this.w*.955);
+        const speed=power/9,width=Math.max(this.w/52*1.7,this.radius*.85);
         const node=this.nodes[Math.round(clamp(x/this.w*52,0,52))];
-        if(node.eroded>=cap-.5)return; // Exposed stable base cannot collect fake cracks.
         let fault=this.faults.find(f=>!f.broken&&Math.abs(f.x-x)<width*.70);
         if(!fault){
             const paths=this.fracturePaths(x,width);
@@ -133,12 +133,13 @@ export class HillPhysics {
             }
             if(fault.broken||this.time<fault.breakAt)continue;
             fault.broken=true;this.terrainBreaks++;
+            if(fault.depth>8)this.collapseSlab(fault);
             for(let i=0;i<this.nodes.length;i++){
                 const n=this.nodes[i],u=Math.abs(n.x-fault.x)/fault.width;
-                if(u>=1.5)continue;
+                  if(u>=1.5||n.x>this.w*.963)continue;
                 const weight=Math.pow(Math.max(0,1-u/1.5),1.6);
                 const crag=.82+.18*Math.sin(i*13.17+fault.x*.037)**2;
-                n.eroded=Math.min(Math.min(32,this.radius*.60),n.eroded+fault.depth*weight*crag);
+                n.eroded+=fault.depth*weight*crag/(1+n.eroded/(this.h*.75));
             }
             this.onImpact?.({x:fault.x,y:this.ground(fault.x),speed:clamp(fault.depth/2,3,7),rock:false,terrain:true,depth:fault.depth,width:fault.width});
         }
@@ -162,6 +163,26 @@ export class HillPhysics {
         for(const [x,power]of offspring)this.dent(x,power);
         // Fractures belong to the material, not to a decal that follows the surface.
         this.faults=this.faults.filter(f=>!f.broken||!f.propagated||this.time-f.breakAt<.35&&f.paths.some(path=>path.some(([x,y])=>y>this.ground(x)+.3)));
+    }
+    collapseSlab(fault){
+        if(this.slabs.length>=12)return;
+        const width=Math.min(fault.width*.9,58),height=12+Math.min(fault.depth,22),x=clamp(fault.x,width,this.w*.95),y=this.ground(x)+height;
+        const body=Bodies.polygon(x,y,5,width*.5,{density:.0015,friction:.65,restitution:.08,collisionFilter:{category:4,mask:4},label:'fallen ledge'});
+        const anchor=clamp(x-width*.75,0,this.w*.95);
+        const tether=Constraint.create({pointA:{x:anchor,y:this.ground(anchor)},bodyB:body,pointB:{x:-width*.3,y:-height*.35},length:width*.65,stiffness:.025,damping:.12});
+        Body.setAngularVelocity(body,(this.terrainBreaks%2?1:-1)*.07);Body.setVelocity(body,{x:.6,y:1.3});
+        Composite.add(this.engine.world,[body,tether]);this.slabs.push({body,tether,anchor,born:this.time});
+    }
+    contour(){
+        const points=[];
+        for(let i=0;i<=51;i++){
+            const x=Math.min(this.w*.963,i*this.w/52);points.push([x,this.ground(x)]);
+            for(const slab of this.slabs){if(Math.floor(slab.anchor/this.w*52)!==i)continue;
+                const verts=slab.body.vertices;points.push([slab.anchor,this.ground(slab.anchor)]);
+                for(const v of verts)points.push([v.x,v.y]);points.push([verts[0].x,verts[0].y],[slab.anchor+3,this.ground(slab.anchor+3)]);
+            }
+        }
+        return points;
     }
     updateGround(){
         for(let i=0;i<52;i++){
@@ -214,7 +235,7 @@ export class HillPhysics {
     }
     flatten(){
         if(this.splat||!this.actor)return;
-        const a=this.actor;this.release(false);this.catchActive=false;this.catchArmed=false;this.reposition=null;this.intercept=null;this.lane=0;
+        const a=this.actor;if(this.drag?.bodyB===a)this.release(false);this.catchActive=false;this.catchArmed=false;this.reposition=null;this.intercept=null;this.lane=0;
         this.splat={age:0,width:this.actorWidth,height:this.actorHeight,mass:a.mass,x:a.position.x};this.mode='flattened';
         const bottom=a.position.y+this.actorHeight/2;
         Body.scale(a,2.7,.10);Body.setMass(a,this.splat.mass);Body.setInertia(a,Infinity);
@@ -449,7 +470,9 @@ export class HillPhysics {
         this.control=control;this.accumulator+=Math.min(dt,.05);const step=1/180;
         while(this.accumulator>=step){
             this.time+=step;this.steps++;
+            if(this.drag?.bodyB===this.rock&&!this.splat&&this.actor){const b=this.rock,a=this.actor;if(b.bounds.max.y>a.bounds.min.y+this.actorHeight*.3&&b.bounds.min.y<a.bounds.max.y&&Math.abs(b.position.x-a.position.x)<this.actorWidth*.7&&b.position.y<a.position.y)this.flatten();}
             this.erodeGround(step);
+            for(let i=this.slabs.length-1;i>=0;i--){const slab=this.slabs[i];if(this.time-slab.born>14){Composite.remove(this.engine.world,slab.body);Composite.remove(this.engine.world,slab.tether);this.slabs.splice(i,1);}else{slab.tether.pointA.y=this.ground(slab.anchor);}}
             if(this.assist){
                 const a=this.actor,b=this.rock;
                 const unavailable=this.splat||this.reposition||this.time<this.springUntil||!a||Math.abs(b.position.x-a.position.x)>this.radius+this.actorSize*1.5||b.bounds.max.y<this.ground(b.position.x)-this.actorSize;
@@ -516,6 +539,7 @@ export class HillPhysics {
 
     ruinDay(){this.release(false);this.assist=null;const b=this.rock,height=Math.max(180,Math.min(this.h*.55,b.position.y-this.radius-24));Body.setVelocity(b,{x:0,y:-Math.sqrt(2*(1000/3600)*height)});Body.setAngularVelocity(b,.055);}
     reset(){
+        for(const slab of this.slabs){Composite.remove(this.engine.world,slab.body);Composite.remove(this.engine.world,slab.tether);}this.slabs=[];
         this.release(false);this.unsplat(false);this.springUntil=0;for(const n of this.nodes){n.y=0;n.v=0;n.eroded=0;n.damage=0;}this.faults=[];this.terrainBreaks=0;this.terrainVersion++;this.updateGround();this.seedTerrain();
         for(const chip of this.chips)Composite.remove(this.engine.world,chip.body);this.chips=[];this.fractures=[];this.referenceOrigin={...this.initialReferenceOrigin};
         Body.setAngle(this.rock,0);Body.setVertices(this.rock,this.initialOutline.map(p=>({...p})));this.chipCount=0;this.lastChip=-100;this.lastChipArea=0;
@@ -528,5 +552,5 @@ export class HillPhysics {
         this.stepUntil=0;this.nextStep=0;
     }
     dispose(){this.release(false);Events.off(this.engine);Composite.clear(this.engine.world,false);Engine.clear(this.engine);}
-    diagnostics(){return{terrainBreaks:this.terrainBreaks,terrainFaults:this.faults.length,terrainVersion:this.terrainVersion,erosion:this.nodes.map(n=>n.eroded),structuralDamage:this.nodes.map(n=>n.damage),intercept:this.intercept?{...this.intercept}:null,catchBeat:this.catchBeat,catchArmed:this.catchArmed,catchImpactAge:this.time-this.catchImpactAt,catchSpeed:this.catchSpeed,catchGap:this.catchGap,assisting:!!this.assist,powerLeft:this.assist?Math.max(0,this.assist.until-this.time):0,tripCount:this.tripCount,emotion:this.emotion,emotionAge:this.time-this.emotionSince,panicHops:this.panicHops,setbackAge:this.time-this.setbackAt,splatAge:this.splat?.age||0,flattened:!!this.splat,position:{...this.rock.position},velocity:{...this.rock.velocity},angle:this.rock.angle,radius:this.radius,outline:this.outline(),area:this.rock.area,originalArea:this.originalArea,chipCount:this.chipCount,chips:this.chips.length,lastChipArea:this.lastChipArea||0,ground:this.ground(this.rock.position.x),dragging:!!this.drag,impacts:this.impactCount,maxIndent:this.maxIndent,indent:this.nodes.map(n=>n.y),steps:this.steps,catchCount:this.catchCount,maxSlide:this.maxSlide,contact:this.contact,gripGrace:this.gripGrace,mode:this.mode,catchAge:this.catchAge,stroke:this.stroke,workAge:this.workAge,pushForce:this.pushForce,strength:this.strength,mass:this.rock.mass,actorMass:this.actor?.mass,facing:this.facing,lane:this.lane,reposition:this.reposition?{...this.reposition}:null,repositionCount:this.repositionCount,actor:this.actor?{position:{...this.actor.position},velocity:{...this.actor.velocity}}:null};}
+    diagnostics(){return{slabs:this.slabs.length,terrainBreaks:this.terrainBreaks,terrainFaults:this.faults.length,terrainVersion:this.terrainVersion,erosion:this.nodes.map(n=>n.eroded),structuralDamage:this.nodes.map(n=>n.damage),intercept:this.intercept?{...this.intercept}:null,catchBeat:this.catchBeat,catchArmed:this.catchArmed,catchImpactAge:this.time-this.catchImpactAt,catchSpeed:this.catchSpeed,catchGap:this.catchGap,assisting:!!this.assist,powerLeft:this.assist?Math.max(0,this.assist.until-this.time):0,tripCount:this.tripCount,emotion:this.emotion,emotionAge:this.time-this.emotionSince,panicHops:this.panicHops,setbackAge:this.time-this.setbackAt,splatAge:this.splat?.age||0,flattened:!!this.splat,position:{...this.rock.position},velocity:{...this.rock.velocity},angle:this.rock.angle,radius:this.radius,outline:this.outline(),area:this.rock.area,originalArea:this.originalArea,chipCount:this.chipCount,chips:this.chips.length,lastChipArea:this.lastChipArea||0,ground:this.ground(this.rock.position.x),dragging:!!this.drag,impacts:this.impactCount,maxIndent:this.maxIndent,indent:this.nodes.map(n=>n.y),steps:this.steps,catchCount:this.catchCount,maxSlide:this.maxSlide,contact:this.contact,gripGrace:this.gripGrace,mode:this.mode,catchAge:this.catchAge,stroke:this.stroke,workAge:this.workAge,pushForce:this.pushForce,strength:this.strength,mass:this.rock.mass,actorMass:this.actor?.mass,facing:this.facing,lane:this.lane,reposition:this.reposition?{...this.reposition}:null,repositionCount:this.repositionCount,actor:this.actor?{position:{...this.actor.position},velocity:{...this.actor.velocity}}:null};}
 }

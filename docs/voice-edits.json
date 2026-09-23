@@ -1,0 +1,44 @@
+[
+  {
+    "cut": "clean-kitten-0",
+    "source": 93,
+    "start": 0,
+    "length": 0.88,
+    "rate": 1.08
+  },
+  {
+    "cut": "clean-kitten-1",
+    "source": 86,
+    "start": 0,
+    "length": 0.77,
+    "rate": 1.1
+  },
+  {
+    "cut": "clean-kitten-2",
+    "source": 91,
+    "start": 0,
+    "length": 0.86,
+    "rate": 1.14
+  },
+  {
+    "cut": "clean-kitten-3",
+    "source": 93,
+    "start": 0.08,
+    "length": 0.65,
+    "rate": 1.18
+  },
+  {
+    "cut": "clean-kitten-4",
+    "source": 86,
+    "start": 0.04,
+    "length": 0.68,
+    "rate": 1.2
+  },
+  {
+    "cut": "clean-kitten-5",
+    "source": 91,
+    "start": 0.09,
+    "length": 0.62,
+    "rate": 1.22
+  }
+]

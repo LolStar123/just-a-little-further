@@ -1,6 +1,24 @@
 // Project copy describes the work. Demo inputs are labelled in each runnable example.
-export const trail=["scraper", "pipeline", "poe", "tfl", "commute", "smoothtato", "mtxtato", "deadlock", "baxter", "botato", "halo", "liquidation"];
+export const trail=["scraper", "pipeline", "poe", "tfl", "commute", "smoothtato", "mtxtato", "deadlock", "baxter", "botato", "halo", "liquidation", "ocr"];
 export const projects={
+  "ocr": {
+  "title": "poe / OCR crafting prototype",
+  "short": "OCR rolls",
+  "category": "path of exile / screen reading",
+  "caption": "Reads tooltips and stops on target modifiers.",
+  "description": "Capture a tooltip region, convert it to monochrome, run Tesseract, normalise confusable letters and compare candidate modifiers. The original Python prototype used exact and fuzzy matching with a stop event. This small example runs the text-matching stage on sample OCR output.",
+  "scene": "ocr",
+  "links": [
+    {
+      "label": "try the matching example",
+      "url": "demo.html?scene=ocr"
+    },
+    {
+      "label": "github / code",
+      "url": "https://github.com/LolStar123/meowl-corner/blob/main/examples/ocr_match.py"
+    }
+  ]
+},
   "scraper": {
     "title": "quant finance research scraper",
     "short": "quant scraper",
@@ -54,7 +72,7 @@ export const projects={
     "demoScope": "Actual historical data; costs and training choices are editable. Historical results do not promise future returns."
   },
   "poe": {
-    "title": "poe item pricer",
+    "title": "poe / variant pricing and expected value",
     "short": "PoE statistics",
     "category": "GAME ECONOMIES / STATISTICS",
     "caption": "Explore item-price datasets, compare Watcher's Eye variants and check expected profit and risk.",
@@ -184,7 +202,7 @@ export const projects={
     "demoScope": "Actual catalogue, mapping confidence and asset paths. No game-file patching in the browser."
   },
   "deadlock": {
-    "title": "deadlock match analysis",
+    "title": "deadlock / conditional win probability",
     "short": "Deadlock analysis",
     "category": "GAMES / STATISTICS",
     "caption": "Compares match conditions to find which stats are most associated with winning.",

@@ -1,3 +1,4 @@
+import {pokerMarker} from './poker-markers.js';
 import {SceneSound} from './soundscape.js';
 import {musicPlayer} from './music-player.js';
 import {drawReferenceRock,rockReady} from './rock-reference.js';
@@ -22,7 +23,7 @@ const auraField=new AuraField();
 const hillSound=new SceneSound('hill',canvas),mix=hillSound.mix;musicPlayer(mix);
 let heardChips=0,heardMode='';
 const hero={x:0,y:0,vx:0,vy:0,size:110,pet:0,cheer:0,held:false,mode:'rest',phase:0,effort:0};
-document.querySelector('.project-knots').innerHTML=trail.map((id,i)=>`<button class="knot" data-project="${id}" aria-label="${i+1}. ${projects[id].title}"><span class="knot-dot" aria-hidden="true">${i+1}</span><span class="knot-name"><span class="wide-name">${projects[id].title}</span><span class="small-name">${projects[id].short}</span></span></button>`).join('');
+document.querySelector('.project-knots').innerHTML=trail.map((id,i)=>`<button class="knot" data-project="${id}" aria-label="${i+1}. ${projects[id].title}"><span class="knot-dot" aria-hidden="true">${pokerMarker(i+1)}</span><span class="knot-name"><span class="wide-name">${projects[id].title}</span><span class="small-name">${projects[id].short}</span></span></button>`).join('');
 let panelOpen=false,project=null,returnFocus=null;
 let trailIndex=0;
 function selectCreation(index){
@@ -44,7 +45,7 @@ function positionThought(dt){
     const width=el.offsetWidth,height=el.offsetHeight,origin=canvas.getBoundingClientRect();
     const obstacles=[$('.pencil-note'),$('.introduction'),$('.bottom-edge'),...document.querySelectorAll('.knot-name')].map(el=>{const r=el.getBoundingClientRect();return {left:r.left-origin.left,right:r.right-origin.left,top:r.top-origin.top,bottom:r.bottom-origin.top};});
     const rock=physics.rock.bounds;obstacles.push({left:rock.min.x-10,right:rock.max.x+10,top:rock.min.y-10,bottom:rock.max.y+10},{left:hero.x-hero.size*.6,right:hero.x+hero.size*.6,top:hero.y-hero.size*1.1,bottom:hero.y+15});
-    const candidates=[[hero.x-hero.size*.7-width-14,hero.y-hero.size*.9],[hero.x+hero.size*.7+14,hero.y-hero.size*.9],[hero.x-width*.5,hero.y+50]];
+    const candidates=[...(W<760?[[W*.07,340]]:[]),[hero.x-hero.size*.7-width-14,hero.y-hero.size*.9],[hero.x+hero.size*.7+14,hero.y-hero.size*.9],[hero.x-width*.5,hero.y+50]];
     const choices=candidates.map(([x,y])=>{x=clamp(x,12,W-width-12);y=clamp(y,95,H-height-8);const area=obstacles.reduce((sum,r)=>sum+Math.max(0,Math.min(x+width,r.right)-Math.max(x,r.left))*Math.max(0,Math.min(y+height,r.bottom)-Math.max(y,r.top)),0);return{x,y,area};});
     const chosen=choices.find(p=>p.area===0)||choices.sort((a,b)=>a.area-b.area)[0],{x,y}=chosen,ease=1-Math.exp(-Math.max(dt,.016)*9);
     thoughtX=thoughtX===null?x:thoughtX+(x-thoughtX)*ease;thoughtY=thoughtY===null?y:thoughtY+(y-thoughtY)*ease;
@@ -70,7 +71,7 @@ function resize(){
     cancelGrab();auraField.clear();physics?.dispose();physics=new HillPhysics(W,H,impact);physics.restoreTerrain(terrain);terrainSeen=-1;catchSeen=0;
     if(old&&oldW){const b=physics.rock;Matter.Body.setPosition(b,{x:clamp(old.position.x/oldW*W,physics.radius,W-physics.radius),y:Math.min(old.position.y/oldH*H,physics.ground(old.position.x/oldW*W)-physics.radius)});Matter.Body.setAngle(b,old.angle);}
     hero.size=W<760?84:128;physics.addMeowl(hero.size);hero.held=false;updateCharacters(0);
-    prepareLinework();setHillContour(Array.from({length:52},(_,i)=>{const x=Math.min(W*.963,i*W/52);return[x,physics.ground(x)];}),Math.min(0,physics.base(W*.47)-H*.72-22));layoutProjects();last=0;wake();
+    prepareLinework();setHillContour(physics.contour(),Math.min(0,physics.base(W*.47)-H*.72-22));layoutProjects();last=0;wake();
 }
 function layoutProjects(){
     for(const [i,el]of[...document.querySelectorAll('.knot')].entries()){
@@ -135,8 +136,8 @@ function updateCharacters(dt){
     shake*=Math.exp(-dt*12);stoneKick*=Math.exp(-dt*16);
 }
 function drawGround(){
-    if(terrainSeen!==physics.terrainVersion&&(time-terrainInkAt>.04||!physics.terrainChanging)){
-        setHillContour(Array.from({length:52},(_,i)=>{const x=Math.min(W*.963,i*W/52);return[x,physics.ground(x)];}),Math.min(0,physics.base(W*.47)-H*.72-22));
+    if((terrainSeen!==physics.terrainVersion||physics.slabs.length)&&(time-terrainInkAt>.04||!physics.terrainChanging)){
+        setHillContour(physics.contour(),Math.min(0,physics.base(W*.47)-H*.72-22));
         layoutProjects();terrainSeen=physics.terrainVersion;terrainInkAt=time;
     }
     // Restore the quieter distant sketch and the original hard, uneven ridge.
@@ -145,7 +146,7 @@ function drawGround(){
     background.bezierCurveTo(8,lastY+12,4,physics.ground(0)-15,0,physics.ground(0));
     c.strokeStyle='#777970';c.globalAlpha=.57;c.lineWidth=.65;c.stroke(background);c.globalAlpha=1;
     const ridge=new Path2D();ridge.moveTo(0,physics.ground(0));
-    for(let i=1;i<=51;i++){const x=Math.min(W*.963,i*W/52);ridge.lineTo(x,physics.ground(x));}
+    for(const [x,y]of physics.contour().slice(1))ridge.lineTo(x,y);
     c.strokeStyle='#393a36';c.lineWidth=1.3;c.stroke(ridge);
     const fullH=$('#world').offsetHeight,bookWidth=document.querySelector('.sketchbook').offsetWidth,margin=W<760?10:Math.max(24,(W-bookWidth)/2+22);
     const end=[W*.963,physics.ground(W*.963)],slope=(end[1]-physics.ground(W*50/52))/(W*.963-W*50/52),exit=new Path2D();exit.moveTo(...end);
@@ -153,8 +154,9 @@ function drawGround(){
     c.lineWidth=1.15;c.strokeStyle='#656054';c.globalAlpha=.7;c.stroke(exit);c.globalAlpha=1;
     // Only structural fractures are drawn. Erosion clips away exposed material.
     c.save();c.beginPath();c.moveTo(0,physics.ground(0));
-    for(let i=1;i<=52;i++)c.lineTo(i*W/52,physics.ground(i*W/52));
-    c.lineTo(W,H);c.lineTo(0,H);c.closePath();c.clip();
+    for(let i=1;i<=50;i++)c.lineTo(i*W/52,physics.ground(i*W/52));
+    c.lineTo(W*.963,physics.ground(W*.963));
+    c.lineTo(W*.963,H);c.lineTo(0,H);c.closePath();c.clip();
     for(const fault of physics.faults){
         const damage=Math.min(1,fault.damage||0),growth=Math.min(1,(physics.time-fault.born)/(.14/3))*(.4+damage*.6);
         c.globalAlpha=fault.broken?.55:.32+damage*.6;c.strokeStyle='#665b45';c.lineWidth=fault.broken?.75:.55+damage*1.55;
@@ -258,13 +260,15 @@ $('#help').addEventListener('click',()=>{toyMotionRequested=true;if(paused)setPa
 $('#reset').addEventListener('click',()=>{cancelGrab();auraField.clear();physics.reset();hero.pet=0;hero.cheer=0;particles.length=0;ripples.length=0;scuffs.length=0;status('another morning. another go.');updateCharacters(0);wake();});
 $('#encourage').addEventListener('click',()=>{if(paused)setPause(false);hero.cheer=3;hero.pet=0;used();status('go on, little guy.');playTone('pet');wake();});
 function setPause(value){paused=value;hillSound.active(!paused&&worldVisible&&!panelOpen);cancelGrab();if(paused){cancelAnimationFrame(frame);frame=0;}last=0;wake();}
+const quoteAuthors=['author unverified / a line i keep','from my notebook / written with ai','from my notebook / written with ai','from my notebook / written with ai','my onion reminder'];
 const quotes=["The only man who ever beat you offers a rematch every morning. Take it.","You do not owe the world an undefeated man. Give it one who returns.","The boulder rolled back. It didn't erase the strength you built pushing it.","It's been a hard road. You still get to see where it leads.","The treadmill has sped up. The onion held the line. So must I."];let quote=0;
-$('#next-quote').addEventListener('click',()=>{quote=(quote+1)%quotes.length;$('#quote').textContent=quotes[quote];$('#quote').getAnimations().forEach(a=>a.cancel());$('#quote').animate([{opacity:.2},{opacity:1}],{duration:300});});
+$('#next-quote').addEventListener('click',()=>{quote=(quote+1)%quotes.length;$('#quote').textContent=quotes[quote];$('#quote-author').textContent=quoteAuthors[quote];$('#quote').getAnimations().forEach(a=>a.cancel());$('#quote').animate([{opacity:.2},{opacity:1}],{duration:300});});
 
 function openPanel(key=null,trigger){
+    dispatchEvent(new CustomEvent('project-music',{detail:key}));
     if(!panelOpen)returnFocus=trigger||document.activeElement;
     cancelGrab();cancelAnimationFrame(frame);frame=0;last=0;project=key;panelOpen=true;hillSound.active(false);
-    const panel=$('#project-panel');panel.inert=false;document.body.classList.add('panel-open');mix.refresh();$('#open-index').setAttribute('aria-expanded','true');if(W<760)$('#world').inert=true;
+    const panel=$('#project-panel');panel.inert=false;document.body.classList.add('panel-open');mix.refresh();$('#open-index')?.setAttribute('aria-expanded','true');if(W<760)$('#world').inert=true;
     for(const el of document.querySelectorAll('.knot'))el.setAttribute('aria-expanded',String(el.dataset.project===key));
     const oldScene=$('.scene-frame');if(oldScene)demoObserver.unobserve(oldScene);
     if(!key){
@@ -277,9 +281,9 @@ function openPanel(key=null,trigger){
     }
     panel.scrollTop=0;panel.scrollTop=0;$('#close-panel').focus({preventScroll:true});wake();
 }
-function closePanel(){last=0;panelOpen=false;project=null;$('#world').inert=false;$('#project-panel').inert=true;document.body.classList.remove('panel-open');$('#open-index').setAttribute('aria-expanded','false');for(const el of document.querySelectorAll('.knot'))el.setAttribute('aria-expanded','false');if($('.scene-frame'))demoObserver.unobserve($('.scene-frame'));$('#panel-content').replaceChildren();mix.refresh();returnFocus?.focus({preventScroll:true});wake();}
+function closePanel(){dispatchEvent(new CustomEvent('project-music',{detail:null}));last=0;panelOpen=false;project=null;$('#world').inert=false;$('#project-panel').inert=true;document.body.classList.remove('panel-open');$('#open-index')?.setAttribute('aria-expanded','false');for(const el of document.querySelectorAll('.knot'))el.setAttribute('aria-expanded','false');if($('.scene-frame'))demoObserver.unobserve($('.scene-frame'));$('#panel-content').replaceChildren();mix.refresh();returnFocus?.focus({preventScroll:true});wake();}
 document.addEventListener('click',e=>{const el=e.target.closest('[data-project]');if(el)openPanel(el.dataset.project,el);});
-$('#open-index').addEventListener('click',e=>panelOpen?closePanel():openPanel(null,e.currentTarget));$('#close-panel').addEventListener('click',closePanel);
+$('#open-index')?.addEventListener('click',e=>panelOpen?closePanel():openPanel(null,e.currentTarget));$('#close-panel').addEventListener('click',closePanel);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panelOpen){e.preventDefault();closePanel();}});
 window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===$('.scene-frame')?.contentWindow&&e.data?.type==='close-project')closePanel();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(frame);frame=0;last=0;cancelGrab();hillSound.active(false);}else{wake();}});
@@ -288,7 +292,7 @@ new ResizeObserver(resize).observe(canvas);
 ready.then(wake).catch(()=>{status('the creature artwork could not load. reload to try again.');});
 window.__hill=()=>({time,paused,aura:{count:auraField.particles.length,deflections:auraField.deflections,bounces:auraField.bounces},sound:mix.enabled,audio:mix.diagnostics(),pointerGrab:grab?.type||null,lastRelease,reducedMotion:reduce.matches,toyMotionRequested,assets:art.ready,hero:{...hero},physics:physics?.diagnostics(),particles:particles.length,scuffs:scuffs.length,panel:project,panelOpen,petCount,meanFrameMs:intervals.length?intervals.reduce((a,b)=>a+b,0)/intervals.length:0});
 
-const chapterObserver=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting){entry.target.classList.add('seen');const demo=entry.target.querySelector('iframe[data-scene]');if(demo&&!demo.hasAttribute('src'))demo.src='demo.html?scene='+demo.dataset.scene;demo.loading='eager';}}},{rootMargin:'550px 0px',threshold:0});
+const chapterObserver=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting){entry.target.classList.add('seen');const demo=entry.target.querySelector('iframe[data-scene]');if(demo&&!demo.hasAttribute('src')){demo.loading='eager';demo.src='demo.html?scene='+demo.dataset.scene;}}}},{rootMargin:'550px 0px',threshold:0});
 document.querySelectorAll('.sketch-chapter').forEach(el=>chapterObserver.observe(el));
 
 new IntersectionObserver(entries=>{worldVisible=entries[0].isIntersecting;hillSound.active(worldVisible&&!paused&&!panelOpen);if(!worldVisible){cancelAnimationFrame(frame);frame=0;last=0;cancelGrab();}else wake();},{threshold:0}).observe($('#world'));

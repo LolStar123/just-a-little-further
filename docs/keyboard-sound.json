@@ -1,0 +1,24 @@
+{
+  "author": "MattRuthSound",
+  "source": "https://freesound.org/people/MattRuthSound/sounds/561697/",
+  "preview": "https://cdn.freesound.org/previews/561/561697_7107243-hq.mp3",
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "edits": "Trimmed, low-pass filtered, softened and three playback-rate variants",
+  "cuts": [
+    {
+      "offset": 55.958666666666666,
+      "duration": 0.09358333333333334,
+      "cut": "mechanical-key-0"
+    },
+    {
+      "offset": 56.12225,
+      "duration": 0.09075,
+      "cut": "mechanical-key-1"
+    },
+    {
+      "offset": 56.283,
+      "duration": 0.08770833333333333,
+      "cut": "mechanical-key-2"
+    }
+  ]
+}
