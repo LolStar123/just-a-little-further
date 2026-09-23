@@ -4,33 +4,33 @@
     "cases": [
       {
         "scroll": 0,
-        "maxGroundGap": 3.569990537431792,
+        "maxGroundGap": 2.375241627827177,
         "modes": [
-          "air",
           "run",
+          "air",
           "land",
           "crouch"
         ]
       },
       {
         "scroll": 240,
-        "maxGroundGap": 16.896362503551263,
+        "maxGroundGap": 5.325058231399069,
         "modes": [
-          "land",
           "air",
           "crouch",
-          "run"
+          "fly",
+          "run",
+          "land"
         ]
       },
       {
         "scroll": 1000,
-        "maxGroundGap": 13.272088053849115,
+        "maxGroundGap": 13.711596394149282,
         "modes": [
           "run",
-          "crouch",
-          "land",
           "air",
-          "flutter"
+          "land",
+          "crouch"
         ]
       }
     ],
@@ -71,32 +71,33 @@
     "cases": [
       {
         "scroll": 0,
-        "maxGroundGap": 5.297743549624892,
+        "maxGroundGap": 4.341051812684699,
         "modes": [
           "run",
           "air",
-          "crouch",
-          "land"
+          "land",
+          "crouch"
         ]
       },
       {
         "scroll": 240,
-        "maxGroundGap": 6.807085286924561,
+        "maxGroundGap": 4.11271075020339,
         "modes": [
-          "air",
           "run",
+          "air",
           "land",
           "crouch"
         ]
       },
       {
         "scroll": 1000,
-        "maxGroundGap": 1.7825379168569884,
+        "maxGroundGap": 9.985622140965932,
         "modes": [
-          "land",
-          "crouch",
+          "flutter",
           "air",
-          "flutter"
+          "crouch",
+          "run",
+          "land"
         ]
       }
     ],
@@ -137,32 +138,32 @@
     "cases": [
       {
         "scroll": 0,
-        "maxGroundGap": 11.998111204482045,
+        "maxGroundGap": 4.446109919921737,
         "modes": [
-          "air",
           "run",
+          "air",
           "land",
           "crouch"
         ]
       },
       {
         "scroll": 240,
-        "maxGroundGap": 1.076449488080867,
+        "maxGroundGap": 6.12490951117097,
         "modes": [
+          "land",
           "air",
           "run",
-          "land",
           "crouch"
         ]
       },
       {
         "scroll": 1000,
-        "maxGroundGap": 0.527959704556633,
+        "maxGroundGap": 6.017017404397892,
         "modes": [
-          "land",
-          "crouch",
+          "run",
           "air",
-          "flutter"
+          "land",
+          "crouch"
         ]
       }
     ],

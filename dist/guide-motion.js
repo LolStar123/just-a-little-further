@@ -52,15 +52,18 @@ export class GuideMotion{
   const bandTop=viewport.top+(viewport.bottom-viewport.top)*.8;
   const offscreen=this.y<viewport.top-130||this.y>viewport.bottom+130;
   // Watch actual progress, not repeated state changes around the same curl.
-  const routeDistance=Math.hypot(target.x-this.x,target.y-this.y);
-  if(!this.progressGoal||Math.hypot(target.x-this.progressGoal.x,target.y-this.progressGoal.y)>90){this.progressGoal={...target};this.bestDistance=routeDistance;this.stalledFor=0;}
-  if(routeDistance<this.bestDistance-22){this.bestDistance=routeDistance;this.stalledFor=0;}
-  else if(routeDistance>115&&['run','air','land','crouch'].includes(this.mode))this.stalledFor=(this.stalledFor||0)+dt;
-  else if(routeDistance<100)this.stalledFor=0;
-  if(this.stalledFor>1.8&&this.time>(this.bypassAfter||0)&&!this.held){
-   this.stalledFor=0;this.bypassAfter=this.time+4;this.attentionBounce=0;this.triplet=0;
+  const routeDistance=Math.hypot(target.x-this.x,target.y-this.y),progressDistance=route.remaining??routeDistance;
+  if(!this.progressGoal||Math.hypot(target.x-this.progressGoal.x,target.y-this.progressGoal.y)>90){this.progressGoal={...target};this.bestDistance=progressDistance;this.stalledFor=0;}
+  if(progressDistance<this.bestDistance-22){this.bestDistance=progressDistance;this.stalledFor=0;}
+  else if((routeDistance>35||route.remaining>180)&&['run','air','land','crouch'].includes(this.mode))this.stalledFor=(this.stalledFor||0)+dt;
+  else if(routeDistance<30&&route.remaining<100)this.stalledFor=0;
+  const grounded=['run','land','crouch'].includes(this.mode);
+  if(grounded&&Math.hypot(this.vx,this.vy)<12&&(routeDistance>28||route.remaining>100))this.junctionWait=(this.junctionWait||0)+dt;
+  else this.junctionWait=0;
+  if((this.stalledFor>1.8||this.junctionWait>.7)&&this.time>(this.bypassAfter||0)&&!this.held){
+   this.stalledFor=0;this.junctionWait=0;this.bypassAfter=this.time+2;this.attentionBounce=0;this.triplet=0;
    this.text=['this curl? taking a shortcut!','tiny wings. big shortcut.','coming! hopping over this bit.'][this.moveCount++%3];this.contextText=this.text;this.sayAt=this.time+4;
-   if(routeDistance<310&&Math.abs(target.y-this.y)<160)this.jump(target,'kong');
+   if(routeDistance<310&&Math.abs(target.y-this.y)<160){this.landingPoint=null;this.jump(target,'kong');}
    else{this.bypassTarget={...target};this.state('flutter');}
   }
   if(this.bypassTarget){if(Math.hypot(this.bypassTarget.x-route.target.x,this.bypassTarget.y-route.target.y)>350)this.bypassTarget=null;else target=this.bypassTarget;}
@@ -104,7 +107,7 @@ export class GuideMotion{
   }else{
    const dx=ahead.x-this.x,dy=ahead.y-this.y,d=Math.hypot(dx,dy),slope=dy/(Math.abs(dx)+8);
    if(offscreen&&distance>300||Math.hypot(near.x-this.x,near.y-this.y)>100){this.state('fly');}
-   else if(!ledge&&distance<100&&this.idleTime>.35){
+   else if(!ledge&&distance<32&&(route.remaining??0)<60&&this.idleTime>.35){
     // A local attention routine: full-body wave, high hop, then an occasional rebound.
     this.kind='wave';const perch=route.perchAt(this.x,this.y);this.vx+=(perch.x-this.x)*60*dt-this.vx*14*dt;this.vy+=(perch.y-this.y)*60*dt-this.vy*14*dt;
     if(!reduced&&this.time>this.nextMove){

@@ -122,3 +122,11 @@ Verified at 1440px and 390px: no scene exceptions, 17 desk key events sampled pe
 - [x] Research-paper rustles now follow the runner clock: pickup at lap start, notebook placement at 65% of the lap. Slightly louder varied paper recordings (.8 to 1 / 1.12 scene levels).
 
 - [x] Restore the visible papers-collected counter under the research title; increments at notebook delivery, using the continuous route clock.
+
+## Centred stamps and hairpin traversal
+- [x] Keep PUSH. / PUUUSH! / PUUUUUUSH!!! in a fixed-width centred key. Label stamps rotate -4 / +3 / -5 degrees with a brief squash and sparse impact marks; reduced motion retains static tilts.
+- [x] Shorten guide look-ahead from 110px to 24px so tight bends do not aim back across themselves. Restrict branch matching to a local 130px arc and prevent backward branch jumps beyond 20px.
+- [x] Detect stationary nearby junctions, not just distant stalls; hop across when necessary.
+- [x] Measure stall progress using remaining distance along the wire rather than straight-line distance, which increases legitimately around a hairpin. Only settle once both physical and path distance are close.
+
+Verification: three stamp stages measured centred within .01px on 1440px and 390px viewports; full word fits the key. Deterministic guide traversal passed 12px, 25px and 55px radius 180-degree turns.

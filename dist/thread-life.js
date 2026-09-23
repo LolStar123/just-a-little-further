@@ -90,18 +90,18 @@ export function threadLife(svg,path){
             let j=nearest(actor.x,actor.y);
             if(routeCache&&!['fly','flutter','thrown','held','cheer'].includes(actor.mode)){
                 let bestLocal=Infinity,local=j;
-                for(let i=tugStart;i<base.length;i++){const arc=Math.abs(lengths[i]-travel);if(arc>650)continue;const score=Math.hypot(shape[i][0]-actor.x,shape[i][1]-actor.y)+arc*.12;if(score<bestLocal){bestLocal=score;local=i;}}
+                for(let i=tugStart;i<base.length;i++){const arc=Math.abs(lengths[i]-travel);if(arc>130)continue;if(routeCache.direction&&routeCache.direction*(lengths[i]-travel)<-20)continue;const score=Math.hypot(shape[i][0]-actor.x,shape[i][1]-actor.y)+arc*.12;if(score<bestLocal){bestLocal=score;local=i;}}
                 if(bestLocal<260)j=local;
             }
             travel=lengths[j];
             const destination=lengths[targetIndex],direction=destination>=travel?1:-1;
-            const ahead=pointAt(Math.max(0,Math.min(total,travel+direction*Math.min(110,Math.abs(destination-travel))))),near=pointAt(travel),target=pointAt(Math.max(0,Math.min(total,destination)));
+            const ahead=pointAt(Math.max(0,Math.min(total,travel+direction*Math.min(24,Math.abs(destination-travel))))),near=pointAt(travel),target=pointAt(Math.max(0,Math.min(total,destination)));
             // Loops offer real shortcuts: select a reachable future foothold, then leap through space.
             let shortcut=null;
             for(let distance=170;distance<=480;distance+=50){const candidate=pointAt(Math.max(0,Math.min(total,travel+direction*distance))),gap=Math.hypot(candidate.x-actor.x,candidate.y-actor.y);if(gap>65&&gap<230&&candidate.y>actor.y-80&&candidate.y<actor.y+155){shortcut=candidate;}}
             // The viewport chooses a real perch. Never move the perch off its wire.
             const perchAt=(x,y)=>{let best=Infinity,pick=target;for(const p of shape){if(p[0]<viewLeft+45||p[0]>viewLeft+viewWidth-45||p[1]<viewTop+70||p[1]>viewBottom-22)continue;const score=Math.hypot(p[0]-x,p[1]-y);if(score<best){best=score;pick={x:p[0],y:p[1]};}}return {...pick};};
-            routeCache={near,ahead,target,shortcut,perchAt,goodbye,remaining:Math.abs(destination-travel),committedExit:crossingTubeLoop?target:null};
+            routeCache={near,ahead,target,shortcut,perchAt,goodbye,direction,remaining:Math.abs(destination-travel),committedExit:crossingTubeLoop?target:null};
             sceneCache=sceneRects.find(r=>actor.y>=r.top-100&&actor.y<r.bottom+130)||null;
             targetAt=now+90;
         }

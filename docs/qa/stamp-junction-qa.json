@@ -1,0 +1,116 @@
+[
+  {
+    "width": 1440,
+    "stages": [
+      {
+        "text": "PUSH.",
+        "offset": 0.0078125,
+        "rotate": "-4deg",
+        "width": 78.5927734375,
+        "available": 290
+      },
+      {
+        "text": "PUUUSH!",
+        "offset": 0,
+        "rotate": "3deg",
+        "width": 116.61865234375,
+        "available": 290
+      },
+      {
+        "text": "PUUUUUUSH!!!",
+        "offset": 0.0078125,
+        "rotate": "-5deg",
+        "width": 185.6849365234375,
+        "available": 289.988525390625
+      }
+    ],
+    "nearJunction": {
+      "x": 107.65500025993646,
+      "biggest": 5.091798755764791,
+      "history": [
+        {
+          "mode": "air",
+          "kind": "kong",
+          "at": 0.7083333333333333
+        },
+        {
+          "mode": "land",
+          "kind": "land",
+          "at": 1.166666666666665
+        },
+        {
+          "mode": "run",
+          "kind": "run",
+          "at": 1.3499999999999976
+        },
+        {
+          "mode": "crouch",
+          "kind": "crouch",
+          "at": 1.8749999999999958
+        },
+        {
+          "mode": "air",
+          "kind": "starhop",
+          "at": 2.0583333333333287
+        }
+      ]
+    }
+  },
+  {
+    "width": 390,
+    "stages": [
+      {
+        "text": "PUSH.",
+        "offset": 0.0078125,
+        "rotate": "-4deg",
+        "width": 74.46633911132812,
+        "available": 290
+      },
+      {
+        "text": "PUUUSH!",
+        "offset": 7.62939453125e-06,
+        "rotate": "3deg",
+        "width": 109.51148986816406,
+        "available": 289.96142578125
+      },
+      {
+        "text": "PUUUUUUSH!!!",
+        "offset": 0.0077972412109375,
+        "rotate": "-5deg",
+        "width": 173.544189453125,
+        "available": 289.960693359375
+      }
+    ],
+    "nearJunction": {
+      "x": 107.65500025993646,
+      "biggest": 5.091798755764791,
+      "history": [
+        {
+          "mode": "air",
+          "kind": "kong",
+          "at": 0.7083333333333333
+        },
+        {
+          "mode": "land",
+          "kind": "land",
+          "at": 1.166666666666665
+        },
+        {
+          "mode": "run",
+          "kind": "run",
+          "at": 1.3499999999999976
+        },
+        {
+          "mode": "crouch",
+          "kind": "crouch",
+          "at": 1.8749999999999958
+        },
+        {
+          "mode": "air",
+          "kind": "starhop",
+          "at": 2.0583333333333287
+        }
+      ]
+    }
+  }
+]

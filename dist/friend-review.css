@@ -117,3 +117,5 @@ body.tugging-thread,body.tugging-thread *{user-select:none!important;cursor:grab
 .poetato-sticker:not(.has-yoshi-arrow){margin-top:24px}
 
 #little-boot #boot-push{min-width:min(290px,78vw);border-width:1.5px 1.5px 5px;border-radius:3px 5px 2px 4px;background:var(--paper);transform-origin:center bottom;font-size:29px;letter-spacing:.01em}
+
+#little-boot #boot-push{position:relative;display:grid;place-items:center;margin:0 auto;width:min(290px,78vw);height:80px;padding:10px 14px;text-align:center;rotate:0deg;transform-origin:center}.push-word{display:block;white-space:nowrap;line-height:1.15;transform-origin:center;font-size:clamp(23px,7vw,29px);-webkit-text-stroke:.2px currentColor}.push-ink{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;opacity:.35}
