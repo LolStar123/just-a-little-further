@@ -325,17 +325,18 @@ export class HillPhysics {
         const a=this.actor,b=this.rock,r=this.reposition;
         r.age+=dt;this.catchActive=false;this.contact=false;this.effort=0;
         a.friction=.05;a.frictionStatic=.1;
-        // Recover by physically hopping over the stone; never change collision layers.
+        // Step into the foreground passing lane. Only the boulder is bypassed;
+        // ground and walls remain solid. Rejoin its lane before bracing.
+        a.collisionFilter.mask=0xFFFFFFFD;
         const edge=b.bounds.min.x-this.actorWidth*.72;
         const target=clamp(edge-this.actorSize*.48-Math.max(0,-b.velocity.x)*16,this.actorWidth*.65+3,this.w-this.actorWidth);
         let desired=0;
         if(r.phase==='startle'){
             this.mode='scramble';this.facing=1;
             this.lane=smooth(r.age/.14);desired=-.65;
-            if(r.age>.14){r.phase='around';r.age=0;a.collisionFilter.mask=0xFFFFFFFF;}
+            if(r.age>.14){r.phase='around';r.age=0;}
         }else if(r.phase==='around'){
-            this.mode='scurry';this.facing=-1;this.lane=0;
-            if(a.position.x>b.position.x){Body.setVelocity(a,{x:Math.max(0,a.velocity.x),y:-10});this.actorFlight={age:.7,phase:'flutter',homeX:target,overtake:'rise',clearY:Math.min(a.position.y,b.bounds.min.y-this.actorHeight*.7-28)};return;}
+            this.mode='scurry';this.facing=-1;this.lane+=(1-this.lane)*(1-Math.exp(-dt*20));
             desired=clamp((target-a.position.x)*.16,-6.8,0);
             const clear=a.bounds.max.x<b.bounds.min.x-Math.min(this.actorSize*.4,Math.max(5,b.bounds.min.x-this.actorWidth*1.9));
             if(clear){this.plantIntercept();return;}
@@ -364,27 +365,6 @@ export class HillPhysics {
             const f=this.actorFlight;f.age+=dt;this.contact=false;this.gripGrace=false;this.grounded=false;this.pushForce=0;this.effort=0;this.lane=0;
             if(f.age<.7){this.mode='tossed';return;}
             f.phase='flutter';this.mode='flutter';a.collisionFilter.mask=0xFFFFFFFF;
-            if(f.overtake){
-                // Commit to a three-part vault. A moving grip target must not
-                // alternate climb/run every time a rotating corner passes us.
-                const lead=Math.max(0,-b.velocity.x)*28;
-                const tx=clamp(b.bounds.min.x-this.actorWidth*.9-24-lead,this.actorWidth*.65+3,this.w-this.actorWidth);
-                f.homeX=tx;
-                f.clearY=Math.min(f.clearY,b.bounds.min.y-this.actorHeight*.7-28,this.ground(a.position.x)-this.actorHeight*.65-20);
-                const edgeLanding=tx<=this.actorWidth*.65+4&&a.position.x<b.position.x-this.radius*.25;
-                const clear=a.bounds.max.x<b.bounds.min.x-18||edgeLanding;
-                if(f.overtake==='rise'&&a.bounds.max.y<b.bounds.min.y-22)f.overtake='cross';
-                if(f.overtake==='cross'&&clear)f.overtake='land';
-                if(f.overtake==='land'&&!clear)f.overtake='cross';
-                const ty=f.overtake==='land'?this.ground(tx)-this.actorHeight/2-2:f.clearY;
-                const dx=f.overtake==='rise'?0:tx-a.position.x,dy=ty-a.position.y;
-                const vx=clamp(dx*.12,-12,8),vy=clamp(dy*.10,-10,9);
-                Body.applyForce(a,a.position,{x:a.mass*(vx-a.velocity.x)*.0022,y:a.mass*((vy-a.velocity.y)*.0022-this.engine.gravity.y*this.engine.gravity.scale)});
-                this.facing=f.overtake==='land'?1:-1;this.mode='flutter';
-                const feet=a.bounds.max.y,landed=feet>=this.ground(a.position.x)-9;
-                if(f.overtake==='land'&&clear&&(landed||(edgeLanding&&a.bounds.max.y>b.position.y&&Math.abs(a.velocity.y)<1))){this.actorFlight=null;this.grounded=true;this.plantIntercept();}
-                return;
-            }
             const tx=f.homeX??=clamp(b.bounds.min.x-this.actorWidth*.7-14,this.actorWidth*.7+8,this.w-this.actorWidth);
             const homeY=this.ground(tx)-this.actorHeight/2-3;
             const crossing=(a.position.x>b.bounds.min.x&&tx<b.bounds.min.x)||(a.position.x<b.bounds.max.x&&tx>b.bounds.max.x);

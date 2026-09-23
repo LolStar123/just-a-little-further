@@ -57,7 +57,7 @@ export class GuideMotion{
   const grounded=['run','land','crouch'].includes(this.mode);
   if(grounded&&Math.hypot(this.vx,this.vy)<12&&(routeDistance>28||route.remaining>100))this.junctionWait=(this.junctionWait||0)+dt;
   else this.junctionWait=0;
-  if((this.stalledFor>1.8||this.junctionWait>.7)&&this.time>(this.bypassAfter||0)&&!this.held){
+  if((this.stalledFor>1.8||this.junctionWait>.7)&&this.time>(this.bypassAfter||0)&&grounded&&!this.held){
    this.stalledFor=0;this.junctionWait=0;this.bypassAfter=this.time+2;this.attentionBounce=0;this.triplet=0;
    this.text=['this curl? taking a shortcut!','tiny wings. big shortcut.','coming! hopping over this bit.'][this.moveCount++%3];this.contextText=this.text;this.sayAt=this.time+4;
    const foothold=shortcut||route.cornerExit||ahead;this.landingPoint=null;this.jump(foothold,'kong');
@@ -126,13 +126,15 @@ export class GuideMotion{
      this.x+=this.vx*dt;this.y+=this.vy*dt;return;
     }
     const previousTerrain=this.kind;
+    const poleTime=this.poleTime||0;this.poleTime=previousTerrain==='pole'?poleTime+dt:0;
     // Hold the slide through hand-drawn bumps; leave only for a sustained exit.
     const descending=dy>8&&Math.abs(dx)<18;
     if(descending)this.poleGrace=.28;else this.poleGrace=Math.max(0,(this.poleGrace||0)-dt);
     const slide=descending||(previousTerrain==='pole'&&this.poleGrace>0&&dy>-10);
     this.kind=slide?'pole':slope<-.7?'climb':slope>.35&&(!scene||this.y>scene.bottom-15)?'grind':slope>.85?'scramble':['halo','baxter'].includes(sceneKey)?'tiptoe':sceneKey==='mtxtato'?'balance':'scamper';
     const exit=route.cornerExit;
-    if(previousTerrain==='pole'&&this.kind!=='pole'&&exit&&Math.abs(exit.x-this.x)>28&&Math.abs(exit.y-this.y)<100&&!reduced){
+    if(previousTerrain==='pole'&&poleTime>.18&&this.time>(this.kickAfter||0)&&this.kind!=='pole'&&exit&&Math.abs(exit.x-this.x)>55&&Math.abs(exit.y-this.y)<65&&!reduced){
+     this.kickAfter=this.time+2.5;this.cornerAfter=this.time+1.5;
      this.kickPoint={x:near.x,y:near.y};this.kickDirection=Math.sign(exit.x-this.x);this.kickCount=(this.kickCount||0)+1;
      this.facing=this.kickDirection;this.attentionBounce=0;this.triplet=0;this.jump(exit,'wallkick');this.nextMove=this.time+1.1;
      this.text=this.kickDirection<0?'and... left!':'and... right!';this.contextText=this.text;this.sayAt=this.time+3;
@@ -143,7 +145,7 @@ export class GuideMotion{
     this.vx+=(dx/(d||1)*speed-this.vx)*(1-Math.exp(-dt*12));this.vy+=(dy/(d||1)*speed-this.vy)*(1-Math.exp(-dt*12));
     if(!reduced&&this.kind!=='pole'&&this.time>this.nextMove){
      this.moveCount++;let kind='leap',goal=shortcut||ahead;
-     if(slope< -1.25){kind='walljump';goal=ahead;this.text=['little kick. up we go!','one wall. two tiny feet.','boing. taking the upstairs route.'][this.moveCount%3];}
+     if(slope< -1.25&&exit&&exit.y<this.y-70&&Math.abs(exit.x-this.x)<40&&this.time>(this.kickAfter||0)){this.kickAfter=this.time+2.5;kind='walljump';goal=exit;this.text=['little kick. up we go!','one wall. two tiny feet.','boing. taking the upstairs route.'][this.moveCount%3];}
      else if(sceneKey==='deadlock'){kind='leap';goal={x:ahead.x,y:ahead.y-2};this.text=['that peak looks friendly.','mind the outliers.','the floor is doing statistics.'][this.moveCount%3];}
      else if(['scraper','pipeline'].includes(sceneKey)&&shortcut){kind=this.moveCount%2?'leap':'kong';this.text='shortcut. watch my feet.';}
      else if(sceneKey==='tfl'){kind='leap';this.text='mind the gap. tiny feet.';}

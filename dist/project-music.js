@@ -15,30 +15,54 @@ export const musicThemes={
  liquidation:{bpm:106,root:-3,meter:16,swing:.22,tone:'felt',chords:[[0,4,10,13,21],[-1,3,9,14,18],[-2,2,9,12,16],[0,4,9,14,19]],bass:[-24,-25,-26,-24],cents:[0,-14,-31,12,-16],bend:-25,rhythm:[0,3,6,8,11.5,14],name:'second hand / chromatic bargain'},
  ocr:{bpm:110,root:5,meter:15,swing:0,tone:'reed',chords:[[0,3,9,14,19],[1,5,10,15,20],[0,5,11,14,18],[0,4,9,14,19]],bass:[-24,-23,-24,-24],cents:[0,16,-16,0,2],bend:40,rhythm:[0,3,6,9,12,14],name:'odd characters / five small groups'}
 };
-const spectra={felt:[0,1,.16,.065,.035,.012],reed:[0,1,.09,.22,.025,.07],bell:[0,1,.24,.055,.13,.03,.045]};
+// Separate instrument envelopes as well as spectra: not one pluck with new notes.
+const instruments={
+ felt:{s:[0,1,.32,.12,.06,.015],attack:.006,decay:.22,sustain:.13,release:.8},
+ organ:{s:[0,1,.45,.12,.21,.025,.04],attack:.045,decay:.16,sustain:.76,release:.24},
+ flute:{s:[0,1,.025,.12,.012,.02],attack:.085,decay:.18,sustain:.68,release:.3},
+ pad:{s:[0,1,.16,.075,.025],attack:.15,decay:.3,sustain:.72,release:.65},
+ marimba:{s:[0,1,.02,.025,.32,.015,.08],attack:.003,decay:.075,sustain:.025,release:.25},
+ pluck:{s:[0,1,.42,.23,.12,.07,.025],attack:.004,decay:.11,sustain:.06,release:.35},
+ bell:{s:[0,1,.18,.04,.09],attack:.004,decay:.18,sustain:.15,release:.8},
+ bass:{s:[0,1,.1,.025],attack:.015,decay:.14,sustain:.3,release:.18}
+};
+const palettes={tfl:['organ','marimba'],scraper:['felt','flute'],pipeline:['marimba','pluck'],poe:['flute','bell'],commute:['pluck','felt'],smoothtato:['pad','flute'],mtxtato:['bell','pad'],deadlock:['organ','marimba'],baxter:['felt','organ'],botato:['marimba','flute'],halo:['pad','felt'],liquidation:['pluck','marimba'],ocr:['marimba','bell']};
+const spectra=Object.fromEntries(Object.entries(instruments).map(([k,v])=>[k,v.s]));
 const waves=new WeakMap();
 function wave(a,tone){let bank=waves.get(a);if(!bank){bank={};waves.set(a,bank);}return bank[tone]??=a.createPeriodicWave(new Float32Array(spectra[tone].length),Float32Array.from(spectra[tone]));}
 export function renderThemeBar(a,out,key,at,bar=0,variation=0,track=()=>{}){
- const t=musicThemes[key],tick=60/t.bpm/4,duration=t.meter*tick,cycle=(bar+variation)%t.chords.length,events=[];
+ const t=musicThemes[key],palette=palettes[key],chordTone=palette[Math.floor(bar/2)%2],leadTone=palette[(Math.floor(bar/2)+1)%2],tick=60/t.bpm/4,duration=t.meter*tick,cycle=(bar+variation)%t.chords.length,events=[];
  function voice(semi,when,length,amp,cents=0,bend=0,tone=t.tone,pan=0){
   const o=a.createOscillator(),g=a.createGain(),p=a.createStereoPanner();o.setPeriodicWave(wave(a,tone));o.frequency.value=196*2**((semi+t.root)/12);
-  o.detune.setValueAtTime(cents+bend,when);// Signed cents use linear interpolation.
-  o.detune.linearRampToValueAtTime(cents,when+.19);p.pan.value=pan;
-  g.gain.setValueAtTime(0,when);g.gain.linearRampToValueAtTime(amp,when+.012);g.gain.exponentialRampToValueAtTime(Math.max(.0001,amp*.2),when+.18);g.gain.exponentialRampToValueAtTime(.0001,when+length);
-  o.connect(g);g.connect(p);p.connect(out);o.start(when);o.stop(when+length+.02);track(o,g);o.onended=()=>{o.disconnect();g.disconnect();p.disconnect();};events.push({at:when,semitone:semi+t.root,cents,bend,amp});
+  const instrument=instruments[tone],held=['organ','flute','pad'].includes(tone);
+  // Pitch scoops belong to the airy voices, not every instrument's attack.
+  const scoop=held?bend:0;
+  o.detune.setValueAtTime(cents+scoop,when);o.detune.linearRampToValueAtTime(cents,when+.24);p.pan.value=pan;
+  const peak=amp*(tone==='pad'?.76:tone==='organ'?.75:1),end=when+Math.max(length,instrument.attack+instrument.decay+.03)+instrument.release;
+  g.gain.setValueAtTime(0,when);g.gain.linearRampToValueAtTime(peak,when+instrument.attack);
+  g.gain.exponentialRampToValueAtTime(Math.max(.0001,peak*instrument.sustain),when+instrument.attack+instrument.decay);
+  g.gain.setValueAtTime(Math.max(.0001,peak*instrument.sustain),end-instrument.release);
+  g.gain.exponentialRampToValueAtTime(.0001,end);
+  o.connect(g);g.connect(p);p.connect(out);o.start(when);o.stop(end+.02);track(o,g);
+  // A decaying, inharmonic partial makes the bell metallic rather than a reed.
+  if(tone==='bell'){
+   const chime=a.createOscillator(),cg=a.createGain();chime.type='sine';chime.frequency.value=o.frequency.value*2.756;
+   cg.gain.setValueAtTime(peak*.28,when);cg.gain.exponentialRampToValueAtTime(.0001,end);chime.connect(cg);cg.connect(p);chime.start(when);chime.stop(end);track(chime,cg);chime.onended=()=>{chime.disconnect();cg.disconnect();};
+  }
+  o.onended=()=>{o.disconnect();g.disconnect();p.disconnect();};events.push({at:when,semitone:semi+t.root,cents,bend:scoop,amp:peak,instrument:tone});
  }
  // First chord is immediate. Two distinct answers follow before three seconds.
  for(let k=0;k<3;k++){
   const slot=(cycle+k)%4,chord=t.chords[slot],when=at+[0,5,10][k]*tick;
-  chord.forEach((pitch,i)=>voice(pitch,when+i*.009,.68+k*.06,.038*(i===0?.75:1),t.cents[i],i===3?t.bend*(k===1?-.5:1):0,t.tone,(i-2)*.13));
-  voice(t.bass[slot],when,Math.min(1.1,duration),.11,0,0,'felt');
+  chord.forEach((pitch,i)=>voice(pitch,when+i*.009,.68+k*.06,.038*(i===0?.75:1),t.cents[i],i===3?t.bend*(k===1?-.5:1):0,chordTone,(i-2)*.13));
+  voice(t.bass[slot],when,Math.min(1.1,duration),.11,0,0,'bass');
  }
  const chord=t.chords[cycle];t.rhythm.forEach((beat,i)=>{
   // Triplets and quintuplets retain their exact spacing; only integer offbeats swing.
   const off=Number.isInteger(beat)&&beat%2?t.swing:0,when=at+(beat+off)*tick;
   const pitch=chord[(i*2+bar)%chord.length]+12,ghost=i%3===1;
-  voice(pitch,when+.035,ghost?.30:.5,ghost?.032:.065,t.cents[(i*2+bar)%5],i===1?-t.bend*.5:0,t.tone,Math.sin(i*1.9)*.32);
-  if(i===t.rhythm.length-2&&bar%2===0)voice(pitch-1,when-.025,.22,.023,0,25,t.tone,-.18);
+  voice(pitch,when+.035,ghost?.30:.5,ghost?.032:.065,t.cents[(i*2+bar)%5],i===1?-t.bend*.5:0,leadTone,Math.sin(i*1.9)*.32);
+  if(i===t.rhythm.length-2&&bar%2===0)voice(pitch-1,when-.025,.22,.023,0,25,leadTone,-.18);
  });
  // Quiet inharmonic bell colour. Never spread detuning across the bass anchor.
  if(t.tone==='bell')voice(t.chords[cycle][2]+12,at+.055,.9,.015,17,0,'felt',.25);
@@ -47,9 +71,9 @@ export function renderThemeBar(a,out,key,at,bar=0,variation=0,track=()=>{}){
 export function projectMusic(mix,onChange){
  let key=null,gain=null,next=0,bar=0,volume=.0882,bank=null,entry=0,lastEvents=[],openedAt=0;const nodes=new Set();
  function ensure(){if(gain)return;const a=mix.initialize();gain=a.createGain();gain.gain.value=0;const filter=a.createBiquadFilter();filter.type='lowpass';filter.frequency.value=2300;gain.connect(filter);filter.connect(mix.limiter);}
- function level(){if(gain){const t=mix.context.currentTime;gain.gain.cancelScheduledValues(t);gain.gain.setTargetAtTime(key&&mix.enabled?volume*.24:0,t,.055);}}
+ function level(){if(gain){const t=mix.context.currentTime;gain.gain.cancelScheduledValues(t);gain.gain.setTargetAtTime(key&&mix.enabled?volume*.36:0,t,.055);}}
  function clear(){const a=mix.context;if(!a)return;for(const n of nodes){try{n.g.gain.cancelScheduledValues(a.currentTime);n.g.gain.setTargetAtTime(.0001,a.currentTime,.018);n.o.stop(a.currentTime+.09);}catch{}}nodes.clear();if(bank){const old=bank;bank=null;setTimeout(()=>old.disconnect(),120);}}
- function schedule(){if(!key||!mix.enabled||mix.context?.state!=='running')return;const a=mix.context,now=a.currentTime;if(next<now)next=now+.015;while(next<now+2.5){if(!bank){bank=a.createGain();bank.connect(gain);}const result=renderThemeBar(a,bank,key,next,bar++,entry%2,(o,g)=>{const n={o,g};nodes.add(n);o.addEventListener('ended',()=>nodes.delete(n));});lastEvents=result.events;next+=result.duration;}}
+ function schedule(){if(!key||!mix.enabled||mix.context?.state!=='running')return;const a=mix.context,now=a.currentTime;if(next<now)next=now+.015;let opening=true;while(next<now+2.5){if(!bank){bank=a.createGain();bank.connect(gain);}const result=renderThemeBar(a,bank,key,next,bar++,entry%2,(o,g)=>{const n={o,g};nodes.add(n);o.addEventListener('ended',()=>nodes.delete(n));});if(opening){lastEvents=result.events;opening=false;}next+=result.duration;}}
  const timer=setInterval(schedule,70);
  addEventListener('project-music',e=>{clear();key=musicThemes[e.detail]?e.detail:null;ensure();bar=0;entry++;openedAt=mix.context.currentTime;next=openedAt+.018;level();onChange(!!key);schedule();});
  addEventListener('sound-state',()=>{level();if(!mix.enabled)clear();else{if(!bank)next=mix.context.currentTime+.015;schedule();}});

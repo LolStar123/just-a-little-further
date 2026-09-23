@@ -179,3 +179,11 @@ Music references: https://viva.pressbooks.pub/openmusictheory/chapter/altered-an
 - [x] Below lettering curves and spaces gradually from b/e/l/o through shrinking w tail.
 - [x] Background audio no longer stops or suspends its clock on tab hiding. Theme scheduler buffers ahead; simulated hidden-tab playback and clock advance checked. Browser/OS suspension remains outside page control.
 - [x] Only Deadlock, Path of Exile and Dota text link out; poker/Indomie unchanged. All five throwable objects still recover.
+
+## Restore the grounded chase
+- [x] Removed automatic overtaking flight. Sisyphus scurries through the foreground passing lane, turns downhill and braces.
+- [x] Only rock collision is bypassed during the passing maneuver; ground/walls remain solid. Full rock collision restores at brace, and user throws retain collision.
+- [x] Nine combinations of viewport width and downhill speed: reached brace, zero flight states, ground collision retained, full collision restored.
+- [x] Project theme gain raised 50 percent; main music and SFX unchanged.
+- [x] Distinct instrument spectra AND envelopes: felt keys, organ, flute, pad, marimba, pluck, metallic bell and round bass. Per-project duos trade chord/lead roles every two bars. Reduced universal pitch scoops.
+- [x] Guide wall kicks require a sustained pole slide and cooldown; curl slopes no longer trigger wall jumps. Recovery watchdog cannot restart a jump mid-air. Left/right slide exits and three hairpin radii checked.
