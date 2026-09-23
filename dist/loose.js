@@ -15,7 +15,7 @@ const TAU=Math.PI*2,reduce=matchMedia('(prefers-reduced-motion: reduce)');
 let toyMotionRequested=false;
 const quietToy=()=>reduce.matches&&!toyMotionRequested;
 let W=0,H=0,dpr=1,physics,time=0,last=0,frame=0,paused=false,dirty=true;
-let terrainSeen=-1,terrainInkAt=0;
+let terrainSeen=-1,terrainInkAt=0,extraDepth=0,paintTop=0,paintHeight=0;
 let landscape,lastRelease=null,grab=null,pointer={x:-1000,y:-1000,active:false};
 let petCount=0,catchSeen=0,shake=0,stoneKick=0;
 const particles=[],ripples=[],scuffs=[];
@@ -42,11 +42,11 @@ function positionThought(dt){
         thoughtShown=pendingThought;thoughtAt=time;copy.textContent=thoughtShown;
         copy.getAnimations().forEach(a=>a.cancel());copy.animate([{opacity:.2,transform:'translateY(4px) scale(.96)'},{opacity:1,transform:'translateY(-3px) scale(1.025)'},{transform:'translateY(1px) scale(.995)'},{transform:'none'}],{duration:420,easing:'ease-out'});
     }
-    const width=el.offsetWidth,height=el.offsetHeight,origin=canvas.getBoundingClientRect();
+    const width=el.offsetWidth,height=el.offsetHeight,origin=surface.getBoundingClientRect();
     const obstacles=[$('.introduction'),$('.bottom-edge'),...document.querySelectorAll('.knot-name')].map(el=>{const r=el.getBoundingClientRect();return {left:r.left-origin.left,right:r.right-origin.left,top:r.top-origin.top,bottom:r.bottom-origin.top};});
     const rock=physics.rock.bounds;obstacles.push({left:rock.min.x-10,right:rock.max.x+10,top:rock.min.y-10,bottom:rock.max.y+10},{left:hero.x-hero.size*.6,right:hero.x+hero.size*.6,top:hero.y-hero.size*1.1,bottom:hero.y+15});
     const candidates=[...(W<760?[[W*.07,340]]:[]),[hero.x-hero.size*.7-width-14,hero.y-hero.size*.9],[hero.x+hero.size*.7+14,hero.y-hero.size*.9],[hero.x-width*.5,hero.y+50]];
-    const choices=candidates.map(([x,y])=>{x=clamp(x,12,W-width-12);y=clamp(y,95,H-height-8);const area=obstacles.reduce((sum,r)=>sum+Math.max(0,Math.min(x+width,r.right)-Math.max(x,r.left))*Math.max(0,Math.min(y+height,r.bottom)-Math.max(y,r.top)),0);return{x,y,area};});
+    const choices=candidates.map(([x,y])=>{x=clamp(x,12,W-width-12);y=clamp(y,95,H+extraDepth-height-8);const area=obstacles.reduce((sum,r)=>sum+Math.max(0,Math.min(x+width,r.right)-Math.max(x,r.left))*Math.max(0,Math.min(y+height,r.bottom)-Math.max(y,r.top)),0);return{x,y,area};});
     const chosen=choices.find(p=>p.area===0)||choices.sort((a,b)=>a.area-b.area)[0],{x,y}=chosen,ease=1-Math.exp(-Math.max(dt,.016)*9);
     thoughtX=thoughtX===null?x:thoughtX+(x-thoughtX)*ease;thoughtY=thoughtY===null?y:thoughtY+(y-thoughtY)*ease;
     el.style.transform=`translate(${thoughtX}px,${thoughtY+Math.sin(time*2)*1.2}px)`;
@@ -64,16 +64,19 @@ function prepareLinework(){
     }
 }
 function resize(){
-    const r=canvas.getBoundingClientRect(),nextDpr=Math.min(devicePixelRatio||1,2);
+    const sr=surface.getBoundingClientRect(),r={width:sr.width,height:sr.height-extraDepth},nextDpr=Math.min(devicePixelRatio||1,2);
     if(physics&&Math.abs(r.width-W)<.5&&Math.abs(r.height-H)<.5&&nextDpr===dpr)return;
     const oldW=W,oldH=H,old=physics?.diagnostics(),terrain=physics?.terrainState();W=r.width;H=r.height;dpr=nextDpr;
-    canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);c.setTransform(dpr,0,0,dpr,0,0);
+    surface.dataset.baseHeight=H;paintHeight=0;canvas.width=Math.round(W*dpr);canvas.height=Math.round(Math.min(H,innerHeight+256)*dpr);c.setTransform(dpr,0,0,dpr,0,0);
     cancelGrab();auraField.clear();physics?.dispose();physics=new HillPhysics(W,H,impact);physics.restoreTerrain(terrain);terrainSeen=-1;catchSeen=0;
     if(old&&oldW){const b=physics.rock;Matter.Body.setPosition(b,{x:clamp(old.position.x/oldW*W,physics.radius,W-physics.radius),y:Math.min(old.position.y/oldH*H,physics.ground(old.position.x/oldW*W)-physics.radius)});Matter.Body.setAngle(b,old.angle);}
     hero.size=W<760?84:128;physics.addMeowl(hero.size);hero.held=false;updateCharacters(0);
     prepareLinework();setHillContour(physics.contour(),Math.min(0,physics.base(W*.47)-H*.72-22));layoutProjects();last=0;wake();
 }
 function layoutProjects(){
+    const deepest=Math.max(...physics.nodes.map(n=>physics.ground(n.x))),needed=Math.max(0,Math.ceil((deepest+100-H)/80)*80);
+    if(needed!==extraDepth){extraDepth=needed;$('#world').style.setProperty('--dig-depth',extraDepth+'px');dispatchEvent(new Event('ink-anchors'));}
+    physics.extendDepth(H+extraDepth);
     for(const [i,el]of[...document.querySelectorAll('.knot')].entries()){
         const x=(.06+i*.88/(trail.length-1))*W;
         el.style.left=x+'px';el.style.top=(physics.ground(x)+62)+'px';
@@ -153,7 +156,7 @@ function drawGround(){
     c.save();c.beginPath();c.moveTo(0,physics.ground(0));
     for(let i=1;i<=50;i++)c.lineTo(i*W/52,physics.ground(i*W/52));
     c.lineTo(W*.963,physics.ground(W*.963));
-    c.lineTo(W*.963,H);c.lineTo(0,H);c.closePath();c.clip();
+    c.lineTo(W*.963,H+extraDepth);c.lineTo(0,H+extraDepth);c.closePath();c.clip();
     for(const fault of physics.faults){
         const damage=Math.min(1,fault.damage||0),growth=Math.min(1,(physics.time-fault.born)/(.14/3))*(.4+damage*.6);
         c.globalAlpha=fault.broken?.55:.32+damage*.6;c.strokeStyle='#665b45';c.lineWidth=fault.broken?.75:.55+damage*1.55;
@@ -203,7 +206,12 @@ function render(dt){
         const el=$('#'+id);el.style.width=w+'px';el.style.height=h+'px';el.style.transform='translate('+(x-w/2)+'px,'+(y-h/2)+'px)';
     }
 
-    c.clearRect(0,0,W,H);c.fillStyle='#eeeae0';c.fillRect(0,0,W,H);
+    // Paint only the visible slice; excavation can deepen without a giant bitmap.
+    const top=clamp(-surface.getBoundingClientRect().top-128,0,Math.max(0,H+extraDepth-innerHeight-256));
+    const ph=Math.min(H+extraDepth,innerHeight+256);
+    if(paintHeight!==ph){paintHeight=ph;canvas.height=Math.ceil(ph*dpr);canvas.style.height=ph+'px';}
+    paintTop=top;canvas.style.top=top+'px';c.setTransform(dpr,0,0,dpr,0,-paintTop*dpr);
+    c.clearRect(0,paintTop,W,paintHeight);c.fillStyle='#eeeae0';c.fillRect(0,paintTop,W,paintHeight);
 
     drawGround();
     c.save();if(!quietToy()){c.translate(shake>.02?Math.sin(time*70)*shake*.35:0,0);}
@@ -220,7 +228,7 @@ function tick(now){
     if(dt){const worldDt=dt;time+=worldDt;physics.step(worldDt,{pet:hero.pet,cheer:hero.cheer});updateCharacters(worldDt);auraField.step(worldDt,hero,physics,quietToy());hillAudio();}
     if(dirty||!paused)render(dt);dirty=false;if(!paused&&!document.hidden&&worldVisible&&!panelOpen)frame=requestAnimationFrame(tick);
 }
-function pos(e){const r=canvas.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};}
+function pos(e){const r=surface.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};}
 surface.addEventListener('pointerdown',e=>{
     if(e.pointerType==='mouse'&&e.button!==0)return;
     if(grab&&!physics.drag)cancelGrab(false,'stale constraint');if(grab)return;const p=pos(e);pointer={...p,active:true};
@@ -286,9 +294,9 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panelOpen){e.preven
 window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===$('.scene-frame')?.contentWindow&&e.data?.type==='close-project')closePanel();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(frame);frame=0;last=0;cancelGrab();hillSound.active(false);}else{wake();}});
 window.addEventListener('blur',()=>{cancelGrab(false,'window blur');});
-new ResizeObserver(resize).observe(canvas);
+new ResizeObserver(resize).observe(surface);
 ready.then(wake).catch(()=>{status('the creature artwork could not load. reload to try again.');});
-window.__hill=()=>({time,paused,aura:{count:auraField.particles.length,deflections:auraField.deflections,bounces:auraField.bounces},sound:mix.enabled,audio:mix.diagnostics(),pointerGrab:grab?.type||null,lastRelease,reducedMotion:reduce.matches,toyMotionRequested,assets:art.ready,hero:{...hero},physics:physics?.diagnostics(),particles:particles.length,scuffs:scuffs.length,panel:project,panelOpen,petCount,meanFrameMs:intervals.length?intervals.reduce((a,b)=>a+b,0)/intervals.length:0});
+window.__hill=()=>({depth:{extra:extraDepth,paintTop,paintHeight},time,paused,aura:{count:auraField.particles.length,deflections:auraField.deflections,bounces:auraField.bounces},sound:mix.enabled,audio:mix.diagnostics(),pointerGrab:grab?.type||null,lastRelease,reducedMotion:reduce.matches,toyMotionRequested,assets:art.ready,hero:{...hero},physics:physics?.diagnostics(),particles:particles.length,scuffs:scuffs.length,panel:project,panelOpen,petCount,meanFrameMs:intervals.length?intervals.reduce((a,b)=>a+b,0)/intervals.length:0});
 
 const chapterObserver=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting){entry.target.classList.add('seen');const demo=entry.target.querySelector('iframe[data-scene]');if(demo&&!demo.hasAttribute('src')){demo.loading='eager';demo.src='demo.html?scene='+demo.dataset.scene;}}}},{rootMargin:'550px 0px',threshold:0});
 document.querySelectorAll('.sketch-chapter').forEach(el=>chapterObserver.observe(el));

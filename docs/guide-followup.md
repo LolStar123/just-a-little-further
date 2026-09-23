@@ -187,3 +187,11 @@ Music references: https://viva.pressbooks.pub/openmusictheory/chapter/altered-an
 - [x] Project theme gain raised 50 percent; main music and SFX unchanged.
 - [x] Distinct instrument spectra AND envelopes: felt keys, organ, flute, pad, marimba, pluck, metallic bell and round bass. Per-project duos trade chord/lead roles every two bars. Reduced universal pitch scoops.
 - [x] Guide wall kicks require a sustained pole slide and cooldown; curl slopes no longer trigger wall jumps. Recovery watchdog cannot restart a jump mid-air. Left/right slide exits and three hairpin radii checked.
+
+## Deep excavation cutoff
+- [x] Hill region grows with eroded terrain so cards, dark ridge and cracks remain inside it.
+- [x] Canvas renders a viewport-sized slice instead of allocating an ever-taller bitmap. Pointer coordinates remain in world space.
+- [x] Grounded terrain keeps its original base geometry; only excavation extends page layout and the connected exit line.
+- [x] Physical bottom and side boundaries follow the deeper region; drag range extends with it.
+- [x] Desktop and mobile render checks at 0, 900, 6000 and 14000px excavation; cards remain inside the region, fracture drawing visible, canvas stays at most viewport + 256px tall.
+- [x] Repeated-impact crack renewal test still passes at 180 impacts.

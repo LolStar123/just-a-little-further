@@ -1,0 +1,58 @@
+[
+  {
+    "depth": {
+      "extra": 0,
+      "paintTop": 0,
+      "paintHeight": 580
+    },
+    "ground": 315.74248,
+    "bottom": 680,
+    "base": 580,
+    "world": 615,
+    "bitmap": 580,
+    "cardsInside": true,
+    "faults": 12
+  },
+  {
+    "depth": {
+      "extra": 880,
+      "paintTop": 360,
+      "paintHeight": 1100
+    },
+    "ground": 1215.74248,
+    "bottom": 1560,
+    "base": 580,
+    "world": 1495,
+    "bitmap": 1100,
+    "cardsInside": true,
+    "faults": 12
+  },
+  {
+    "depth": {
+      "extra": 6000,
+      "paintTop": 5480,
+      "paintHeight": 1100
+    },
+    "ground": 6315.74248,
+    "bottom": 6680,
+    "base": 580,
+    "world": 6615,
+    "bitmap": 1100,
+    "cardsInside": true,
+    "faults": 12
+  },
+  {
+    "depth": {
+      "extra": 14000,
+      "paintTop": 13480,
+      "paintHeight": 1100
+    },
+    "ground": 14315.742479999999,
+    "bottom": 14680,
+    "base": 580,
+    "world": 14615,
+    "bitmap": 1100,
+    "cardsInside": true,
+    "faults": 12
+  }
+]

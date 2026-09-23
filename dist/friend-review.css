@@ -156,3 +156,8 @@ body.tugging-thread,body.tugging-thread *{user-select:none!important;cursor:grab
 .projects-invitation .w-tail{font-weight:550}
 @media(min-width:761px){#world .bottom-edge{top:272px;left:8%}}
 @media(max-width:760px){#world .introduction h1{font-size:clamp(30px,8.6vw,40px)}#world .bottom-edge{width:90%;left:5%;top:480px}#world .toys{gap:5px 10px}#world .toys :is(#help,#ruin,#encourage){font-size:18px;min-height:56px;padding-bottom:10px}}
+
+/* The excavated hill owns space below its original page boundary. */
+#world{height:calc(var(--stage-height) + 30px + var(--dig-depth,0px))}
+#interaction-surface{height:calc(var(--stage-height) + var(--dig-depth,0px))}
+@media(max-width:760px){#world{height:calc(615px + var(--dig-depth,0px))}}

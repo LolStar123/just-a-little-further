@@ -22,7 +22,7 @@ export class HillPhysics {
             const body=Bodies.rectangle((x1+x2)/2,(y1+y2)/2+82,Math.hypot(x2-x1,y2-y1)+3,164,{isStatic:true,friction:.62,restitution:0,label:'soil'});
             this.segments.push(body);Composite.add(this.engine.world,body);
         }
-        Composite.add(this.engine.world,[Bodies.rectangle(-60,h/2,120,h*4,{isStatic:true,restitution:.2}),Bodies.rectangle(w+60,h/2,120,h*4,{isStatic:true,restitution:.2}),Bodies.rectangle(w/2,h+100,w+240,160,{isStatic:true})]);
+        this.boundaryDepth=h;this.walls=[Bodies.rectangle(-60,h/2,120,h*4,{isStatic:true,restitution:.2}),Bodies.rectangle(w+60,h/2,120,h*4,{isStatic:true,restitution:.2})];this.bottom=Bodies.rectangle(w/2,h+100,w+240,160,{isStatic:true});Composite.add(this.engine.world,[...this.walls,this.bottom]);
         // Physical contact follows the clipboard stone's traced silhouette.
         const scale=this.radius/rockSource.unit;
         const hull=Vertices.clockwiseSort(Vertices.hull(rockContour.map(p=>({x:p.x*scale,y:p.y*scale}))));
@@ -63,6 +63,12 @@ export class HillPhysics {
             }
         });
         this.updateGround();this.seedTerrain();
+    }
+    extendDepth(depth){
+        if(Math.abs(depth-this.boundaryDepth)<1)return;
+        const ratio=depth/this.boundaryDepth;
+        for(const wall of this.walls){Body.scale(wall,1,ratio);Body.setPosition(wall,{x:wall.position.x,y:depth/2});}
+        Body.setPosition(this.bottom,{x:this.w/2,y:depth+100});this.boundaryDepth=depth;
     }
     base(x){
         const k=clamp(x/this.w*52,0,52),i=Math.min(51,Math.floor(k)),f=k-i;
@@ -581,7 +587,7 @@ export class HillPhysics {
         this.drag=Constraint.create({pointA:{x,y},bodyB:body,pointB:{x:dx,y:dy},stiffness:body===this.rock?.065:.7,damping:body===this.rock?.38:.85,length:0});
         this.catchArmed=false;this.dragSamples=[{x,y,t:performance.now()}];Composite.add(this.engine.world,this.drag);this.catchActive=false;this.intercept=null;return this.drag;
     }
-    move(x,y){if(!this.drag)return;this.drag.pointA.x=clamp(x,8,this.w-8);this.drag.pointA.y=clamp(y,35,this.h-35);const t=performance.now();this.dragSamples.push({x,y,t});this.dragSamples=this.dragSamples.filter(s=>t-s.t<90);}
+    move(x,y){if(!this.drag)return;this.drag.pointA.x=clamp(x,8,this.w-8);this.drag.pointA.y=clamp(y,35,this.boundaryDepth-35);const t=performance.now();this.dragSamples.push({x,y,t});this.dragSamples=this.dragSamples.filter(s=>t-s.t<90);}
     release(flick=true){
         if(!this.drag)return;const b=this.drag.bodyB,s=this.dragSamples,first=s[0],last=s.at(-1);
         if(flick&&s.length>1&&last.t-first.t>8&&performance.now()-last.t<85){const scale=1000/(60*(last.t-first.t)),weight=b===this.rock?.45:1,limit=b===this.rock?9:19;Body.setVelocity(b,{x:clamp((last.x-first.x)*scale*weight,-limit,limit),y:clamp((last.y-first.y)*scale*weight,-limit,limit)});}

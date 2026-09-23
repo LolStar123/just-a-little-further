@@ -138,7 +138,7 @@ function sceneRect(frame,selector){
 }
 function layout(){
     pending=0;if(!hill.length)return;
-    const w=document.documentElement.clientWidth,world=rect(document.querySelector('#world')),stage=rect(document.querySelector('#playground'));
+    const w=document.documentElement.clientWidth,world=rect(document.querySelector('#world')),extent=rect(document.querySelector('#interaction-surface')),stage={...extent,h:Number(document.querySelector('#interaction-surface').dataset.baseHeight)||extent.h};
     const book=document.querySelector('.sketchbook'),h=Math.ceil(rect(book).y+book.offsetHeight),points=[];
     const margin=w<760?10:Math.max(24,(w-book.offsetWidth)/2+22);
     let x=mountainPoints.at(-1)[0]*w,y=mountainPoints.at(-1)[1]*stage.h+mountainOffset;
@@ -264,7 +264,7 @@ function layout(){
     for(const p of hill.slice(1))to(...p);
     const before=hill.at(-2),end=hill.at(-1),slope=(end[1]-before[1])/(end[0]-before[0]||1);
     const tugStart=points.length-1;
-    for(const controls of hillExit(w,end,slope,world.h,margin,stage.h))curve(...controls);
+    for(const controls of hillExit(w,end,slope,world.h,margin,extent.h))curve(...controls);
     let index=0;const guideEntries={};
     for(const frame of document.querySelectorAll('.sketch-demo')){
         const kind=frame.dataset.scene,boxed=kind==='halo'||kind==='botato';
