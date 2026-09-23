@@ -131,3 +131,5 @@ body.tugging-thread,body.tugging-thread *{user-select:none!important;cursor:grab
 #world .toys #reset{min-height:28px;padding:3px 0;margin-top:0}
 #world .pencil-note{top:103px}
 @media(max-width:760px){#world .bottom-edge{left:5%;right:5%;width:90%}#world .toys{gap:9px 9px}#world .toys :is(#help,#ruin,#encourage){font-size:16px;min-height:64px;padding:9px 5px}#world .pencil-note{top:202px}}
+
+.panel-project-links{display:flex;align-items:center;flex-wrap:wrap;gap:12px 28px;margin-top:18px}.panel-project-links .more-scene{display:inline-flex;align-items:center;min-height:44px;margin:0;padding:6px 2px}

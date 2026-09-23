@@ -147,3 +147,9 @@ Verification: three stamp stages measured centred within .01px on 1440px and 390
 - [x] Remove accidental short-lookahead speed cap; faster scamper, climb and slide with frame-rate steering on the wire.
 - [x] Pole sliding tolerates small curls for 280ms and wider descending angles, while retaining real corner kick-offs.
 - [x] Desktop/mobile button checks; 3 hairpin radii; left/right pole exits; all TfL windows at desktop/mobile and existing dashboard browser audit.
+
+- [x] Baxter copy specifies a Claude-powered assistant in a Discord bot, preferred interface, scoping, scheduling and completion checks.
+- [x] Remove divine-orb cycle button; direct drag, keyboard and autoplay remain.
+- [x] HALO translucent uneven blue marker area; meowl speech outlined with a tail.
+- [x] Off-the-clock divine orb, Deadlock wheel/eye and red Dota square doodles; poker and sandwich preserved. Deadlock reference: https://statlocker.gg/images/deadlock-logo.png
+- [x] Panel demo/github links have an explicit wrapping flex row and 28px gap.
