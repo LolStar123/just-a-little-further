@@ -160,3 +160,5 @@ Verification: three stamp stages measured centred within .01px on 1440px and 390
 - [x] Shared mouse-hover wing wave and held squirm for all drawn meowls, including hero and guide; flattened meowl can give a tiny wing wave. Verified 13 project scenes plus main and guide.
 - [x] Main hill meowl retains full collision masks while held, thrown, fluttering and repositioning; rock collisions also remain enabled. Physical rock crossing uses a lift-over route. Project helper recovery remains collision-free.
 - [x] Eroded fracture mouths regenerate in fresh material while preserving structural damage. Checked 180 repeated impacts and fully buried fracture renewal.
+
+- [x] Clipboard-inspired handwritten project invitation; descending, shrinking w letters become a small downward arrow. Responsive desktop/mobile layout, with guide speech avoiding the cue.

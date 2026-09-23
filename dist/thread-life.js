@@ -134,7 +134,9 @@ export function threadLife(svg,path){
             // The caption shares the actor transform on every frame, including flips and jumps.
             const w=words.offsetWidth,h=words.offsetHeight,guideLeft=actor.x-72,guideTop=actor.y-112;
             const captionX=Math.max(8,Math.min(innerWidth-w-8,actor.x-w/2));
-            const captionY=Math.max(scrollY+8,actor.y-152);
+            let captionY=Math.max(scrollY+8,actor.y-152);
+            const invitation=document.querySelector('.projects-invitation');
+            if(invitation){const r=invitation.getBoundingClientRect(),top=r.top+scrollY;if(captionX+w>r.left&&captionX<r.right&&captionY+h>top-10&&captionY<top+r.height+10)captionY=Math.max(scrollY+8,top-h-14);}
             words.style.bottom='auto';words.style.left=captionX-guideLeft+'px';words.style.top=captionY-guideTop+'px';
             if(!sound.nextMeows.has('guide'))sound.nextMeows.set('guide',time+1.5);sound.chirp('guide',time,[10,17],true,{level:.55});
             if(actor.mode==='run'&&actor.kind!=='pole')sound.beat('feet',Math.floor(time*3.4),'step',{level:.35});
