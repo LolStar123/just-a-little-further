@@ -51,9 +51,8 @@ export function personalScene(scene,canvas,wake,sfx){
      line(c,[[-13,-22],[-6,-25],[7,-25],[14,-20]],'#b49959',.8);c.restore();
     }else if(j===2){ // Dota's cut diagonal and two ragged windows.
      c.save();c.rotate(reduced.matches?-.05:Math.sin(time*1.8)*.065-.05);
-     const red='#a44f40';line(c,[[-20,-28],[19,-26],[21,10],[-18,13],[-20,-28]],red,2);
-     line(c,[[-14,-23],[17,4],[10,9],[-18,-18],[-14,-23]],red,2);
-     line(c,[[5,-23],[15,-22],[16,-10],[5,-23]],red,1.8);line(c,[[-15,-6],[-4,7],[-14,8],[-15,-6]],red,1.8);c.restore();
+     const red='#b74936';c.beginPath();c.moveTo(-20,-28);c.lineTo(19,-26);c.lineTo(21,10);c.lineTo(-18,13);c.closePath();c.fillStyle=red;c.fill();line(c,[[-20,-28],[19,-26],[21,10],[-18,13],[-20,-28]],red,1.6);
+     c.fillStyle=paper;for(const cut of [[[-14,-23],[17,4],[10,9],[-18,-18]],[[5,-23],[15,-22],[16,-10]],[[-15,-6],[-4,7],[-14,8]]]){c.beginPath();cut.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.closePath();c.fill();}c.restore();
     }else if(j===3){ // A little fan of cards keeps reshuffling, with the label anchored below.
      for(let k=0;k<3;k++){c.save();c.rotate((k-1)*.2+(selected&&!reduced.matches?Math.sin(time*7+k)*.12:0));line(c,[[-11,-23],[10,-25],[12,6],[-10,8],[-11,-23]],k===1?'#ec302b':ink,1.2);text(c,k===1?'A':'7',0,-5,14);c.restore();}
     }else{ // Indomie sandwich. The steam is the motion, the text stays put.
