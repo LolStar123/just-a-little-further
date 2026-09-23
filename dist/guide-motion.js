@@ -1,7 +1,7 @@
 // A world-space actor. Only construction assigns a position; every later move integrates velocity.
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const lines={
- landing:["psst. ready to see what's down there?","c'monnn. tiny legs are ready.","hey! shall we have a look below?","little scroll? for me?","follow me. i found some good stuff."],
+ landing:["heyyyyyy! down here!","helloooooo! tiny guy. big plans.","hey! hey! look what i found!","pssst. come on, come on!","over here! follow my little feet!","you! yes, you! little scroll?","c'monnnn! there's good stuff below.","hellooo! i saved you a tour!"],
  tfl:["eleven lines. one tiny league table.","the trains are competing. i'm walking."],
  scraper:["papers! quick, before he finds another.","that notebook is getting suspiciously full."],
  pipeline:["test it on data it hasn't seen.","mind the loop. i'm taking the scenic shortcut."],
@@ -20,16 +20,22 @@ const lines={
 };
 export class GuideMotion{
  constructor(point){this.x=point.x;this.y=point.y;this.vx=0;this.vy=0;this.mode='run';this.kind='scamper';this.age=0;this.time=0;this.nextMove=1;this.moveCount=0;this.facing=1;this.held=false;this.history=[];this.bags=new Map();this.text='psst. follow me!';this.sayAt=0;this.lastScene='';this.releasedLedges=new Set();this.airTarget=null;this.triplet=0;this.rotation=0;}
- say(context){const bank=lines[context]||lines.travel;let bag=this.bags.get(context);if(!bag?.length){bag=bank.map((_,i)=>i).sort(()=>Math.random()-.5);if(bank[bag.at(-1)]===this.text)bag.reverse();this.bags.set(context,bag);}this.text=bank[bag.pop()];this.contextText=this.text;this.sayAt=this.time+(context==='landing'?5+Math.random()*3:8+Math.random()*5);return this.text;}
+ say(context){const bank=lines[context]||lines.travel;let bag=this.bags.get(context);if(!bag?.length){bag=bank.map((_,i)=>i).sort(()=>Math.random()-.5);if(bank[bag.at(-1)]===this.text)bag.reverse();this.bags.set(context,bag);}this.text=bank[bag.pop()];this.contextText=this.text;this.sayAt=this.time+(context==='landing'?4.2+Math.random()*1.8:8+Math.random()*5);return this.text;}
  state(mode,kind=mode){if(['held','thrown','flutter','fly','hang'].includes(mode))this.triplet=0;this.mode=mode;this.kind=kind;this.age=0;this.history.push({mode,kind,at:this.time});if(this.history.length>100)this.history.shift();}
  hold(){this.held=true;this.state('held');this.vx=this.vy=0;}
  drag(x,y,dt){const vx=(x-this.x)/Math.max(.008,dt),vy=(y-this.y)/Math.max(.008,dt);this.vx=clamp(this.vx*.35+vx*.65,-1900,1900);this.vy=clamp(this.vy*.35+vy*.65,-1900,1900);this.x=x;this.y=y;}
  release(){this.held=false;this.state('thrown');this.text='wheeeee!';this.sayAt=this.time+3;}
+ cheer(){if(this.held)return;this.cheerBounced=false;this.cheerFloor=this.y;this.vx=0;this.vy=-650;this.state('cheer');this.text='GO LITTLE GUYYYY!!';this.contextText=this.text;this.sayAt=this.time+4;}
  hop(){if(this.held)return;this.vy=-330;this.state('air','leap');this.airTarget=null;}
- jump(target,kind){target={...target,x:clamp(target.x,45,(this.pageWidth||1440)-45)};this.airTarget={...target};const duration=clamp(Math.hypot(target.x-this.x,target.y-this.y)/320,.5,1.15);this.vx=clamp((target.x-this.x)/duration,-620,620);this.vy=(target.y-this.y)/duration-460*duration;this.jumpDuration=duration;this.state('air',kind);}
+ jump(target,kind){target={...target,x:clamp(target.x,45,(this.pageWidth||1440)-45)};this.airTarget={...target};const duration=['hello','starhop','peek'].includes(kind)?.76+(this.moveCount%3)*.08:clamp(Math.hypot(target.x-this.x,target.y-this.y)/320,.5,1.15);this.vx=clamp((target.x-this.x)/duration,-620,620);this.vy=(target.y-this.y)/duration-460*duration;this.jumpDuration=duration;this.state('air',kind);}
  tick(dt,route,viewport,scene,reduced=false){
   this.time+=dt;this.age+=dt;this.rotation=0;this.pageWidth=viewport.width;
   if(this.held)return;
+  if(this.mode==='cheer'){
+   this.vy+=1100*dt;this.vx*=Math.exp(-dt*8);this.x+=this.vx*dt;this.y+=this.vy*dt;
+   if(this.age>.3&&this.vy>0&&this.y>=this.cheerFloor-5){if(!this.cheerBounced){this.cheerBounced=true;this.vy=-230;}else{this.cheerBounced=false;this.state('flutter');}}
+   return;
+  }
   const {near,ahead,target,shortcut}=route,sceneKey=viewport.top<90?'landing':scene?.key||'travel';
   if(this.time>this.sayAt||sceneKey!==this.lastScene){this.say(sceneKey==='landing'?'landing':sceneKey!==this.lastScene?sceneKey:(this.moveCount%3?'travel':sceneKey));this.lastScene=sceneKey;}
   const offscreen=this.y<viewport.top-130||this.y>viewport.bottom+130;
@@ -41,14 +47,14 @@ export class GuideMotion{
    if(viewport.top>scene.bottom-120||viewport.top>this.hangScroll+100){this.releasedLedges.add(scene.top);this.vx=35;this.vy=45;this.state('flutter');this.text='dropping in!';this.sayAt=this.time+5;}
    else{this.vx+=(this.hangPoint.x-this.x)*24*dt-this.vx*8*dt;this.vy+=(this.hangPoint.y-this.y)*24*dt-this.vy*8*dt;}
   }else if(this.mode==='thrown'){
-   this.vy+=920*dt;this.vx*=Math.exp(-.32*dt);
-   if(this.age>1){this.state('flutter');this.text='i have wings. i remembered.';this.sayAt=this.time+5;}
+   this.vy+=1300*dt;this.vx*=Math.exp(-.18*dt);
+   if(this.age>.7){this.state('flutter');this.text='i have wings. i remembered.';this.sayAt=this.time+5;}
   }else if(this.mode==='flutter'||this.mode==='fly'){
    const goal=ledge?{x:scene.right-18,y:scene.top+64}:target;
-   const dx=goal.x-this.x,dy=goal.y-this.y,d=Math.hypot(dx,dy),cruise=offscreen?Math.min(1450,300+distance*.4):310;
-   const wanted= Math.min(cruise,d*3),flap=1+.2*Math.sin(this.time*19);
-   this.vx+=clamp(dx/(d||1)*wanted-this.vx,-850,850)*dt*2;
-   this.vy+=clamp(dy/(d||1)*wanted-this.vy,-1000,1000)*dt*2*flap;
+   const dx=goal.x-this.x,dy=goal.y-this.y,d=Math.hypot(dx,dy),cruise=offscreen?Math.min(4350,900+distance*1.2):930;
+   const wanted= Math.min(cruise,d*5),flap=1+.2*Math.sin(this.time*19);
+   this.vx+=clamp(dx/(d||1)*wanted-this.vx,-2550,2550)*dt*3;
+   this.vy+=clamp(dy/(d||1)*wanted-this.vy,-3000,3000)*dt*3*flap;
    if(d<9&&Math.hypot(this.vx,this.vy)<55){
     if(ledge){this.hangPoint=goal;this.hangScroll=viewport.top;this.state('hang');this.text="your turn. i'll hang about.";this.sayAt=this.time+10;}
     else{this.state('land');this.nextMove=this.time+.8;}
@@ -72,11 +78,20 @@ export class GuideMotion{
   }else{
    const dx=ahead.x-this.x,dy=ahead.y-this.y,d=Math.hypot(dx,dy),slope=dy/(Math.abs(dx)+8);
    if(offscreen&&distance>300||Math.hypot(near.x-this.x,near.y-this.y)>100){this.state('fly');}
+   else if(sceneKey==='landing'){
+    // Hold a small patch of pavement, then visibly crouch, jump and wave at the reader.
+    this.kind='wave';this.vx*=Math.exp(-dt*12);this.vy+=(near.y-this.y)*60*dt-this.vy*14*dt;
+    if(!reduced&&this.time>this.nextMove){
+     this.moveCount++;const kind=['hello','peek','starhop'][this.moveCount%3],side=this.moveCount%2?1:-1;
+     this.planned={kind,target:{x:clamp(this.x+side*(18+this.moveCount%3*9),48,viewport.width-48),y:near.y}};
+     this.state('crouch');this.nextMove=this.time+1.35+Math.random()*.55;
+    }
+   }
    else if(ledge&&Math.abs(this.y-scene.top)<150){this.state('flutter');}
    else{
     this.kind=slope<-.7?'climb':slope>.35&&(!scene||this.y>scene.bottom-15)?'grind':slope>.85?'scramble':['halo','baxter'].includes(sceneKey)?'tiptoe':sceneKey==='mtxtato'?'balance':'scamper';
     // Footfalls drive travel: speed pulses at the planted steps instead of a constant glide.
-    const pace=(this.kind==='climb'?70:this.kind==='grind'?225:135)*(1+.32*Math.sin(this.time*16)),speed=Math.min(pace,d*5);
+    const pace=(this.kind==='climb'?210:this.kind==='grind'?675:405)*(1+.32*Math.sin(this.time*16)),speed=Math.min(pace,d*8);
     this.vx+=(dx/(d||1)*speed-this.vx)*(1-Math.exp(-dt*12));this.vy+=(dy/(d||1)*speed-this.vy)*(1-Math.exp(-dt*12));
     if(!reduced&&this.time>this.nextMove){
      this.moveCount++;let kind='leap',goal=shortcut||ahead;

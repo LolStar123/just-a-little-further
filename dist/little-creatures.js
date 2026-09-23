@@ -244,8 +244,12 @@ export function drawMeowl(c,x,y,size,o={}){
     if(o.parkour){
         const {kind,phase:q=0}=o.parkour,flap=Math.sin(t*19);
         if(['flutter','fly'].includes(kind)){target.left=[-66,-53+flap*32];target.right=[62,-53+flap*32];target.tilt=Math.sin(t*5)*.06;}
+        if(kind==='cheer'){target.left=[-55+Math.sin(t*24)*14,-95+Math.cos(t*24)*17];target.right=[55+Math.cos(t*24)*14,-95+Math.sin(t*24)*17];target.feet=[-24,24];target.turn=0;target.tilt=Math.sin(t*16)*.13;}
+        if(kind==='fall'){target.left=[-48,-40];target.right=[48,-43];target.feet=[-12,13];target.tilt=Math.sin(t*5)*.1;}
         if(kind==='hang'){target.left=[-25,-115];target.right=[25,-115];target.feet=[-9,9];target.tilt=Math.sin(t*3)*.08;}
         if(kind==='grind'){target.hip=[-12,-9];target.chest=[-4,-40];target.head=[2,-66];target.feet=[-26,17];target.left=[-60,-56];target.right=[53,-48];target.tilt=-.17+Math.sin(t*9)*.045;}
+        if(kind==='wave'||kind==='hello'||kind==='peek'){target.left=[-36,-65];target.right=[40+Math.sin(t*15)*17,-100+Math.cos(t*15)*10];target.turn=0;target.tilt=Math.sin(t*7)*.06;target.head=[0,-77];}
+        if(kind==='starhop'){target.left=[-64,-94];target.right=[64,-94];target.feet=[-24,24];target.turn=0;target.tilt=Math.sin(t*10)*.07;}
         if(kind==='point'){target.left=[-28,-35];target.right=[61,-65];target.turn=.5;target.tilt=-.08;}
         if(kind==='balance'){target.left=[-60,-48+Math.sin(t*8)*8];target.right=[57,-49-Math.sin(t*8)*8];target.tilt=Math.sin(t*6)*.13;}
         if(kind==='tiptoe'){target.left=[-31,-29];target.right=[34,-31];target.chest=[-9,-48];target.head=[-7,-74];target.tilt=.14;}
@@ -340,11 +344,18 @@ export function drawMeowl(c,x,y,size,o={}){
     if(o.hat==='goldrim')goldrim(c,p);
     if(o.costume)workCostume(c,p,o.costume,t);
     wing(c,shoulders[1],hands[1],-1,true);
+    if(o.parkour?.kind==='cheer'){
+        for(const [j,hand]of hands.entries()){
+            c.save();c.translate(...hand);c.rotate(Math.sin(t*20+j)*.4);
+            for(let i=0;i<24;i++){const a=i*Math.PI/12,r=13+Math.sin(i*2.7+t*17)*3;c.beginPath();c.moveTo(0,0);c.quadraticCurveTo(Math.cos(a+.25)*r*.7,Math.sin(a+.25)*r*.7,Math.cos(a)*r,Math.sin(a)*r);c.strokeStyle=i%3===0?'#b07b38':i%3===1?'#60715d':ink;c.lineWidth=1.3;c.stroke();}
+            c.restore();
+        }
+    }
     if(o.cargo){
         o.cargo(c,{x:(hands[0][0]+hands[1][0])/2,y:(hands[0][1]+hands[1][1])/2});
         for(const [i,hand]of hands.entries()){const side=i?1:-1;curve(c,[hand[0]+side*4,hand[1]-6],[hand[0]-side*6,hand[1]-5],[hand[0]-side*4,hand[1]+1],1.2);}
     }
-    if(effort>.72){const drop=(t*1.4)%1;c.globalAlpha=(1-drop)*.6;stroke(c,[[p.head[0]-25-drop*4,p.head[1]-3+drop*8],[p.head[0]-27-drop*4,p.head[1]+drop*8]],1.1,faint);c.globalAlpha=1;}
+    if(effort>.72){for(let i=0;i<(o.sweat?3:1);i++){const drop=(t*1.8+i*.31)%1,side=i%2?1:-1;c.globalAlpha=(1-drop)*.8;stroke(c,[[p.head[0]+side*(25+drop*9),p.head[1]-9+i*4+drop*13],[p.head[0]+side*(27+drop*9),p.head[1]-4+i*4+drop*13]],1.35,faint);}c.globalAlpha=1;}
     c.restore();state.t=t;state.x=x;state.y=y;state.mode=mode;
     return{style:'scribble',mode,emotion:o.emotion||'calm',squish,feet:feet.map(world),hands:hands.map(world),head:world(p.head),hip:world(p.hip)};
 }

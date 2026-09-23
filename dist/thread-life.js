@@ -5,26 +5,30 @@ import {SceneSound} from './soundscape.js';
 export function threadLife(svg,path){
     const ns='http://www.w3.org/2000/svg',hit=document.createElementNS(ns,'path');
     hit.style.cssText='stroke:transparent;stroke-width:26px;fill:none;pointer-events:stroke;cursor:grab;touch-action:none';svg.append(hit);
-    const guide=document.createElement('div');guide.className='line-guide';guide.innerHTML='<p></p><canvas width="288" height="288" aria-label="The little guide meowl"></canvas>';document.body.append(guide);
+    const guide=document.createElement('div');guide.className='line-guide';guide.innerHTML='<p></p><canvas width="288" height="288" aria-label="The little guide meowl"></canvas>';const guideLayer=document.createElement('div');guideLayer.style.cssText='position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:4';guideLayer.append(guide);document.body.append(guideLayer);
     const c=guide.querySelector('canvas').getContext('2d');c.scale(2,2);
     c.canvas.style.pointerEvents='none';const pet=document.createElement('button');guide.append(pet);pet.style.cssText='position:absolute;left:34px;top:40px;width:76px;height:84px;border:0;background:transparent;padding:0;pointer-events:auto;touch-action:none;cursor:grab';pet.tabIndex=0;pet.setAttribute('aria-label','Throw the guide meowl. Space gives a little hop.');
-    let speechAt=0;
     let actor=null,petDrag=null,petLast=0,targetAt=0,targetIndex=0,worldHeight=0,routeCache=null,sceneCache=null;
     pet.addEventListener('pointerdown',e=>{if(!actor)return;petDrag={id:e.pointerId,x:e.clientX-actor.x,y:e.clientY+scrollY-actor.y};actor.hold();pet.setPointerCapture(e.pointerId);petLast=performance.now();});
     pet.addEventListener('pointermove',e=>{if(!petDrag)return;const now=performance.now();actor.drag(e.clientX-petDrag.x,e.clientY+scrollY-petDrag.y,(now-petLast)/1000);petLast=now;});
     const dropPet=()=>{if(!petDrag)return;const drag=petDrag;petDrag=null;actor.release();if(pet.hasPointerCapture(drag.id))pet.releasePointerCapture(drag.id);};
     pet.addEventListener('pointerup',dropPet);pet.addEventListener('pointercancel',dropPet);pet.addEventListener('lostpointercapture',dropPet);
+    addEventListener('meowl-cheer',()=>{actor?.cheer();sound.active(true);sound.play('meow',{id:'guide',level:.6});wake();});
     pet.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();actor?.hop();}if(e.key==='Escape')dropPet();});
     const sound=new SceneSound('guide',guide),words=guide.querySelector('p');
-    let base=[],lengths=[],total=0,travel=0,time=0,last=0,raf=0,drag=null,anchor=0,dx=0,dy=0,vx=0,vy=0,pullX=0,pullY=0,shape=[],handles=[],sceneRects=[];
+    const speechSizer=document.createElement('span'),speechInk=document.createElement('span');
+    speechSizer.className='speech-size';speechInk.className='speech-ink';speechSizer.setAttribute('aria-hidden','true');speechInk.setAttribute('aria-hidden','true');words.setAttribute('role','note');words.append(speechSizer,speechInk);
+    let speechText='',speechLetters=[],speechCount=0,typeAt=0;
+    let tugStart=0,base=[],lengths=[],total=0,travel=0,time=0,last=0,raf=0,drag=null,anchor=0,dx=0,dy=0,vx=0,vy=0,pullX=0,pullY=0,shape=[],handles=[],sceneRects=[];
     const reduced=matchMedia('(prefers-reduced-motion: reduce)');
     function wake(){if(!raf&&!document.hidden)raf=requestAnimationFrame(tick);}
     function pointAt(distance){let lo=0,hi=lengths.length-1;while(lo<hi){const mid=(lo+hi)>>1;if(lengths[mid]<distance)lo=mid+1;else hi=mid;}const i=Math.max(1,lo),a=shape[i-1]||base[0],b=shape[i]||a,f=(distance-lengths[i-1])/(lengths[i]-lengths[i-1]||1);return{x:a[0]+(b[0]-a[0])*f,y:a[1]+(b[1]-a[1])*f,angle:Math.atan2(b[1]-a[1],b[0]-a[0]),i};}
     function render(){
         // Long C2 falloff follows arclength across nearby text and illustration floors.
         // It does not pin abruptly at an iframe rectangle or paragraph boundary.
-        const leftSpan=Math.max(1,Math.min(900,lengths[anchor]-lengths[0])),rightSpan=Math.max(1,Math.min(900,total-lengths[anchor]));
+        const leftSpan=Math.max(1,Math.min(900,lengths[anchor]-lengths[tugStart])),rightSpan=Math.max(1,Math.min(900,total-lengths[anchor]));
         shape=base.map((p,i)=>{
+            if(i<=tugStart)return p.slice();
             const distance=lengths[i]-lengths[anchor],u=Math.min(1,Math.abs(distance)/(distance<0?leftSpan:rightSpan));
             // Quintic falloff has zero first AND second derivative at both ends.
             const weight=1-u*u*u*(u*(u*6-15)+10);
@@ -37,7 +41,7 @@ export function threadLife(svg,path){
     function start(e,index){
         const y=e.clientY+scrollY;
 
-        anchor=index??nearest(e.clientX,y);if(base[anchor][1]<document.querySelector('#world').offsetHeight)return;
+        anchor=index??nearest(e.clientX,y);if(anchor<=tugStart)return;
         e.preventDefault();getSelection()?.removeAllRanges();document.body.classList.add('tugging-thread');
         drag={id:e.pointerId,startX:e.clientX-dx,startY:y-dy,target:e.currentTarget};e.currentTarget.setPointerCapture(e.pointerId);wake();
     }
@@ -46,9 +50,9 @@ export function threadLife(svg,path){
     addEventListener('blur',release);
     for(const target of [hit]){target.addEventListener('pointerdown',e=>start(e));target.addEventListener('pointermove',move);target.addEventListener('pointerup',release);target.addEventListener('pointercancel',release);target.addEventListener('lostpointercapture',release);}
     document.addEventListener('pointerdown',e=>{
-        if(drag||e.target.closest?.('button,a,input,canvas,.line-guide')||!base.length||e.clientY+scrollY<worldHeight)return;
+        if(drag||e.target.closest?.('button,a,input,.line-guide')||(e.target.tagName==='CANVAS'&&e.target.id!=='playground')||!base.length)return;
         const j=nearest(e.clientX,e.clientY+scrollY),p=shape[j]||base[j];
-        if(Math.hypot(e.clientX-p[0],e.clientY+scrollY-p[1])<14)start({...{clientX:e.clientX,clientY:e.clientY,pointerId:e.pointerId,currentTarget:hit},preventDefault:()=>e.preventDefault()},j);
+        if(j>tugStart&&Math.hypot(e.clientX-p[0],e.clientY+scrollY-p[1])<14){e.stopPropagation();start({...{clientX:e.clientX,clientY:e.clientY,pointerId:e.pointerId,currentTarget:hit},preventDefault:()=>e.preventDefault()},j);}
     },true);
     function tick(now){
         raf=0;const dt=Math.min(.035,(now-(last||now))/1000);last=now;time+=dt;if(!base.length)return;
@@ -60,7 +64,7 @@ export function threadLife(svg,path){
             for(let i=0;i<base.length;i+=2){const score=Math.abs(base[i][1]-wantedY)+Math.abs(base[i][0]-(landing?innerWidth-100:innerWidth*.78))*(landing?.8:.14);if(score<best){targetIndex=i;best=score;}}
             const j=nearest(actor.x,actor.y);travel=lengths[j];
             const destination=lengths[targetIndex]+(landing?Math.sin(time*.8)*80:Math.sin(time*.45)*35),direction=destination>=travel?1:-1;
-            const ahead=pointAt(Math.max(0,Math.min(total,travel+direction*48))),near=pointAt(travel),target=pointAt(Math.max(0,Math.min(total,destination)));
+            const ahead=pointAt(Math.max(0,Math.min(total,travel+direction*110))),near=pointAt(travel),target=pointAt(Math.max(0,Math.min(total,destination)));
             // Loops offer real shortcuts: select a reachable future foothold, then leap through space.
             let shortcut=null;
             for(let distance=170;distance<=480;distance+=50){const candidate=pointAt(Math.max(0,Math.min(total,travel+direction*distance))),gap=Math.hypot(candidate.x-actor.x,candidate.y-actor.y);if(gap>65&&gap<230&&candidate.y>actor.y-80&&candidate.y<actor.y+155){shortcut=candidate;}}
@@ -74,30 +78,27 @@ export function threadLife(svg,path){
         const active=actor.y>scrollY-140&&actor.y<scrollY+innerHeight+140&&!paused;
         guide.hidden=!active;sound.active(active);
         if(active){
-            guide.style.transform=`translate3d(${actor.x-72}px,${actor.y-112}px,0)`;
+            guide.style.transform=`translate3d(${actor.x-72}px,${actor.y-scrollY-112}px,0)`;
             c.clearRect(0,0,144,144);c.save();c.translate(72,86);c.rotate(reduced.matches?0:actor.rotation);c.translate(-72,-86);
-            const airborne=['air','fly','flutter','thrown','held','hang'].includes(actor.mode),mode=actor.mode==='held'?'held':airborne?'air':actor.mode==='crouch'?'anticipate':actor.mode==='land'?'brace':'scurry';
-            drawMeowl(c,72,112,55,{id:'guide',time,mode,air:airborne,parkour:actor.pose,emotion:actor.mode==='thrown'?'panic':'relieved',speed:Math.hypot(actor.vx,actor.vy),facing:actor.facing,voice:sound.mouth('guide'),landed:actor.mode==='land'?1:0});c.restore();
+            const airborne=['air','fly','flutter','thrown','held','hang','cheer'].includes(actor.mode),mode=actor.mode==='held'?'held':airborne?'air':actor.mode==='crouch'?'anticipate':actor.mode==='land'?'brace':'scurry';
+            drawMeowl(c,72,112,55,{id:'guide',time,mode,air:airborne,parkour:actor.pose,effort:airborne||Math.hypot(actor.vx,actor.vy)>180?.88:.25,sweat:airborne||Math.hypot(actor.vx,actor.vy)>180,emotion:actor.mode==='thrown'?'panic':'relieved',speed:Math.hypot(actor.vx,actor.vy),facing:actor.facing,voice:sound.mouth('guide'),landed:actor.mode==='land'?1:0});c.restore();
             if(actor.kind==='grind'){c.strokeStyle='#a08a57';c.lineWidth=.8;for(let i=0;i<4;i++){const u=(time*4+i*.23)%1;c.globalAlpha=1-u;c.beginPath();c.moveTo(72-actor.facing*u*24,112+u*3);c.lineTo(72-actor.facing*(u*24+5),112+u*6);c.stroke();}c.globalAlpha=1;sound.beat('grind',Math.floor(time*2),'friction',{level:.2});}
-            words.textContent=actor.text;
-            if(now>speechAt){
-                speechAt=now+180;
-                const w=words.offsetWidth,h=words.offsetHeight,guideLeft=actor.x-72,guideTop=actor.y-112;
-                const blocks=[...document.querySelectorAll('.chapter-copy h2,.chapter-copy p,.chapter-copy a,.toys,#quote,#quote-author,.sketch-foot')].map(e=>e.getBoundingClientRect()).filter(r=>r.bottom>0&&r.top<innerHeight).map(r=>({x:r.left,y:r.top+scrollY,w:r.width,h:r.height,weight:5}));
-                blocks.push({x:actor.x-42,y:actor.y-86,w:84,h:104,weight:12});
-                for(const r of sceneRects)if(r.bottom>scrollY&&r.top<scrollY+innerHeight)blocks.push({x:r.left,y:r.top,w:r.right-r.left,h:r.bottom-r.top,weight:1});
-                const left=Math.max(8,Math.min(innerWidth-w-8,actor.x-w/2));
-                const candidates=[{x:left,y:actor.y-98-h},{x:left,y:actor.y+25},{x:Math.max(8,actor.x-w-48),y:actor.y-70},{x:Math.min(innerWidth-w-8,actor.x+48),y:actor.y-70}];
-                if(sceneCache)candidates.push({x:left,y:sceneCache.top-h-12},{x:left,y:sceneCache.bottom+16});
-                for(const p of candidates){p.y=Math.max(scrollY+8,Math.min(scrollY+innerHeight-h-8,p.y));p.cost=Math.abs(p.y-(actor.y-98-h))*.1;for(const r of blocks)p.cost+=Math.max(0,Math.min(p.x+w+5,r.x+r.w)-Math.max(p.x-5,r.x))*Math.max(0,Math.min(p.y+h+5,r.y+r.h)-Math.max(p.y-5,r.y))*r.weight;}
-                const p=candidates.sort((a,b)=>a.cost-b.cost)[0];words.style.bottom='auto';words.style.left=p.x-guideLeft+'px';words.style.top=p.y-guideTop+'px';
-            }
+            if(speechText!==actor.text){speechText=actor.text;speechLetters=Array.from(speechText);speechCount=0;typeAt=now;speechSizer.textContent=speechText;speechInk.textContent='';words.setAttribute('aria-label',speechText);}
+            if(reduced.matches){speechInk.textContent=speechText;speechCount=speechLetters.length;}
+            else if(now>=typeAt&&speechCount<speechLetters.length){const letter=speechLetters[speechCount++];speechInk.textContent=speechLetters.slice(0,speechCount).join('');if(speechCount%2===0&&letter.trim())sound.play('click',{id:'typing',level:.055});typeAt=now+(/[.!?]/.test(letter)?115:letter===','?70:23);}
+            words.classList.toggle('typing',speechCount<speechLetters.length);
+            // The caption shares the actor transform on every frame, including flips and jumps.
+            const w=words.offsetWidth,h=words.offsetHeight,guideLeft=actor.x-72,guideTop=actor.y-112;
+            const captionX=Math.max(8,Math.min(innerWidth-w-8,actor.x-w/2));
+            const captionY=Math.max(scrollY+8,actor.y-152);
+            words.style.bottom='auto';words.style.left=captionX-guideLeft+'px';words.style.top=captionY-guideTop+'px';
             if(!sound.nextMeows.has('guide'))sound.nextMeows.set('guide',time+1.5);sound.chirp('guide',time,[10,17],true,{level:.55});
             if(actor.mode==='run')sound.beat('feet',Math.floor(time*3.4),'step',{level:.35});
         }
         wake();
     }
-    function update(points){
+    function update(points,startIndex=0){
+        tugStart=startIndex;
         worldHeight=document.querySelector('#world').offsetHeight;
         base=points.map(p=>p.slice());lengths=[0];for(let i=1;i<base.length;i++)lengths[i]=lengths[i-1]+Math.hypot(base[i][0]-base[i-1][0],base[i][1]-base[i-1][1]);total=lengths.at(-1);anchor=Math.min(anchor,base.length-1);render();
         sceneRects=[...document.querySelectorAll('.sketch-chapter')].map(el=>{const frame=el.querySelector('.sketch-demo'),r=(frame||el).getBoundingClientRect(),inside=frame?.dataset.scene==='botato'?frame.contentDocument?.querySelector('.toy')?.getBoundingClientRect():null;return{key:frame?.dataset.scene,left:r.left+(inside?.left||0),right:inside?r.left+inside.right:r.right,top:r.top+(inside?.top||0)+scrollY,bottom:r.top+(inside?.bottom||r.height)+scrollY};});
@@ -105,6 +106,6 @@ export function threadLife(svg,path){
         handles.forEach((b,i)=>{const r=sceneRects[i],j=nearest(innerWidth*.5,r.bottom+60),p=base[j];b.dataset.point=j;b.style.left=p[0]-19+'px';b.style.top=p[1]-19+'px';});wake();
     }
     addEventListener('scroll',wake,{passive:true});document.addEventListener('visibilitychange',()=>{last=0;if(document.hidden){cancelAnimationFrame(raf);raf=0;sound.active(false);}else wake();});
-    window.__threadLife=()=>({points:base.length,total,travel,dragging:!!drag,offset:[dx,dy],guideVisible:!guide.hidden,handles:handles.length,actor:actor?{x:actor.x,y:actor.y,vx:actor.vx,vy:actor.vy,mode:actor.mode,kind:actor.kind,text:actor.text,history:actor.history}:null});
+    window.__threadLife=()=>({points:base.length,tugStart,total,travel,dragging:!!drag,offset:[dx,dy],guideVisible:!guide.hidden,handles:handles.length,actor:actor?{x:actor.x,y:actor.y,vx:actor.vx,vy:actor.vy,mode:actor.mode,kind:actor.kind,text:actor.text,history:actor.history}:null});
     return {update};
 }

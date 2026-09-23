@@ -1,0 +1,29 @@
+[
+  {
+    "researcherMaxFrameStep": 13.698862781335492,
+    "samples": 650,
+    "manualChanges": 5
+  },
+  {
+    "width": 1440,
+    "typingClicks": 7,
+    "thoughts": [
+      0,
+      1
+    ],
+    "overflow": 0,
+    "captionVariance": 3.348069731146097e-05,
+    "errors": []
+  },
+  {
+    "width": 390,
+    "typingClicks": 6,
+    "thoughts": [
+      0,
+      1
+    ],
+    "overflow": 0,
+    "captionVariance": 2.6244315449730493e-05,
+    "errors": []
+  }
+]

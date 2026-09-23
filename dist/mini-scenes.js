@@ -24,7 +24,7 @@ export function miniScene(scene,canvas,wake,sfx){
  $('.caption').textContent=spec[0];
  $('#scene').innerHTML=`<canvas class="toy mini-toy" id="mini-art" aria-label="${spec[0]}"></canvas><p class="toy-note" id="toy-note" aria-live="polite"></p><div class="controls"><button id="next">${spec[1]}</button></div><p class="disclosure">${spec[2]}</p>`;
  const artHeight=['deadlock','poe'].includes(scene)?430:330;
- const a=canvas('mini-art'),state={scene,choice:0,actions:0,cycles:0,elapsed:0,clock:0,transition:1},note=$('#toy-note');
+ const a=canvas('mini-art'),state={scene,choice:0,actions:0,cycles:0,elapsed:0,clock:0,routeTime:0,transition:1},note=$('#toy-note');
  let previous=null,paperBag=[];const counts={scraper:paperTitles.length,pipeline:5,smoothtato:4,mtxtato:3,tfl:3,commute:5,deadlock:6,baxter:4,poe:3};
  const duration={scraper:2.5,pipeline:4.2,smoothtato:5,mtxtato:5,tfl:7,commute:4.5,deadlock:6,baxter:10,poe:6}[scene]||5;
  const auraImages=scene==='mtxtato'?auraStyles.map(style=>{const image=new Image();image.onload=()=>{draw();wake();};image.src='assets/mtx/'+style.file;return image;}):[];
@@ -38,14 +38,14 @@ export function miniScene(scene,canvas,wake,sfx){
   note.textContent=({poe:["Watcher's Eye",'Timeless jewels','Sublime Vision'][n%3]+' / prices to risk sheets.',scraper:paperTitles[n]+' / collecting paper '+(state.cycles+1)+'.',pipeline:'clean market data. test on the next unseen period.',smoothtato:presets[n]+': '+['all effects visible.','particles and bloom off.','decorative props and skill FX off.','shadows, reflections and fog off.'][n],mtxtato:auraStyles[n%3].name,tfl:['Central','Victoria','Northern'][n%3]+' is delayed. each checkpoint updates the ratings.',commute:(n%5+1)+' days: '+((n%5+1)*6===24?'both cost the same in this example.':((n%5+1)*6<24?'single journeys':'the weekly ticket')+' cost less in this example.'),deadlock:'Compare '+deadlockStats[n]+', holding the game stage fixed.',baxter:['baxter sorts the request','the product manager scopes it','the developer builds it','the verifier checks it'][Math.min(3,Math.floor(state.elapsed/2.4))]})[scene];
  }
  function change(manual=false){
-  previous=document.createElement('canvas');previous.width=a.el.width;previous.height=a.el.height;previous.getContext('2d').drawImage(a.el,0,0);
+  if(scene!=='scraper'){previous=document.createElement('canvas');previous.width=a.el.width;previous.height=a.el.height;previous.getContext('2d').drawImage(a.el,0,0);}
   const choices=Array.from({length:counts[scene]||3},(_,i)=>i).filter(i=>i!==state.choice);
   if(scene==='scraper'){
    if(!paperBag.length){paperBag=choices;for(let i=paperBag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[paperBag[i],paperBag[j]]=[paperBag[j],paperBag[i]];}}
    state.choice=paperBag.pop();
   }else state.choice=choices[Math.floor(Math.random()*choices.length)];
   state.cycles++;if(manual)state.actions++;
-  state.elapsed=0;state.transition=0;caption();draw();wake();
+  if(scene!=='scraper'||!manual)state.elapsed=0;state.transition=scene==='scraper'?1:0;caption();draw();wake();
  }
  $('#next').onclick=()=>change(true);caption();
  if(scene==='poe'||scene==='deadlock'){
@@ -129,7 +129,7 @@ export function miniScene(scene,canvas,wake,sfx){
    if(a.el.dataset.threadPoints!==encoded){a.el.dataset.threadPoints=encoded;if(woven)parent.dispatchEvent(new Event('ink-anchors'));}
   }
   audioEvents();
-  const t=state.elapsed,n=state.choice,u=scene==='scraper'?(t%2.5)/2.5:(t%5)/5,e=u*u*(3-2*u);
+  const t=state.elapsed,n=state.choice,u=scene==='scraper'?(state.routeTime%2.5)/2.5:(t%5)/5,e=u*u*(3-2*u);
   if(scene==='poe'){
    const family=families[n%3],count=Math.min(240,Math.floor(t*480)),key=n+':'+state.cycles;
    if(priceKey!==key){priceKey=key;prices=priceSamples(n,state.cycles);priceIncoming=Array.from({length:4},(_,i)=>priceSamples(n,state.cycles+113+i)).flat();const all=[...prices,...priceIncoming].map(r=>r.value),hi=Math.max(...all);priceDomain=[-family.cost*1.6,hi*1.15];priceUpdates=0;priceCount=-1;}
@@ -165,7 +165,7 @@ export function miniScene(scene,canvas,wake,sfx){
   }else if(scene==='scraper'){
    for(let i=0;i<3;i++)page(c,36+i*15,85-i*6);
    page(c,338,73,92,120);label(c,'sources',70,188);label(c,'notebook',384,219);
-   const outbound=u<.65,travel=outbound?u/.65:1-(u-.65)/.35,x=105+220*travel;
+   const outbound=u<.65,travel=outbound?u/.65:1-(u-.65)/.35,x=105+220*travel*travel*(3-2*travel);state.runner={x,phase:u,outbound};
    owl(c,x,247,'mini',59,{mode:outbound?'carry':'scurry',overhead:outbound,effort:.84,speed:outbound?150:210,facing:outbound?1:-1,emotion:'worried',cargo:outbound?(ctx,grip)=>page(ctx,grip.x-35,grip.y-70,70,74):null});
    label(c,paperTitles[n],240,292,21);
 
@@ -275,7 +275,7 @@ export function miniScene(scene,canvas,wake,sfx){
   }
   c.restore();
  }
- return{state,draw,advance(dt){state.elapsed+=toyBusy(a.el)?0:dt;state.clock+=dt;state.transition=Math.min(1,state.transition+dt/.45);if(state.elapsed>=duration)change();if(scene==='baxter')caption();
+ return{state,draw,advance(dt){const movementDt=toyBusy(a.el)?0:dt;state.elapsed+=movementDt;state.routeTime+=movementDt;state.clock+=dt;state.transition=Math.min(1,state.transition+dt/.45);if(state.elapsed>=duration)change();if(scene==='baxter')caption();
   if(scene==='tfl'){
    const event=Math.floor(state.clock/.8);
    if(event!==state.lastTrainEvent){

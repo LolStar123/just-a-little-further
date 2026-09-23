@@ -10,7 +10,7 @@ export function attachToys(canvas,wake,sfx){
     function point(e,item){const r=canvas.getBoundingClientRect();return new DOMPoint((e.clientX-r.left)*canvas.width/r.width,(e.clientY-r.top)*canvas.height/r.height);}
     function release(e){
         const item=world.held;if(!item)return;
-        if(e?.type==='pointercancel'){item.vx=0;item.vy=0;}
+        if(e?.type==='pointercancel'){item.vx=0;item.vy=0;item.releaseVelocity={x:0,y:0};}
         if(item.pageActive)world.page.release(item);
         item.held=false;item.returnAt=performance.now()+700;world.held=null;
         if(canvas.hasPointerCapture(item.pointer))canvas.releasePointerCapture(item.pointer);
@@ -80,7 +80,7 @@ export function toyPose(c,id,x,y,size,options,painter){
     item.actorPainter=(ctx,box,time,mode,velocity)=>painter(ctx,0,box.h/2,box.h/1.12,{...options,time,mode,air:true,ground:undefined,cargo:null,parkour:{kind:mode==='air'?'flutter':'leap'},speed:Math.hypot(velocity.x,velocity.y)*60,facing:velocity.x<0?-1:1});
     if(item.pageActive)return{x,y,options,hidden:true};
     const stolen=[...world.props.values()].find(p=>p.active&&performance.now()-p.lastFrame<200);
-    if(stolen&&!item.active&&options.chase!==false){
+    if(stolen&&!stolen.pageActive&&!item.active&&options.chase!==false){
         const target=clamp(stolen.x,20,item.width-20);item.chase=(item.chase??item.x)+(target-(item.chase??item.x))*.055;
         const local=new DOMPoint(item.chase,item.y).matrixTransform(matrix.inverse());
         return {x:local.x,y:options.ground?.(local.x)??y,options:{...options,mode:'panic',emotion:'worried',speed:95}};

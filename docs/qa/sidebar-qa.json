@@ -1,0 +1,62 @@
+[
+  {
+    "width": 1440,
+    "scene": "baxter",
+    "visibleWhileHeld": true,
+    "cleanAfterClose": true
+  },
+  {
+    "width": 1440,
+    "scene": "liquidation",
+    "visibleWhileHeld": true,
+    "cleanAfterClose": true
+  },
+  {
+    "width": 1440,
+    "scene": "scraper",
+    "visibleWhileHeld": true,
+    "cleanAfterClose": true
+  },
+  {
+    "width": 1440,
+    "scene": "halo",
+    "visibleWhileHeld": true,
+    "cleanAfterClose": true
+  },
+  {
+    "width": 1440,
+    "scene": "botato",
+    "visibleWhileHeld": true,
+    "cleanAfterClose": true
+  },
+  {
+    "width": 390,
+    "scene": "baxter",
+    "visibleWhileHeld": true,
+    "cleanAfterClose": true
+  },
+  {
+    "width": 390,
+    "scene": "liquidation",
+    "visibleWhileHeld": true,
+    "cleanAfterClose": true
+  },
+  {
+    "width": 390,
+    "scene": "scraper",
+    "visibleWhileHeld": true,
+    "cleanAfterClose": true
+  },
+  {
+    "width": 390,
+    "scene": "halo",
+    "visibleWhileHeld": true,
+    "cleanAfterClose": true
+  },
+  {
+    "width": 390,
+    "scene": "botato",
+    "visibleWhileHeld": true,
+    "cleanAfterClose": true
+  }
+]

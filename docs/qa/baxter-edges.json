@@ -1,0 +1,109 @@
+[
+  {
+    "case": "repeat",
+    "remaining": [],
+    "elapsedMs": 250,
+    "contacts": 5,
+    "errors": [],
+    "continuity": {
+      "maxStep": 29.428333413678764,
+      "handoffs": 5
+    }
+  },
+  {
+    "case": "left",
+    "remaining": [],
+    "elapsedMs": 3750,
+    "contacts": 3,
+    "errors": [],
+    "continuity": null
+  },
+  {
+    "case": "up",
+    "remaining": [],
+    "elapsedMs": 3750,
+    "contacts": 1,
+    "errors": [],
+    "continuity": null
+  },
+  {
+    "case": "right",
+    "remaining": [],
+    "elapsedMs": 4000,
+    "contacts": 0,
+    "errors": [],
+    "continuity": null
+  },
+  {
+    "case": "down",
+    "remaining": [],
+    "elapsedMs": 2000,
+    "contacts": 1,
+    "errors": [],
+    "continuity": null
+  },
+  {
+    "case": "pair",
+    "remaining": [],
+    "elapsedMs": 3750,
+    "contacts": 5,
+    "errors": [],
+    "continuity": null
+  },
+  {
+    "case": "regrab",
+    "remaining": [],
+    "elapsedMs": 3250,
+    "contacts": 4,
+    "errors": [],
+    "continuity": null
+  },
+  {
+    "case": "cancel",
+    "remaining": [],
+    "elapsedMs": 3250,
+    "contacts": 4,
+    "errors": [],
+    "continuity": null
+  },
+  {
+    "case": "hold",
+    "remaining": [],
+    "elapsedMs": 3000,
+    "contacts": 1,
+    "errors": [],
+    "continuity": null
+  },
+  {
+    "case": "resize",
+    "remaining": [],
+    "elapsedMs": 4250,
+    "contacts": 1,
+    "errors": [],
+    "continuity": null
+  },
+  {
+    "case": "scroll",
+    "remaining": [],
+    "elapsedMs": 3000,
+    "contacts": 1,
+    "errors": [],
+    "continuity": null
+  },
+  {
+    "case": "phone-left",
+    "remaining": [],
+    "elapsedMs": 3750,
+    "contacts": 1,
+    "errors": [],
+    "continuity": null
+  },
+  {
+    "case": "phone-right",
+    "remaining": [],
+    "elapsedMs": 3500,
+    "contacts": 0,
+    "errors": [],
+    "continuity": null
+  }
+]

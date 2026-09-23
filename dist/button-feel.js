@@ -14,19 +14,29 @@ if(!window.__buttonFeel){
         const current=getComputedStyle(button).scale;
         animations.get(button)?.cancel();
         button.querySelectorAll('.poker-card').forEach((card,i)=>{
-            const rotation=getComputedStyle(card).rotate,side=i?1:-1;
+            const rotation=getComputedStyle(card).rotate,rest=Number(card.dataset.tilt||0),side=Math.random()<.5?-1:1,kick=12+Math.random()*19,lift=4+Math.random()*7;
             card.getAnimations().forEach(a=>a.cancel());
-            card.animate([{rotate:rotation,translate:'0 0'},{rotate:(side*(press?23:15))+'deg',translate:(side*5)+'px -6px',offset:.32},{rotate:(side*4)+'deg',translate:'0 2px',offset:.7},{rotate:(i?9:-6)+'deg',translate:'0 0'}],{duration:press?420:330,easing:'cubic-bezier(.2,.8,.25,1)'});
+            card.animate([{rotate:rotation,translate:'0 0'},{rotate:(rest+side*kick)+'deg',translate:(side*(3+Math.random()*5))+'px -'+lift+'px',offset:.32},{rotate:(rest-side*5)+'deg',translate:'0 2px',offset:.7},{rotate:rest+'deg',translate:'0 0'}],{duration:press?420:330,easing:'cubic-bezier(.2,.8,.25,1)'});
         });
         // Individual scale leaves positioning transforms (especially hill cards) intact.
-        const a=button.animate(press?[{scale:current},{scale:'.91 1.06',offset:.16},{scale:'1.09 .94',offset:.45},{scale:'.985 1.015',offset:.75},{scale:'1'}]:[{scale:current},{scale:'1.035 .97',offset:.35},{scale:'.99 1.02',offset:.68},{scale:'1'}],{duration:press?360:310,easing:'ease-out'});
+        const a=button.animate(press?[{scale:current},{scale:'.94 .73',translate:'0 3px',offset:.14},{scale:'1.13 1.16',translate:'0 -2px',offset:.43},{scale:'1.025 .91',translate:'0 1px',offset:.66},{scale:'.985 1.04',translate:'0 0',offset:.84},{scale:'1',translate:'0 0'}]:[{scale:current},{scale:'1.035 .97',offset:.35},{scale:'.99 1.02',offset:.68},{scale:'1'}],{duration:press?480:310,easing:'ease-out'});
         animations.set(button,a);
     }
-    document.addEventListener('focusin',e=>{const b=e.target.closest?.('button');if(b)bounce(b,false);});
-    document.addEventListener('pointerover',e=>{const b=e.target.closest?.('button');if(b&&!b.contains(e.relatedTarget)&&e.pointerType!=='touch')bounce(b,false);});
+    let pressedButton=null;
+    document.addEventListener('pointerdown',e=>{const b=e.target.closest?.('button');if(!b||b.disabled||reduced.matches)return;pressedButton=b;const current=getComputedStyle(b).scale;animations.get(b)?.cancel();animations.set(b,b.animate([{scale:current,translate:'0 0'},{scale:'.94 .8',translate:'0 3px'}],{duration:75,fill:'forwards',easing:'ease-out'}));},true);
+    document.addEventListener('pointerup',e=>{if(pressedButton&&!pressedButton.contains(e.target))bounce(pressedButton,true);pressedButton=null;},true);
+    document.addEventListener('pointercancel',()=>{if(pressedButton)animations.get(pressedButton)?.cancel();pressedButton=null;},true);
+    addEventListener('blur',()=>{if(pressedButton)animations.get(pressedButton)?.cancel();pressedButton=null;});
+    document.addEventListener('focusin',e=>{const b=e.target.closest?.('button');if(b&&b!==pressedButton)bounce(b,false);});
+    document.addEventListener('pointerover',e=>{const b=e.target.closest?.('button');if(b&&b!==pressedButton&&!b.contains(e.relatedTarget)&&e.pointerType!=='touch')bounce(b,false);});
     document.addEventListener('click',e=>{
         const b=e.target.closest?.('button');if(!b||b.disabled)return;
         sound.bus.element=b;sound.active(true);sound.mix.enable(true);sound.play('click',{level:.95});bounce(b,true);
+        if(b.classList.contains('squish-yoshi')){
+            const mascot=b.querySelector('img'),current=getComputedStyle(mascot).scale;mascot.getAnimations().forEach(a=>a.cancel());
+            b.dataset.squishes=String(Number(b.dataset.squishes||0)+1);sound.play('squish',{level:1.2,id:'yoshi'});
+            mascot.animate([{scale:current},{scale:'1.65 .23',offset:.13},{scale:'1.58 .27',offset:.32},{scale:'.77 1.22',offset:.57},{scale:'1.14 .88',offset:.76},{scale:'.97 1.035',offset:.9},{scale:'1'}],{duration:reduced.matches?120:980,easing:'cubic-bezier(.2,.7,.3,1)'});
+        }
         if(b.id==='encourage'){
             const r=b.getBoundingClientRect();
             for(let i=0;i<9;i++){

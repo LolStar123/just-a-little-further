@@ -1,0 +1,11 @@
+// A small drawn stagehand occupies the real scene bounds until it is ready.
+const pending=new Map();let raf=0;
+const art=`<svg viewBox="0 0 240 120" aria-hidden="true"><path class="loading-thread" d="M5 102 C35 96 49 110 65 99 S105 91 130 101 C156 112 191 71 222 96 S228 116 235 100"/><g class="loading-meowl"><path class="loading-wing" d="M87 65 Q110 47 130 78 Q108 86 91 75"/><path d="M60 42 L55 19 L75 32 Q86 26 98 32 L111 21 L108 47 Q124 91 96 98 Q65 104 58 82 Q53 66 60 42Z"/><path d="M61 45 Q73 33 83 47 Q94 32 106 45 Q110 65 95 68 Q87 66 83 59 Q75 70 64 62Z"/><ellipse cx="73" cy="51" rx="3" ry="6"/><ellipse cx="96" cy="51" rx="3" ry="6"/><path d="M81 61 L87 61 L84 65Z M67 99 l-7 6 13 -1 M94 99 l8 6 -12 -1 M62 67 l-12 -2 M63 71 l-14 4"/><path class="loading-rope" d="M99 75 Q122 85 138 100"/></g><path class="loading-puff" d="M40 78 l-8 -4 M40 88 l-12 1 M45 96 l-8 5"/></svg>`;
+function layout(){raf=0;for(const [f,s]of pending){if(!f.isConnected){s.el.remove();pending.delete(f);continue;}const r=f.getBoundingClientRect();s.el.style.cssText=`left:${r.left+scrollX}px;top:${r.top+scrollY}px;width:${r.width}px;height:${r.height}px;z-index:${f.closest('#project-panel')?12:2}`;s.el.classList.toggle('visible',r.bottom>0&&r.top<innerHeight);}}
+function schedule(){if(!raf)raf=requestAnimationFrame(layout);}
+function add(f){if(pending.has(f)||f.dataset.sceneReady)return;const el=document.createElement('div');el.className='scene-loading';el.setAttribute('role','status');el.innerHTML=art+'<span>one little moment...</span>';document.body.append(el);f.setAttribute('aria-busy','true');pending.set(f,{el});observer.observe(f);schedule();}
+const observer=new ResizeObserver(schedule);
+function scan(){document.querySelectorAll('iframe.sketch-demo,iframe.scene-frame').forEach(add);schedule();}
+new MutationObserver(scan).observe(document.body,{childList:true,subtree:true});
+addEventListener('message',e=>{if(e.origin!==location.origin||e.data?.type!=='demo-ready')return;const f=[...pending.keys()].find(f=>f.contentWindow===e.source);if(!f)return;f.dataset.sceneReady='true';f.removeAttribute('aria-busy');const s=pending.get(f);s.el.remove();observer.unobserve(f);pending.delete(f);});
+addEventListener('scroll',schedule,true);addEventListener('resize',schedule);scan();

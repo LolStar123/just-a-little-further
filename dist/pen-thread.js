@@ -261,6 +261,7 @@ function layout(){
     curve(8,y+12,4,hill[0][1]-15,hill[0][0],hill[0][1]);
     for(const p of hill.slice(1))to(...p);
     const before=hill.at(-2),end=hill.at(-1),slope=(end[1]-before[1])/(end[0]-before[0]||1);
+    const tugStart=points.length-1;
     for(const controls of hillExit(w,end,slope,world.h,margin,stage.h))curve(...controls);
     let index=0;
     for(const frame of document.querySelectorAll('.sketch-demo')){
@@ -306,7 +307,7 @@ function layout(){
         index++;
     }
     svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.style.height=h+'px';
-    life.update(points);
+    life.update(points,tugStart);
     svg.dataset.joins='mountains hill '+[...document.querySelectorAll('.sketch-demo')].map(f=>f.dataset.scene).join(' ');
 }
 const observer=new ResizeObserver(schedule);observer.observe(document.querySelector('.sketchbook'));

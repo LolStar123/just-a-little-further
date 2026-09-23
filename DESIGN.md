@@ -1,4 +1,4 @@
-# A little further
+# Just a little further
 
 A personal sketchbook about Atul's projects and interests: paper, a wandering pen, a stubborn meowl and a boulder. Project copy explains work, evidence and outputs. Rendering techniques belong here or in the colophon.
 
@@ -6,15 +6,15 @@ A personal sketchbook about Atul's projects and interests: paper, a wandering pe
 
 `dist/friend-review.css` owns paper `#eeeae0`, ink `#3b3a36`, muted `#69675e`, olive `#60715d`, ochre `#8b7248` and clay `#936957`. Handwriting uses locally hosted Nothing You Could Do; reading copy uses Newsreader. Keep paragraphs readable. Colour distinguishes useful controls and data.
 
-The short hero contains the name, UCL economics, profile links, audio sliders, title, attributed thought and hill. The first project peeks below. Tube reliability comes first below the hill. Hill markers preserve the previous sequence; OCR is appended without inventing a date. Playing cards replace numbers, with combined ranks above ten.
+The short hero contains the name, UCL economics, profile links, audio sliders, title, attributed thought and hill. The first project peeks below. Tube reliability comes first below the hill. Hill markers preserve the previous sequence; OCR is temporarily archived. Playing cards replace numbers, with combined ranks above ten.
 
-Fourteen illustrated sections include OCR and personal interests. The interests matrix reveals itself automatically and calculates a correct 2×2 inverse. OCR distinguishes sample text matching from historical screen capture and Tesseract. `examples/ocr_match.py` extracts the actual matching stage without live input automation.
+Twelve project sections accompany an interests thought bubble. Its labels stay readable while themed doodles animate. The heading is only 'off the clock' with cycling dots. OCR source remains archived, outside the page and navigation.
 
 ## The continuous pen
 
 Shared geometry connects hill, scenery, chapter floors, statistical curves and invented signature. The wide SVG hit path is transparent. Tugs taper along 900 pixels of arc length on each side with zero endpoint slope and curvature; chapter floors return to their base geometry after release. Use broad curls and continuous tangents, never sharp sawtooth fillers. Data-derived curves retain measured values.
 
-The guide travels in world coordinates, using the line for footholds rather than snapping to an arc-length position. Geometry selects climbing, grinding, leaps and shortcuts. Botato has a scroll-released ledge hang. Throws keep momentum and gravity for one second before winged recovery. Keyboard tug handles sit between chapters. Scene picking uses painter order and transformed bounds. Thrown helpers and props enter a shared page-wide Matter world, outside iframe clipping. They collide with sampled line segments, text and other objects. Flying recovery passes above the thin-wire plane; its final approach blends into the home pose with overlapping colliders disabled.
+The guide travels in world coordinates, using the line for footholds rather than snapping to an arc-length position. Geometry selects climbing, grinding, leaps and shortcuts. Botato has a scroll-released ledge hang. Throws keep momentum and gravity for 0.7 seconds before winged recovery. Keyboard tug handles sit between chapters. Scene picking uses painter order and transformed bounds. Thrown helpers and props enter a shared page-wide Matter world, outside iframe clipping. They collide with sampled line segments, text and other objects. All recovery is collision-free for both helper and item, from dispatch through restoration. Normal collision physics resumes after restoration and a fresh throw. The shared layer stays above open panels and discards bodies belonging to closed panels.
 
 ## Motion and physics
 
@@ -34,4 +34,8 @@ Mechanical key recordings are credited to MattRuthSound under CC BY 4.0. Six kit
 
 `docs/reference-notes.md` logs ten posts, captions, loaded replies, expanded resources, frame-based media review and the installed skill. Hidden/unexpanded replies are not claimed as inspected. Temporary reference media was deleted.
 
-`docs/friend-review-checklist.md` and `docs/guide-polish.md` track the requests. Private browser evidence is under `output/friend-review/` and `output/card-polish/`. Syntax, visual, interaction and audio checks are separate evidence. Automated playback is not a listening test.
+`docs/friend-review.md`, `docs/guide-polish.md` and `docs/guide-followup.md` track the requests. Private browser evidence is under `output/friend-review/` and `output/card-polish/`. Syntax, visual, interaction and audio checks are separate evidence. Automated playback is not a listening test.
+
+The title is centred and intentionally wonky. Card suits use black spades, blue clubs, bright red hearts and orange diamonds. Guide speech has a fixed-size typewriter box anchored every frame, with quiet typing clicks. The guide overlay clips at viewport edges without changing world-space motion.
+
+The hill actor has an exclusive throw/recovery state: no pushing or terrain foot planting during flight. It selects a stable foothold rather than chasing a moving landing target. Hard held-rock impacts use constraint displacement as well as pre-step velocity. The loose cliff-exit segment is tug-enabled by path index while the physical ridge remains pinned. Cheer gives the guide a large ballistic bounce and two drawn pom-poms. Pending scenes show a small original stagehand until the real ready message. Research annotations sit as small crooked margin asides.

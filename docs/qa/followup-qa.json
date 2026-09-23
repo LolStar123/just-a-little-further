@@ -1,0 +1,42 @@
+[
+  {
+    "width": 1440,
+    "captionOffsetRange": [
+      -152.00002990672408,
+      -151.9999698598324
+    ],
+    "typed": true,
+    "colours": {
+      "spades": "rgb(52, 60, 75)",
+      "hearts": "rgb(236, 48, 43)",
+      "clubs": "rgb(66, 105, 80)",
+      "diamonds": "rgb(231, 131, 20)"
+    },
+    "errors": []
+  },
+  {
+    "width": 390,
+    "captionOffsetRange": [
+      -152.0000300729174,
+      -151.99996978235254
+    ],
+    "typed": true,
+    "colours": {
+      "spades": "rgb(52, 60, 75)",
+      "hearts": "rgb(236, 48, 43)",
+      "clubs": "rgb(66, 105, 80)",
+      "diamonds": "rgb(231, 131, 20)"
+    },
+    "errors": []
+  },
+  {
+    "gpuStart": 30,
+    "gpuEnd": 34,
+    "returnedObjects": true
+  },
+  {
+    "width": 24.887391338888165,
+    "fall": 334.63183918854054,
+    "detached": true
+  }
+]

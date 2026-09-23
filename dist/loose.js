@@ -188,7 +188,7 @@ function drawStone(){
     for(const f of physics.fractures){c.beginPath();c.moveTo(f.a.x,f.a.y);c.lineTo(f.b.x,f.b.y);c.strokeStyle='#eeeae0';c.lineWidth=2.4;c.stroke();c.lineWidth=.9;c.strokeStyle='#34352f';c.stroke();}
     c.restore();
     for(const slab of physics.slabs){
-        const age=physics.time-slab.born;c.save();c.translate(slab.body.position.x,slab.body.position.y);c.rotate(slab.body.angle);c.globalAlpha=Math.max(0,Math.min(1,(slab.shattered?3:9)-age));c.beginPath();slab.inkOutline.forEach((p,i)=>i?c.lineTo(p.x,p.y):c.moveTo(p.x,p.y));c.closePath();c.fillStyle='#eeeae0';c.fill();c.strokeStyle='#666054';c.lineWidth=.8;c.stroke();c.restore();
+        const age=physics.time-slab.born;c.save();c.translate(slab.body.position.x,slab.body.position.y);c.rotate(slab.body.angle);c.globalAlpha=Math.max(0,Math.min(1,(slab.shattered?2:4)-age));c.beginPath();slab.inkOutline.forEach((p,i)=>i?c.lineTo(p.x,p.y):c.moveTo(p.x,p.y));c.closePath();c.fillStyle='#eeeae0';c.fill();c.strokeStyle='#666054';c.lineWidth=.8;c.stroke();c.restore();
     }
     for(const fragment of physics.chips){const age=physics.time-fragment.born;c.save();c.globalAlpha=Math.min(1,(12-age)/2);c.beginPath();fragment.body.vertices.forEach((p,i)=>i?c.lineTo(p.x,p.y):c.moveTo(p.x,p.y));c.closePath();c.fillStyle='#eeeae0';c.fill();c.strokeStyle='#42413b';c.lineWidth=.65;c.stroke();c.restore();}
     if(physics.drag?.bodyB===b){const p=physics.drag.pointA;c.beginPath();c.moveTo(b.position.x,b.position.y);c.lineTo(p.x,p.y);c.setLineDash([2,5]);c.strokeStyle='rgba(103,97,82,.55)';c.lineWidth=1;c.stroke();c.setLineDash([]);}
@@ -212,7 +212,7 @@ function render(dt){
     c.save();if(!quietToy()){c.translate(shake>.02?Math.sin(time*70)*shake*.35:0,0);}
     drawPower();
     c.save();drawStone();
-    hero.pose=drawMeowl(c,hero.x,hero.y,hero.size,{voice:hillSound.mouth('hero'),ground:x=>physics.ground(x)+physics.lane*hero.size*.24,rock:{contact:physics.contact||physics.gripGrace,vertices:physics.rock.vertices},splatAge:physics.splat?.age||0,stroke:physics.stroke,time,air:!physics.splat&&physics.ground(hero.x)-(physics.actor.position.y+physics.actorHeight/2)>hero.size*.22,mode:hero.mode,emotion:hero.emotion,emotionAge:hero.emotionAge,speed:hero.vx,phase:hero.phase,effort:hero.effort,pet:hero.pet>0,landed:physics.landed,facing:physics.facing,look:clamp((physics.rock.position.x-hero.x)/20,-4,4)});
+    hero.pose=drawMeowl(c,hero.x,hero.y,hero.size,{voice:hillSound.mouth('hero'),parkour:hero.mode==='flutter'?{kind:'flutter'}:hero.mode==='tossed'?{kind:'fall'}:null,ground:x=>physics.ground(x)+physics.lane*hero.size*.24,rock:{contact:!physics.actorFlight&&!hero.held&&(physics.contact||physics.gripGrace),vertices:physics.rock.vertices},splatAge:physics.splat?.age||0,stroke:physics.stroke,time,air:hero.held||!!physics.actorFlight||!physics.splat&&physics.ground(hero.x)-(physics.actor.position.y+physics.actorHeight/2)>hero.size*.22,mode:hero.mode,emotion:hero.emotion,emotionAge:hero.emotionAge,speed:hero.vx,phase:hero.phase,effort:hero.effort,pet:hero.pet>0,landed:physics.landed,facing:physics.facing,look:clamp((physics.rock.position.x-hero.x)/20,-4,4)});
     c.restore();drawPower(true);drawParticles(dt);c.restore();
     if(!art.ready){c.fillStyle='#b4c5cb';c.font='14px Plex, sans-serif';c.textAlign='center';c.fillText('the meowl is on his way…',W*.59,H*.56);c.textAlign='left';}
 }
@@ -261,10 +261,10 @@ canvas.addEventListener('keydown',e=>{
 $('#ruin').addEventListener('click',()=>{toyMotionRequested=true;if(paused)setPause(false);cancelGrab();physics.ruinDay();hillSound.play('swish',{level:.8});used();status('wait. what are you doing.');wake();});
 $('#help').addEventListener('click',()=>{toyMotionRequested=true;if(paused)setPause(false);cancelGrab();physics.helpRock();hero.cheer=3;hillSound.play('aura',{style:1,level:.8});used();status('okay. just this once.');wake();});
 $('#reset').addEventListener('click',()=>{cancelGrab();auraField.clear();physics.reset();hero.pet=0;hero.cheer=0;particles.length=0;ripples.length=0;scuffs.length=0;status('another morning. another go.');updateCharacters(0);wake();});
-$('#encourage').addEventListener('click',()=>{if(paused)setPause(false);hero.cheer=3;hero.pet=0;used();status('go on, little guy.');playTone('pet');wake();});
+$('#encourage').addEventListener('click',()=>{dispatchEvent(new Event('meowl-cheer'));if(paused)setPause(false);hero.cheer=3;hero.pet=0;used();status('go on, little guy.');playTone('pet');wake();});
 function setPause(value){paused=value;hillSound.active(!paused&&worldVisible&&!panelOpen);cancelGrab();if(paused){cancelAnimationFrame(frame);frame=0;}last=0;wake();}
-const quoteAuthors=['attributed online to epictetus / wording unverified','chatgpt / a line from our conversations','chatgpt / a line from our conversations','chatgpt / a line from our conversations','atul / the onion reminder'];
-const quotes=["The only man who ever beat you offers a rematch every morning. Take it.","You do not owe the world an undefeated man. Give it one who returns.","The boulder rolled back. It didn't erase the strength you built pushing it.","It's been a hard road. You still get to see where it leads.","The treadmill has sped up. The onion held the line. So must I."];let quote=0;
+const quoteAuthors=['- marcus aurelius','- marcus aurelius','- chatgpt','- chatgpt','- atul'];
+const quotes=["I am rising to the work of a human being.","Love the art, poor as it may be, which thou hast learned, and be content with it.","The boulder rolled back. It didn't erase the strength you built pushing it.","It's been a hard road. You still get to see where it leads.","The treadmill has sped up. The onion held the line. So must I."];let quote=0;
 $('#next-quote').addEventListener('click',()=>{quote=(quote+1)%quotes.length;$('#quote').textContent=quotes[quote];$('#quote-author').textContent=quoteAuthors[quote];$('#quote').getAnimations().forEach(a=>a.cancel());$('#quote').animate([{opacity:.2},{opacity:1}],{duration:300});});
 
 function openPanel(key=null,trigger){

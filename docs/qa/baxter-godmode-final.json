@@ -1,0 +1,21 @@
+[
+  {
+    "case": "repeat",
+    "remaining": [],
+    "elapsedMs": 250,
+    "contacts": 5,
+    "errors": [],
+    "continuity": {
+      "maxStep": 30.22407392579054,
+      "handoffs": 5
+    }
+  },
+  {
+    "case": "pair",
+    "remaining": [],
+    "elapsedMs": 3750,
+    "contacts": 5,
+    "errors": [],
+    "continuity": null
+  }
+]

@@ -1,5 +1,5 @@
 // Project copy describes the work. Demo inputs are labelled in each runnable example.
-export const trail=["scraper", "pipeline", "poe", "tfl", "commute", "smoothtato", "mtxtato", "deadlock", "baxter", "botato", "halo", "liquidation", "ocr"];
+export const trail=["scraper", "pipeline", "poe", "tfl", "commute", "smoothtato", "mtxtato", "deadlock", "baxter", "botato", "halo", "liquidation"];
 export const projects={
   "ocr": {
   "title": "poe / OCR crafting prototype",
@@ -153,7 +153,7 @@ export const projects={
     "title": "smoothtato",
     "short": "Smoothtato",
     "category": "PATH OF EXILE / PERFORMANCE",
-    "caption": "Cuts Path of Exile's visual clutter with presets that keep combat cues readable.",
+    "caption": "Cuts Path of Exile's visual clutter with presets that carefully replace video game files.",
     "description": "Choose a preset, inspect which effect categories it removes and keep the important encounter cues. Saved configurations make the changes repeatable; restoring Original brings the visuals back.",
     "scene": "smoothtato",
     "note": "",

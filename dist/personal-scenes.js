@@ -29,10 +29,33 @@ export function personalScene(scene,canvas,wake,sfx){
    const expansion=reduced.matches?1:Math.min(1,time/1.5),growth=1-Math.pow(1-expansion,3);
    c.save();c.translate(240,244);c.scale(.12+.88*growth,.12+.88*growth);c.translate(-240,-244);
    c.beginPath();c.moveTo(46,242);c.bezierCurveTo(10,240,8,197,22,172);c.bezierCurveTo(-1,137,9,59,35,42);c.bezierCurveTo(44,7,131,7,164,20);c.bezierCurveTo(225,-2,297,13,325,20);c.bezierCurveTo(395,-2,467,20,463,60);c.bezierCurveTo(485,118,469,171,464,181);c.bezierCurveTo(478,233,425,244,386,239);c.bezierCurveTo(292,261,124,247,46,242);c.strokeStyle=ink;c.lineWidth=1.1;c.stroke();
-   for(const b of atoms){c.save();c.translate(b.x,b.y);c.rotate(reduced.matches?0:b.spin+Math.sin(time*2+b.x)*.018);b.words.forEach((word,i)=>text(c,word,0,i*20-3,18));c.restore();}
+   const seats=[[90,74],[244,74],[392,74],[143,179],[335,179]],active=Math.floor(time/2.6)%5,phase=(time%2.6)/2.6;
+   state.activeThought=active;
+   // The words never move. The doodles do the daydreaming above each label.
+   const thread=[[35,42],[68,23],[137,30],[201,14],[278,29],[339,13],[445,34],[453,113],[377,128],[313,120],[249,143],[182,120],[87,134],[47,215],[85,236],[194,246]];
+   line(c,thread,'#b2aa98',.75);
+   for(let j=0;j<5;j++){
+    const [x,y]=seats[j],selected=j===active,lift=reduced.matches?0:selected?Math.sin(phase*Math.PI)*8:Math.sin(time*1.6+j)*2;
+    c.save();c.translate(x,y-30-lift);c.strokeStyle=selected?olive:ink;c.lineWidth=1.5;
+    if(j===0){ // A little competitive-game soul orb, with a wandering glint.
+     c.beginPath();c.ellipse(0,-7,12,15,.1,0,Math.PI*2);c.stroke();line(c,[[-9,-18],[-3,-27],[4,-22],[9,-15]],olive,1.2);line(c,[[-5,-7],[-2,-4],[2,-8]],ink,1.4);
+     const glint=reduced.matches?0:Math.sin(time*4)*4;line(c,[[17+glint,-16],[21+glint,-16]],olive,1);line(c,[[19+glint,-18],[19+glint,-14]],olive,1);
+    }else if(j===1){ // Watcher's Eye: a blinking, slightly suspicious piece of loot.
+     const blink=reduced.matches?1:Math.abs(Math.sin(time*1.3))<.13?.12:1;c.save();c.scale(1,blink);c.beginPath();c.ellipse(0,-8,19,11,0,0,Math.PI*2);c.stroke();c.beginPath();c.arc(Math.sin(time)*4,-8,4,0,Math.PI*2);c.stroke();c.restore();line(c,[[-20,7],[-12,11],[9,8],[19,11]],olive,.8);
+    }else if(j===2){ // A hand-drawn arena banner.
+     line(c,[[-16,14],[-15,-27]],ink,1.3);const flutter=reduced.matches?0:Math.sin(time*5)*5;line(c,[[-15,-25],[0,-28+flutter],[19,-22],[12,-10],[0,-14+flutter],[-15,-12]],'#936957',1.6);line(c,[[-7,-21],[8,-14]],ink,1.6);
+    }else if(j===3){ // A little fan of cards keeps reshuffling, with the label anchored below.
+     for(let k=0;k<3;k++){c.save();c.rotate((k-1)*.2+(selected&&!reduced.matches?Math.sin(time*7+k)*.12:0));line(c,[[-11,-23],[10,-25],[12,6],[-10,8],[-11,-23]],k===1?'#ec302b':ink,1.2);text(c,k===1?'A':'7',0,-5,14);c.restore();}
+    }else{ // Indomie sandwich. The steam is the motion, the text stays put.
+     line(c,[[-24,-10],[-19,-19],[15,-19],[24,-10],[-24,-10],[-19,7],[18,7],[24,-10]],'#946313',1.4);line(c,[[-20,-3],[-11,-7],[-3,-1],[6,-6],[14,-1],[21,-5]],olive,1.5);
+     for(let k=0;k<3;k++){const sway=reduced.matches?0:Math.sin(time*3+k)*4;line(c,[[-12+k*12,-24],[-15+k*12+sway,-30],[-10+k*12,-36]],ink,.9);}
+    }
+    c.restore();atoms[j].words.forEach((word,i)=>text(c,word,x,y+i*20,18));
+    if(selected){const spread=20+Math.sin(phase*Math.PI)*23;line(c,[[x-spread,y+26],[x-7,y+28],[x+spread,y+25]],olive,1.1);}
+   }
    c.restore();
    line(c,[[0,308],[122,307],[139,283],[153,268],[172,258],[167,254],[161,260],[174,269],[194,246]],olive,1);
-   drawMeowl(c,141,307,59,{id:'thoughtful',time,mode:'watch',voice:sfx.mouth('thoughtful')});
+   drawMeowl(c,141,307,59,{id:'thoughtful',time,mode:'watch',parkour:{kind:'point'},look:Math.sin(time*.7),voice:sfx.mouth('thoughtful')});
    note.textContent='a few things taking up brain space.';state.atoms=atoms;
    sfx.chirp('thoughtful',time,[13,19]);
   }else{
@@ -48,5 +71,5 @@ export function personalScene(scene,canvas,wake,sfx){
   }
   c.restore();
  }
- return {state,draw,advance(dt){state.clock+=dt;if(interests&&!reduced.matches)moveAtoms(Math.min(dt,.035));}};
+ return {state,draw,advance(dt){state.clock+=dt;}};
 }

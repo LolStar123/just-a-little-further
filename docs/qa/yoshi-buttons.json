@@ -1,0 +1,11 @@
+{
+  "pressedScale": "0.94 0.8",
+  "reboundScale": "1.03024 0.922479",
+  "arrows": [
+    "yoshi-arrow arrow-sketch",
+    "yoshi-arrow arrow-loop",
+    "yoshi-arrow arrow-hop"
+  ],
+  "squelches": 6,
+  "errors": []
+}
