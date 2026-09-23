@@ -166,7 +166,7 @@ export function miniScene(scene,canvas,wake,sfx){
    const thread=JSON.stringify(points.map(([x,y])=>[+(x*s+(a.w-480*s)/2).toFixed(2),+(y*s+(a.h-artHeight*s)/2).toFixed(2)]));
    if(a.el.dataset.threadPoints!==thread){a.el.dataset.threadPoints=thread;if(woven)parent.dispatchEvent(new Event('ink-anchors'));}
    state.priceDistribution={...d,points,domain:priceDomain,values:prices.slice(0,count).map(r=>r.value),windowUpdates:priceUpdates};
-   note.textContent='50k variants. proxy logs. risk sheets. tiny chance, very long tail.';
+   note.textContent='50k variants. proxy logs. risk sheets.';
   }else if(scene==='scraper'){
    for(let i=0;i<3;i++)page(c,36+i*15,85-i*6);
    page(c,338,73,92,120);label(c,'sources',70,188);label(c,'notebook',384,219);
