@@ -1,0 +1,29 @@
+{
+  "start": {
+    "active": [
+      {
+        "id": "carried-gpu",
+        "x": 52.48016117590801,
+        "y": 9308.154834044994,
+        "held": false,
+        "actor": false
+      }
+    ],
+    "contacts": 2,
+    "terrain": 88
+  },
+  "end": {
+    "active": [
+      {
+        "id": "carried-gpu",
+        "x": 463.2733885007304,
+        "y": 9737.253342734697,
+        "held": false,
+        "actor": false
+      }
+    ],
+    "contacts": 7,
+    "terrain": 200
+  },
+  "errors": []
+}

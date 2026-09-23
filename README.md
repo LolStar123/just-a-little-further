@@ -21,7 +21,7 @@ After editing an embedded project scene, run `npm run build:demos`.
 
 | Source | Responsibility |
 | --- | --- |
-| [dist/index.html](dist/index.html) | The page, thirteen projects and the interests matrix |
+| [dist/index.html](dist/index.html) | The page, thirteen projects and the interests thought bubble |
 | [dist/creations.js](dist/creations.js) | Project descriptions, GitHub links and working demos |
 | [dist/hill-physics.js](dist/hill-physics.js) | Boulder, terrain erosion and the meowl's movement |
 | [dist/little-creatures.js](dist/little-creatures.js) | Shared drawn characters and poses |
@@ -37,9 +37,15 @@ fonts retain their respective rights; see the credits and bundled license files.
 ## Small experiments
 
 - [OCR matching](examples/ocr_match.py): run `python examples/ocr_match.py`. Normalises confusable characters and checks exact/fuzzy modifier matches without screen capture or input automation.
-- [Personal scenes](dist/personal-scenes.js): sample OCR output and an automatically revealed interests matrix with a calculated inverse.
-- [Interaction system](dist/toy-interactions.js): grab, throw, cancel and recover helpers and props in responsive canvas coordinates.
-- [Guiding line](dist/thread-life.js): springy tugs and the little guide's path along the page.
+- [Personal scenes](dist/personal-scenes.js): sample OCR output and an expanding thought bubble of colliding interests.
+- [Interaction system](dist/toy-interactions.js): precise picking and a shared [page-wide physics world](dist/page-toys.js) for throwing, collisions and winged recovery.
+- [Guiding line](dist/thread-life.js): smooth elastic tugs and a [world-space guide](dist/guide-motion.js) with climbs, leaps, rail grinds and ledge hangs.
 - [Design rules](DESIGN.md) and [reference decisions](docs/reference-notes.md).
 
 Enter with three pushes to unlock audio. The examples run automatically while visible. Main music and effects have separate sliders. Project-panel themes are original quiet synth arrangements. The website remains a stylised playground; illustrative scene data is labelled separately from the linked working research demos.
+
+## Interaction review
+
+[Completed checklist and test findings](docs/guide-polish.md). The review includes real pointer throws, repeated hill impacts, mobile layout, panel switching and continuous movement during fast scrolling. It records both fixed failures and simulation limits.
+
+![The guide hanging from the Botato ledge](docs/guide-hang.png)

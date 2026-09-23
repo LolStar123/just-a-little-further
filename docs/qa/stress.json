@@ -1,0 +1,54 @@
+[
+  {
+    "width": 1440,
+    "scenes": [
+      "tfl",
+      "scraper",
+      "pipeline",
+      "deadlock",
+      "baxter",
+      "botato",
+      "halo",
+      "interests",
+      "liquidation"
+    ],
+    "guideMaxSpeed": 1221.3549828720097,
+    "errors": []
+  },
+  {
+    "width": 390,
+    "scenes": [
+      "tfl",
+      "scraper",
+      "pipeline",
+      "deadlock",
+      "baxter",
+      "botato",
+      "halo",
+      "interests",
+      "liquidation"
+    ],
+    "guideMaxSpeed": 1449.2133309662672,
+    "errors": []
+  },
+  {
+    "breaks": 329,
+    "topWear": 246.60268290346926,
+    "deficit": 27.89674341196428,
+    "finite": true,
+    "slabVertices": [
+      14,
+      14,
+      14,
+      14,
+      14,
+      14,
+      14,
+      14,
+      14,
+      14,
+      14,
+      14
+    ]
+  }
+]

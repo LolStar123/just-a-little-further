@@ -11,15 +11,22 @@ if(!window.__buttonFeel){
     document.head.append(css);
     function bounce(button,press){
         if(reduced.matches)return;
+        const current=getComputedStyle(button).scale;
         animations.get(button)?.cancel();
+        button.querySelectorAll('.poker-card').forEach((card,i)=>{
+            const rotation=getComputedStyle(card).rotate,side=i?1:-1;
+            card.getAnimations().forEach(a=>a.cancel());
+            card.animate([{rotate:rotation,translate:'0 0'},{rotate:(side*(press?23:15))+'deg',translate:(side*5)+'px -6px',offset:.32},{rotate:(side*4)+'deg',translate:'0 2px',offset:.7},{rotate:(i?9:-6)+'deg',translate:'0 0'}],{duration:press?420:330,easing:'cubic-bezier(.2,.8,.25,1)'});
+        });
         // Individual scale leaves positioning transforms (especially hill cards) intact.
-        const a=button.animate(press?[{scale:'1'},{scale:'.91 1.06',offset:.16},{scale:'1.09 .94',offset:.45},{scale:'.985 1.015',offset:.75},{scale:'1'}]:[{scale:'1'},{scale:'1.035 .97',offset:.35},{scale:'.99 1.02',offset:.68},{scale:'1'}],{duration:press?360:310,easing:'ease-out'});
+        const a=button.animate(press?[{scale:current},{scale:'.91 1.06',offset:.16},{scale:'1.09 .94',offset:.45},{scale:'.985 1.015',offset:.75},{scale:'1'}]:[{scale:current},{scale:'1.035 .97',offset:.35},{scale:'.99 1.02',offset:.68},{scale:'1'}],{duration:press?360:310,easing:'ease-out'});
         animations.set(button,a);
     }
+    document.addEventListener('focusin',e=>{const b=e.target.closest?.('button');if(b)bounce(b,false);});
     document.addEventListener('pointerover',e=>{const b=e.target.closest?.('button');if(b&&!b.contains(e.relatedTarget)&&e.pointerType!=='touch')bounce(b,false);});
     document.addEventListener('click',e=>{
         const b=e.target.closest?.('button');if(!b||b.disabled)return;
-        sound.bus.element=b;sound.active(true);sound.mix.enable(true);sound.play('click',{level:.7});bounce(b,true);
+        sound.bus.element=b;sound.active(true);sound.mix.enable(true);sound.play('click',{level:.95});bounce(b,true);
         if(b.id==='encourage'){
             const r=b.getBoundingClientRect();
             for(let i=0;i<9;i++){

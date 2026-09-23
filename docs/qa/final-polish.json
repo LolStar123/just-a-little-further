@@ -1,0 +1,12 @@
+{
+  "cardAnimations": 9,
+  "landingPhrases": [
+    "psst. ready to see what's down there?",
+    "follow me. i found some good stuff."
+  ],
+  "grindingFrames": 90,
+  "gpuStart": 30,
+  "gpuEnd": 35,
+  "gpuMaxSpeed": 129.9999999987986,
+  "errors": []
+}

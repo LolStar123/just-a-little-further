@@ -154,13 +154,23 @@ function layout(){
         const phone=w<760,room=Math.max(36,floor-ceiling),mid=ceiling+room*.49;
         const span=phone?w*.60:Math.min(w*.34,460),cx=w*(index%2?.40:.60);
         const rx=Math.min(span/2,cx-22,w-cx-22),ry=Math.min(phone?57:82,room*.41);
+        if(kind==='interests'){
+            const destination=nextLane,centre=(edge+destination)/2;
+            // Four broad bends carry the vertical tangent into a single open curl.
+            curve(edge,ceiling+room*.24,centre+rx*.6,ceiling+room*.12,centre,mid-ry*.35);
+            curve(centre-rx*.6,mid+ry*.2,centre-rx*.8,mid+ry*.82,centre-rx*.25,mid+ry*.82);
+            curve(centre+rx*.3,mid+ry*.82,centre+rx*.4,mid-ry*.3,centre,mid-ry*.35);
+            curve(centre-rx*.4,mid-ry*.4,destination,floor-45,destination,floor);
+            return;
+        }
         if(kind==='liquidation'){
             // Invented lettering, never a trace of a personal signature. One pen
             // moves through every letter and the final underlining flourish.
             const width=Math.min(w*.80,790),sx=width/670,sy=Math.min(sx*1.1,room/180);
             const ox=(w-width)/2,oy=mid-62*sy;
             const pen=(...v)=>curve(...v.map((n,i)=>i%2?oy+n*sy:ox+n*sx));
-            curve(edge,ceiling+22,ox-20*sx,oy+62*sy,ox,oy+92*sy);
+            curve(edge,ceiling+room*.32,ox-42*sx,oy+8*sy,ox-18*sx,oy+53*sy);
+            curve(ox+6*sx,oy+98*sy,ox-18*sx,oy+80*sy,ox,oy+92*sy);
             // a t u l
             pen(18,106,57,49,42,48);pen(18,46,5,100,35,99);
             pen(51,98,54,57,56,60);pen(50,103,67,108,83,78);

@@ -164,24 +164,43 @@ export class HillPhysics {
         // Fractures belong to the material, not to a decal that follows the surface.
         this.faults=this.faults.filter(f=>!f.broken||!f.propagated||this.time-f.breakAt<.35&&f.paths.some(path=>path.some(([x,y])=>y>this.ground(x)+.3)));
     }
+    failUnsupportedRidge(dt){
+        const spacing=this.w/52,failures=[];
+        for(let i=1;i<=50;i++){
+            const n=this.nodes[i],surface=this.base(n.x)+n.eroded;
+            let deficit=0;
+            for(const j of[i-1,i+1]){const neighbour=this.nodes[j];if(neighbour.eroded<18)continue;const initial=Math.abs(this.base(neighbour.x)-this.base(n.x)),capacity=Math.max(spacing*.9,initial*1.35);deficit=Math.max(deficit,this.base(neighbour.x)+neighbour.eroded-capacity-surface);}
+            n.supportStress=Math.max(0,(n.supportStress||0)+(deficit>7?dt*deficit/spacing*1.7:-dt));
+            if(n.supportStress>.55){n.supportStress=0;failures.push({n,depth:Math.min(deficit,this.h*.12)});}
+        }
+        for(const {n,depth}of failures){
+            const width=spacing*1.4;
+            this.collapseSlab({x:n.x,width,depth});n.eroded+=depth;this.terrainBreaks++;this.terrainVersion++;
+            this.dent(n.x,17);this.dent(Math.max(0,n.x-spacing),11);this.dent(Math.min(this.w*.955,n.x+spacing),11);
+            this.onImpact?.({x:n.x,y:this.ground(n.x),speed:5,terrain:true,depth,width});
+        }
+        // The off-page continuation inherits summit movement instead of acting as an immortal support.
+        if(this.nodes[50].eroded>0)for(let i=51;i<53;i++)this.nodes[i].eroded=Math.max(this.nodes[i].eroded,this.nodes[50].eroded);
+    }
     collapseSlab(fault){
         if(this.slabs.length>=12)return;
         const width=Math.min(fault.width*.9,58),height=12+Math.min(fault.depth,22),x=clamp(fault.x,width,this.w*.95),y=this.ground(x)+height;
-        const body=Bodies.polygon(x,y,5,width*.5,{density:.0015,friction:.65,restitution:.08,collisionFilter:{category:4,mask:4},label:'fallen ledge'});
+        // The visible shard comes from this ledge's actual surface and a wandering fracture.
+        // A convex collision hull is hidden behind that irregular pen outline.
+        const outline=[];
+        for(let i=0;i<=6;i++){const px=x-width*.5+width*i/6;outline.push({x:px,y:this.ground(px)+1});}
+        for(let i=6;i>=0;i--){const px=x-width*.5+width*i/6,jag=Math.sin(fault.x*.37+i*4.71)*height*.17;outline.push({x:px+Math.sin(i*2.3)*2,y:this.ground(px)+height*(.5+.26*Math.sin(i*.8+1)**2)+jag});}
+        const centre=Vertices.centre(Vertices.hull(outline));
+        const body=Bodies.fromVertices(centre.x,centre.y,[Vertices.hull(outline)],{density:.0015,friction:.65,restitution:.08,collisionFilter:{category:4,mask:5},label:'fractured ledge'});
+        const inkOutline=outline.map(p=>({x:p.x-centre.x,y:p.y-centre.y}));
         const anchor=clamp(x-width*.75,0,this.w*.95);
         const tether=Constraint.create({pointA:{x:anchor,y:this.ground(anchor)},bodyB:body,pointB:{x:-width*.3,y:-height*.35},length:width*.65,stiffness:.025,damping:.12});
         Body.setAngularVelocity(body,(this.terrainBreaks%2?1:-1)*.07);Body.setVelocity(body,{x:.6,y:1.3});
-        Composite.add(this.engine.world,[body,tether]);this.slabs.push({body,tether,anchor,born:this.time});
+        Composite.add(this.engine.world,[body,tether]);this.slabs.push({body,tether,anchor,inkOutline,born:this.time});
     }
     contour(){
         const points=[];
-        for(let i=0;i<=51;i++){
-            const x=Math.min(this.w*.963,i*this.w/52);points.push([x,this.ground(x)]);
-            for(const slab of this.slabs){if(Math.floor(slab.anchor/this.w*52)!==i)continue;
-                const verts=slab.body.vertices;points.push([slab.anchor,this.ground(slab.anchor)]);
-                for(const v of verts)points.push([v.x,v.y]);points.push([verts[0].x,verts[0].y],[slab.anchor+3,this.ground(slab.anchor+3)]);
-            }
-        }
+        for(let i=0;i<=51;i++){const x=Math.min(this.w*.963,i*this.w/52);points.push([x,this.ground(x)]);}
         return points;
     }
     updateGround(){
@@ -471,8 +490,8 @@ export class HillPhysics {
         while(this.accumulator>=step){
             this.time+=step;this.steps++;
             if(this.drag?.bodyB===this.rock&&!this.splat&&this.actor){const b=this.rock,a=this.actor;if(b.bounds.max.y>a.bounds.min.y+this.actorHeight*.3&&b.bounds.min.y<a.bounds.max.y&&Math.abs(b.position.x-a.position.x)<this.actorWidth*.7&&b.position.y<a.position.y)this.flatten();}
-            this.erodeGround(step);
-            for(let i=this.slabs.length-1;i>=0;i--){const slab=this.slabs[i];if(this.time-slab.born>14){Composite.remove(this.engine.world,slab.body);Composite.remove(this.engine.world,slab.tether);this.slabs.splice(i,1);}else{slab.tether.pointA.y=this.ground(slab.anchor);}}
+            this.erodeGround(step);this.failUnsupportedRidge(step);
+            for(let i=this.slabs.length-1;i>=0;i--){const slab=this.slabs[i];if(this.time-slab.born>14){Composite.remove(this.engine.world,slab.body);Composite.remove(this.engine.world,slab.tether);this.slabs.splice(i,1);}else{slab.tether.pointA.y=this.ground(slab.anchor);if(this.time-slab.born>.3&&!slab.detached){Composite.remove(this.engine.world,slab.tether);slab.detached=true;}if(slab.detached&&!slab.shattered&&this.time-slab.born>.65&&slab.body.speed<1.8){slab.shattered=true;this.onImpact?.({x:slab.body.position.x,y:slab.body.position.y,speed:4,terrain:true,depth:10,width:24});}}}
             if(this.assist){
                 const a=this.actor,b=this.rock;
                 const unavailable=this.splat||this.reposition||this.time<this.springUntil||!a||Math.abs(b.position.x-a.position.x)>this.radius+this.actorSize*1.5||b.bounds.max.y<this.ground(b.position.x)-this.actorSize;

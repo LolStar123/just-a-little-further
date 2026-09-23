@@ -1,0 +1,756 @@
+{
+  "samples": [
+    {
+      "active": [
+        {
+          "id": "baxterworker0",
+          "x": 83.95426921838627,
+          "y": 5253.991648757907,
+          "held": false,
+          "actor": true,
+          "home": {
+            "x": 836.0082448064552,
+            "y": 6027.0106812685635
+          },
+          "velocity": {
+            "x": 10.339745110011147,
+            "y": -12.06642846097748
+          },
+          "retrieving": null,
+          "delivery": null
+        },
+        {
+          "id": "paper-0",
+          "x": 775.5491449596014,
+          "y": 6229.060459953011,
+          "held": null,
+          "actor": false,
+          "home": {
+            "x": 807.6120079303605,
+            "y": 6032.574644083534
+          },
+          "velocity": {
+            "x": 0.010332166483287943,
+            "y": 8.204424627827692
+          },
+          "retrieving": null,
+          "delivery": null
+        }
+      ],
+      "contacts": 2,
+      "terrain": 280
+    },
+    {
+      "active": [
+        {
+          "id": "baxterworker0",
+          "x": 434.05359975809046,
+          "y": 5091.100423309699,
+          "held": false,
+          "actor": true,
+          "home": {
+            "x": 854.5838124752045,
+            "y": 6027.10636076041
+          },
+          "velocity": {
+            "x": 8.999999999999911,
+            "y": 6.701894294116446
+          },
+          "retrieving": null,
+          "delivery": null
+        },
+        {
+          "id": "paper-0",
+          "x": 776.0680647256086,
+          "y": 6430.981013740262,
+          "held": null,
+          "actor": false,
+          "home": {
+            "x": 807.6120079303605,
+            "y": 6032.574644083534
+          },
+          "velocity": {
+            "x": 0.032110980496790724,
+            "y": -3.0008016106033804
+          },
+          "retrieving": null,
+          "delivery": null
+        }
+      ],
+      "contacts": 4,
+      "terrain": 476
+    },
+    {
+      "active": [
+        {
+          "id": "baxterworker0",
+          "x": 713.6564880731315,
+          "y": 5608.534848600385,
+          "held": false,
+          "actor": true,
+          "home": {
+            "x": 852.678585145697,
+            "y": 6027.087435208424
+          },
+          "velocity": {
+            "x": 8.81592364503122,
+            "y": 24.703422869401923
+          },
+          "retrieving": null,
+          "delivery": null
+        },
+        {
+          "id": "paper-0",
+          "x": 776.6979987103202,
+          "y": 6433.679083331301,
+          "held": null,
+          "actor": false,
+          "home": {
+            "x": 892.8242949017063,
+            "y": 6039.795813434678
+          },
+          "velocity": {
+            "x": -0.005123650625495798,
+            "y": -0.12460249962660352
+          },
+          "retrieving": null,
+          "delivery": null
+        }
+      ],
+      "contacts": 5,
+      "terrain": 355
+    },
+    {
+      "active": [
+        {
+          "id": "baxterworker0",
+          "x": 851.9576661340049,
+          "y": 6022.494769817064,
+          "held": false,
+          "actor": true,
+          "home": {
+            "x": 852.678585145697,
+            "y": 6027.087435208424
+          },
+          "velocity": {
+            "x": 0.5746940122075255,
+            "y": 1.9424960296873908
+          },
+          "retrieving": null,
+          "delivery": null
+        },
+        {
+          "id": "paper-0",
+          "x": 782.5726865562547,
+          "y": 6441.397621382791,
+          "held": null,
+          "actor": false,
+          "home": {
+            "x": 840.504612614196,
+            "y": 6002.360900735369
+          },
+          "velocity": {
+            "x": -0.2281000468409881,
+            "y": 0.25565199225638935
+          },
+          "retrieving": null,
+          "delivery": null
+        }
+      ],
+      "contacts": 7,
+      "terrain": 295
+    },
+    {
+      "active": [
+        {
+          "id": "baxterworker0",
+          "x": 853.6002195037678,
+          "y": 6029.907597388391,
+          "held": false,
+          "actor": true,
+          "home": {
+            "x": 852.678585145697,
+            "y": 6027.087435208424
+          },
+          "velocity": {
+            "x": -0.06836022729721129,
+            "y": -0.19778044530285058
+          },
+          "retrieving": null,
+          "delivery": null
+        },
+        {
+          "id": "paper-0",
+          "x": 782.1349598029307,
+          "y": 6441.715159238801,
+          "held": null,
+          "actor": false,
+          "home": {
+            "x": 824.3812150396438,
+            "y": 6002.7315082247205
+          },
+          "velocity": {
+            "x": -8.411743259613947e-07,
+            "y": -4.2881231546220943e-07
+          },
+          "retrieving": null,
+          "delivery": null
+        },
+        {
+          "id": "baxterworker1",
+          "x": 692.5296420688311,
+          "y": 6038.478283041368,
+          "held": null,
+          "actor": true,
+          "home": {
+            "x": 892.8242953635504,
+            "y": 6027.707110179265
+          },
+          "velocity": {
+            "x": 2.159086065904352,
+            "y": 4.072931881638546
+          },
+          "retrieving": "paper-0",
+          "delivery": null
+        }
+      ],
+      "contacts": 10,
+      "terrain": 264
+    },
+    {
+      "active": [
+        {
+          "id": "paper-0",
+          "x": 782.1349463625457,
+          "y": 6441.714868336675,
+          "held": null,
+          "actor": false,
+          "home": {
+            "x": 824.3812150396438,
+            "y": 6002.7315082247205
+          },
+          "velocity": {
+            "x": -9.480402241024423e-07,
+            "y": -4.661918258837735e-07
+          },
+          "retrieving": null,
+          "delivery": null
+        },
+        {
+          "id": "baxterworker1",
+          "x": 773.3069232926432,
+          "y": 6361.045069321084,
+          "held": null,
+          "actor": true,
+          "home": {
+            "x": 903.6792178675316,
+            "y": 6027.920804148736
+          },
+          "velocity": {
+            "x": 1.119449802339053,
+            "y": 7.817475801008793
+          },
+          "retrieving": "paper-0",
+          "delivery": null
+        }
+      ],
+      "contacts": 11,
+      "terrain": 193
+    },
+    {
+      "active": [
+        {
+          "id": "paper-0",
+          "x": 792.1503494737257,
+          "y": 6353.323590481587,
+          "held": null,
+          "actor": false,
+          "home": {
+            "x": 824.3812150396438,
+            "y": 6002.7315082247205
+          },
+          "velocity": {
+            "x": 1.0139903335073086,
+            "y": -7.867871304498901
+          },
+          "retrieving": null,
+          "delivery": null
+        },
+        {
+          "id": "baxterworker1",
+          "x": 814.2103694026853,
+          "y": 6129.474790593865,
+          "held": null,
+          "actor": true,
+          "home": {
+            "x": 931.7925750844545,
+            "y": 6028.451970573394
+          },
+          "velocity": {
+            "x": 0.9924296060347616,
+            "y": -12.123921175301197
+          },
+          "retrieving": null,
+          "delivery": "paper-0"
+        }
+      ],
+      "contacts": 15,
+      "terrain": 186
+    },
+    {
+      "active": [
+        {
+          "id": "paper-0",
+          "x": 819.9879658027102,
+          "y": 6150.189523139063,
+          "held": null,
+          "actor": false,
+          "home": {
+            "x": 824.3812150396438,
+            "y": 6002.7315082247205
+          },
+          "velocity": {
+            "x": 0.4753211960415153,
+            "y": -2.637387558623535
+          },
+          "retrieving": null,
+          "delivery": null
+        },
+        {
+          "id": "baxterworker1",
+          "x": 825.0022397998323,
+          "y": 6093.465184218684,
+          "held": null,
+          "actor": true,
+          "home": {
+            "x": 959.1368128641758,
+            "y": 6028.796486136285
+          },
+          "velocity": {
+            "x": 0.066264901431623,
+            "y": -0.01988067908011241
+          },
+          "retrieving": null,
+          "delivery": "paper-0"
+        }
+      ],
+      "contacts": 18,
+      "terrain": 130
+    },
+    {
+      "active": [
+        {
+          "id": "paper-0",
+          "x": 826.9257302153474,
+          "y": 6132.697156408747,
+          "held": null,
+          "actor": false,
+          "home": {
+            "x": 824.3812150396438,
+            "y": 6002.7315082247205
+          },
+          "velocity": {
+            "x": 0.02802171746275255,
+            "y": -1.0481252495066775
+          },
+          "retrieving": null,
+          "delivery": null
+        },
+        {
+          "id": "baxterworker1",
+          "x": 826.6230332750317,
+          "y": 6061.14300413214,
+          "held": null,
+          "actor": true,
+          "home": {
+            "x": 968.2201794981956,
+            "y": 6028.838345555486
+          },
+          "velocity": {
+            "x": -0.005934721690165362,
+            "y": -4.48172456060289
+          },
+          "retrieving": null,
+          "delivery": "paper-0"
+        }
+      ],
+      "contacts": 47,
+      "terrain": 128
+    },
+    {
+      "active": [
+        {
+          "id": "paper-0",
+          "x": 828.5829531166704,
+          "y": 6052.381049994367,
+          "held": null,
+          "actor": false,
+          "home": {
+            "x": 965.1871534638622,
+            "y": 6009.965428597822
+          },
+          "velocity": {
+            "x": 0.6846989668404876,
+            "y": -2.7047988465013026
+          },
+          "retrieving": null,
+          "delivery": null
+        },
+        {
+          "id": "baxterworker1",
+          "x": 860.9137677047256,
+          "y": 5980.454690155384,
+          "held": null,
+          "actor": true,
+          "home": {
+            "x": 967.082073403673,
+            "y": 6028.835495230501
+          },
+          "velocity": {
+            "x": 5.413661673651188,
+            "y": -0.3480905708552535
+          },
+          "retrieving": null,
+          "delivery": "paper-0"
+        }
+      ],
+      "contacts": 49,
+      "terrain": 205
+    },
+    {
+      "active": [
+        {
+          "id": "paper-0",
+          "x": 901.9143336043663,
+          "y": 6011.064831920837,
+          "held": null,
+          "actor": false,
+          "home": {
+            "x": 877.4018553208349,
+            "y": 6004.032926384937
+          },
+          "velocity": {
+            "x": 1.9194523008416013,
+            "y": -0.5037036912220038
+          },
+          "retrieving": null,
+          "delivery": null
+        },
+        {
+          "id": "baxterworker1",
+          "x": 917.4471580165211,
+          "y": 5970.104152231517,
+          "held": null,
+          "actor": true,
+          "home": {
+            "x": 967.082073403673,
+            "y": 6028.835495230501
+          },
+          "velocity": {
+            "x": -1.5243295138005313,
+            "y": -0.20348577613222524
+          },
+          "retrieving": null,
+          "delivery": "paper-0"
+        }
+      ],
+      "contacts": 49,
+      "terrain": 213
+    },
+    {
+      "active": [
+        {
+          "id": "paper-0",
+          "x": 893.3482137456535,
+          "y": 6003.519491018023,
+          "held": null,
+          "actor": false,
+          "home": {
+            "x": 838.2864776936419,
+            "y": 6003.071772156566
+          },
+          "velocity": {
+            "x": -1.6217838070226271,
+            "y": -0.09517957216792519
+          },
+          "retrieving": null,
+          "delivery": null
+        },
+        {
+          "id": "baxterworker1",
+          "x": 860.9771888812363,
+          "y": 5967.568660589731,
+          "held": null,
+          "actor": true,
+          "home": {
+            "x": 967.082073403673,
+            "y": 6028.835495230501
+          },
+          "velocity": {
+            "x": -1.5059413089729778,
+            "y": 0.017885385674043946
+          },
+          "retrieving": null,
+          "delivery": "paper-0"
+        }
+      ],
+      "contacts": 49,
+      "terrain": 214
+    },
+    {
+      "active": [
+        {
+          "id": "paper-0",
+          "x": 847.2664486940582,
+          "y": 6002.410918147885,
+          "held": null,
+          "actor": false,
+          "home": {
+            "x": 821.2030197593721,
+            "y": 6001.445269305188
+          },
+          "velocity": {
+            "x": -1.138202011276305,
+            "y": -0.003936776091207723
+          },
+          "retrieving": null,
+          "delivery": null
+        },
+        {
+          "id": "baxterworker1",
+          "x": 830.1246808195193,
+          "y": 5967.562770063564,
+          "held": null,
+          "actor": true,
+          "home": {
+            "x": 967.082073403673,
+            "y": 6028.835495230501
+          },
+          "velocity": {
+            "x": -0.6438660857303318,
+            "y": 0.003259549581948825
+          },
+          "retrieving": null,
+          "delivery": "paper-0"
+        }
+      ],
+      "contacts": 49,
+      "terrain": 214
+    },
+    {
+      "active": [
+        {
+          "id": "paper-0",
+          "x": 823.8013808981797,
+          "y": 6002.4351659312415,
+          "held": null,
+          "actor": false,
+          "home": {
+            "x": 813.271861399083,
+            "y": 6001.644697601903
+          },
+          "velocity": {
+            "x": -0.47428779847651753,
+            "y": 0.006407993140103597
+          },
+          "retrieving": null,
+          "delivery": null
+        },
+        {
+          "id": "baxterworker1",
+          "x": 816.8369178867425,
+          "y": 5967.515107800955,
+          "held": null,
+          "actor": true,
+          "home": {
+            "x": 967.082073403673,
+            "y": 6028.835495230501
+          },
+          "velocity": {
+            "x": -0.26200611885913266,
+            "y": -0.026742694466342466
+          },
+          "retrieving": null,
+          "delivery": "paper-0"
+        }
+      ],
+      "contacts": 49,
+      "terrain": 214
+    },
+    {
+      "active": [
+        {
+          "id": "paper-0",
+          "x": 814.0648348418869,
+          "y": 6002.506715701117,
+          "held": null,
+          "actor": false,
+          "home": {
+            "x": 808.9084416982249,
+            "y": 6002.7930201461395
+          },
+          "velocity": {
+            "x": -0.20673956238681515,
+            "y": 0.0010518315093577257
+          },
+          "retrieving": null,
+          "delivery": null
+        },
+        {
+          "id": "baxterworker1",
+          "x": 811.0340108573768,
+          "y": 5967.3805446994575,
+          "held": null,
+          "actor": true,
+          "home": {
+            "x": 967.082073403673,
+            "y": 6028.835495230501
+          },
+          "velocity": {
+            "x": -0.11826797766805916,
+            "y": -0.020570417533842072
+          },
+          "retrieving": null,
+          "delivery": "paper-0"
+        }
+      ],
+      "contacts": 49,
+      "terrain": 214
+    },
+    {
+      "active": [
+        {
+          "id": "paper-0",
+          "x": 809.6791112200108,
+          "y": 6002.51488571788,
+          "held": null,
+          "actor": false,
+          "home": {
+            "x": 806.936531936228,
+            "y": 6003.497670930985
+          },
+          "velocity": {
+            "x": -0.0910213594229011,
+            "y": -0.003853331994226513
+          },
+          "retrieving": null,
+          "delivery": null
+        },
+        {
+          "id": "baxterworker1",
+          "x": 808.3195045095339,
+          "y": 5967.4388388162015,
+          "held": null,
+          "actor": true,
+          "home": {
+            "x": 967.082073403673,
+            "y": 6028.835495230501
+          },
+          "velocity": {
+            "x": -0.07083244074313674,
+            "y": 0.030338076218564918
+          },
+          "retrieving": null,
+          "delivery": "paper-0"
+        }
+      ],
+      "contacts": 49,
+      "terrain": 214
+    },
+    {
+      "active": [
+        {
+          "id": "baxterworker1",
+          "x": 848.9921389248507,
+          "y": 5972.675885687313,
+          "held": null,
+          "actor": true,
+          "home": {
+            "x": 940.0253301730774,
+            "y": 6028.582985156431
+          },
+          "velocity": {
+            "x": 4.282537096265571,
+            "y": 2.359481595919496
+          },
+          "retrieving": null,
+          "delivery": null
+        }
+      ],
+      "contacts": 51,
+      "terrain": 193
+    },
+    {
+      "active": [
+        {
+          "id": "baxterworker1",
+          "x": 922.1844148345391,
+          "y": 6024.709700615137,
+          "held": null,
+          "actor": true,
+          "home": {
+            "x": 908.0200261889424,
+            "y": 6028.006823928074
+          },
+          "velocity": {
+            "x": -0.028272781960936303,
+            "y": 0.5403789484868564
+          },
+          "retrieving": null,
+          "delivery": null
+        }
+      ],
+      "contacts": 51,
+      "terrain": 190
+    },
+    {
+      "active": [
+        {
+          "id": "baxterworker1",
+          "x": 899.7710740829315,
+          "y": 6028.314893889561,
+          "held": null,
+          "actor": true,
+          "home": {
+            "x": 892.7656317949295,
+            "y": 6027.705962448279
+          },
+          "velocity": {
+            "x": -0.6326497061640642,
+            "y": -0.032078679820794306
+          },
+          "retrieving": null,
+          "delivery": null
+        }
+      ],
+      "contacts": 51,
+      "terrain": 185
+    },
+    {
+      "active": [],
+      "contacts": 51,
+      "terrain": 185
+    },
+    {
+      "active": [],
+      "contacts": 51,
+      "terrain": 185
+    },
+    {
+      "active": [],
+      "contacts": 51,
+      "terrain": 185
+    },
+    {
+      "active": [],
+      "contacts": 51,
+      "terrain": 185
+    },
+    {
+      "active": [],
+      "contacts": 51,
+      "terrain": 185
+    }
+  ],
+  "errors": []
+}

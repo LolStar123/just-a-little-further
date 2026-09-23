@@ -24,3 +24,19 @@
 @media(max-width:760px){#world .pencil-note{max-width:43%;width:165px;font-size:13px}#quote-author{font-size:10px}.thread-grab{width:44px;height:44px}}
 @media(min-width:761px){.scroll-invite{left:35%}}
 @media(max-width:760px){#small-life{max-width:125px;font-size:14px}}
+
+/* Three held ink poses, like independently redrawn lettering. */
+.knot:is(:hover,:focus-visible) .card-rank{animation:rank-boil .36s steps(1,end) infinite;transform-origin:10px 10px}
+.knot:is(:hover,:focus-visible) .card-suit{animation:suit-boil .43s steps(1,end) infinite;transform-origin:15px 24px}
+.knot:is(:hover,:focus-visible) .card-border{animation:border-boil .39s steps(1,end) infinite;transform-origin:center}
+@keyframes rank-boil{0%,100%{transform:rotate(-4deg) translateY(.3px)}33%{transform:rotate(3deg) translateX(.5px)}66%{transform:rotate(-1deg) translateY(-.5px)}}
+@keyframes suit-boil{0%,100%{transform:rotate(2deg)}33%{transform:rotate(-3deg) scale(.96,1.02)}66%{transform:translate(.4px,-.4px) rotate(1deg)}}
+@keyframes border-boil{0%,100%{transform:skewX(.6deg)}33%{transform:skewX(-.5deg) scale(1.01,.995)}66%{transform:skewY(.6deg)}}
+.line-guide{width:104px;height:104px;left:0;top:0;will-change:transform}.line-guide canvas{width:104px;height:104px}.line-guide p{bottom:90px;max-width:195px;white-space:normal;width:max-content;font-size:15px;line-height:1.2;text-shadow:0 1px var(--paper),1px 0 var(--paper),-1px 0 var(--paper)}
+@media(prefers-reduced-motion:reduce){.knot .card-rank,.knot .card-suit,.knot .card-border{animation:none!important}}
+
+body.tugging-thread,body.tugging-thread *{user-select:none!important;cursor:grabbing!important}body.tugging-thread iframe{pointer-events:none}.thread-grab{z-index:5}.line-guide canvas{user-select:none}
+
+.thread-grab::after{display:none}
+
+.line-guide,.line-guide canvas{width:144px;height:144px}.line-guide p{bottom:125px}

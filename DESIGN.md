@@ -12,13 +12,13 @@ Fourteen illustrated sections include OCR and personal interests. The interests 
 
 ## The continuous pen
 
-Shared geometry connects hill, scenery, chapter floors, statistical curves and invented signature. The wide SVG hit path is transparent. Chart floors remain pinned during tugs. Use broad curls and continuous tangents, never sharp sawtooth fillers. Data-derived curves retain measured values.
+Shared geometry connects hill, scenery, chapter floors, statistical curves and invented signature. The wide SVG hit path is transparent. Tugs taper along 900 pixels of arc length on each side with zero endpoint slope and curvature; chapter floors return to their base geometry after release. Use broad curls and continuous tangents, never sharp sawtooth fillers. Data-derived curves retain measured values.
 
-The guide follows path arc length, with travel, slide, trip, flip and celebration. Throwing it activates a damped return. Keyboard tug handles sit between chapters. Scene picking uses canvas coordinates so pixel ratio, responsive scaling and flipped cargo grips agree. Helpers return after a throw, vault nearby props and react when objects move.
+The guide travels in world coordinates, using the line for footholds rather than snapping to an arc-length position. Geometry selects climbing, grinding, leaps and shortcuts. Botato has a scroll-released ledge hang. Throws keep momentum and gravity for one second before winged recovery. Keyboard tug handles sit between chapters. Scene picking uses painter order and transformed bounds. Thrown helpers and props enter a shared page-wide Matter world, outside iframe clipping. They collide with sampled line segments, text and other objects. Flying recovery passes above the thin-wire plane; its final approach blends into the home pose with overlapping colliders disabled.
 
 ## Motion and physics
 
-Matter.js 0.20.0 provides stylised game physics. Structural faults accumulate damage; impacts expose new layers without the old shallow erosion ceiling. Temporary ledges hang from flexible tethers on the pen. Their removal bounds memory while erosion remains. Reset clears bodies and constraints. Damage beyond the visible ridge is excluded.
+Matter.js 0.20.0 provides stylised game physics. Structural faults accumulate damage; impacts expose new layers without the old shallow erosion ceiling. Unsupported ridges accumulate stress and fail after adjacent erosion. Irregular ledges use the sampled surface and a jagged fracture outline, hang briefly, then detach and tumble. Their removal bounds memory while erosion remains. Reset clears bodies and constraints. Damage beyond the visible ridge is excluded.
 
 Bound leg and torso reach. A hand-held rock can pancake meowl. Keep full-screen impact frames removed. Scenes autoplay and vary only while visible. Pointer cancellation releases capture. Blank canvas supports mobile scrolling. Iframes reserve height, report their measured size and recover missed observer notifications through a visibility watchdog.
 
@@ -32,6 +32,6 @@ Mechanical key recordings are credited to MattRuthSound under CC BY 4.0. Six kit
 
 ## Evidence and limits
 
-`research/X-DESIGN-SWEEP-2026-09-23.md` logs ten posts, captions, loaded replies, expanded resources, frame-based media review and the installed skill. Hidden/unexpanded replies are not claimed as inspected. Temporary reference media was deleted.
+`docs/reference-notes.md` logs ten posts, captions, loaded replies, expanded resources, frame-based media review and the installed skill. Hidden/unexpanded replies are not claimed as inspected. Temporary reference media was deleted.
 
-`research/FRIEND-REVIEW-CHECKLIST.md` tracks the request. Private browser evidence is under `output/friend-review/`. Syntax, visual, interaction and audio checks are separate evidence. Automated playback is not a listening test.
+`docs/friend-review-checklist.md` and `docs/guide-polish.md` track the requests. Private browser evidence is under `output/friend-review/` and `output/card-polish/`. Syntax, visual, interaction and audio checks are separate evidence. Automated playback is not a listening test.

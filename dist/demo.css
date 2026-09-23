@@ -22,3 +22,9 @@ body:is([data-scene=deadlock],[data-scene=poe]) .mini-toy{height:400px}
 @media(max-width:420px){body:is([data-scene=deadlock],[data-scene=poe]) .mini-toy{height:350px}}
 
 html.embedded,html.embedded body{background:transparent}
+
+.woven .caption{display:none}.woven body:is([data-scene="interests"],[data-scene="scraper"],[data-scene="pipeline"],[data-scene="smoothtato"],[data-scene="mtxtato"],[data-scene="baxter"],[data-scene="ocr"]) .toy-note{display:none}
+
+.woven .disclosure,.woven .mini-disclosure,.woven .source-note{display:none}
+
+.disclosure{display:none}

@@ -187,6 +187,9 @@ function drawStone(){
     c.save();c.translate(b.position.x,b.position.y);c.rotate(b.angle);
     for(const f of physics.fractures){c.beginPath();c.moveTo(f.a.x,f.a.y);c.lineTo(f.b.x,f.b.y);c.strokeStyle='#eeeae0';c.lineWidth=2.4;c.stroke();c.lineWidth=.9;c.strokeStyle='#34352f';c.stroke();}
     c.restore();
+    for(const slab of physics.slabs){
+        const age=physics.time-slab.born;c.save();c.translate(slab.body.position.x,slab.body.position.y);c.rotate(slab.body.angle);c.globalAlpha=Math.max(0,Math.min(1,(slab.shattered?3:9)-age));c.beginPath();slab.inkOutline.forEach((p,i)=>i?c.lineTo(p.x,p.y):c.moveTo(p.x,p.y));c.closePath();c.fillStyle='#eeeae0';c.fill();c.strokeStyle='#666054';c.lineWidth=.8;c.stroke();c.restore();
+    }
     for(const fragment of physics.chips){const age=physics.time-fragment.born;c.save();c.globalAlpha=Math.min(1,(12-age)/2);c.beginPath();fragment.body.vertices.forEach((p,i)=>i?c.lineTo(p.x,p.y):c.moveTo(p.x,p.y));c.closePath();c.fillStyle='#eeeae0';c.fill();c.strokeStyle='#42413b';c.lineWidth=.65;c.stroke();c.restore();}
     if(physics.drag?.bodyB===b){const p=physics.drag.pointA;c.beginPath();c.moveTo(b.position.x,b.position.y);c.lineTo(p.x,p.y);c.setLineDash([2,5]);c.strokeStyle='rgba(103,97,82,.55)';c.lineWidth=1;c.stroke();c.setLineDash([]);}
 }
@@ -260,7 +263,7 @@ $('#help').addEventListener('click',()=>{toyMotionRequested=true;if(paused)setPa
 $('#reset').addEventListener('click',()=>{cancelGrab();auraField.clear();physics.reset();hero.pet=0;hero.cheer=0;particles.length=0;ripples.length=0;scuffs.length=0;status('another morning. another go.');updateCharacters(0);wake();});
 $('#encourage').addEventListener('click',()=>{if(paused)setPause(false);hero.cheer=3;hero.pet=0;used();status('go on, little guy.');playTone('pet');wake();});
 function setPause(value){paused=value;hillSound.active(!paused&&worldVisible&&!panelOpen);cancelGrab();if(paused){cancelAnimationFrame(frame);frame=0;}last=0;wake();}
-const quoteAuthors=['author unverified / a line i keep','from my notebook / written with ai','from my notebook / written with ai','from my notebook / written with ai','my onion reminder'];
+const quoteAuthors=['attributed online to epictetus / wording unverified','chatgpt / a line from our conversations','chatgpt / a line from our conversations','chatgpt / a line from our conversations','atul / the onion reminder'];
 const quotes=["The only man who ever beat you offers a rematch every morning. Take it.","You do not owe the world an undefeated man. Give it one who returns.","The boulder rolled back. It didn't erase the strength you built pushing it.","It's been a hard road. You still get to see where it leads.","The treadmill has sped up. The onion held the line. So must I."];let quote=0;
 $('#next-quote').addEventListener('click',()=>{quote=(quote+1)%quotes.length;$('#quote').textContent=quotes[quote];$('#quote-author').textContent=quoteAuthors[quote];$('#quote').getAnimations().forEach(a=>a.cancel());$('#quote').animate([{opacity:.2},{opacity:1}],{duration:300});});
 

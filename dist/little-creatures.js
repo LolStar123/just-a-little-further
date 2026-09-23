@@ -233,13 +233,28 @@ function workCostume(c,p,role,t){
     c.restore();
 }
 export function drawMeowl(c,x,y,size,o={}){
-    const toy=toyPose(c,o.id||'meowl',x,y,size,o);x=toy.x;y=toy.y;o=toy.options;
+    const toy=toyPose(c,o.id||'meowl',x,y,size,o,drawMeowl);if(toy.hidden)return{hands:[{x,y},{x,y}],head:{x,y:y-size*.7},hip:{x,y},feet:[{x,y},{x,y}],hidden:true};x=toy.x;y=toy.y;o=toy.options;
     if(o.mode==='flattened')return pancake(c,x,y,size,o.time||0,o.splatAge||0,o.ground,o.voice||0);
     const t=o.time||0,seed=o.seed||0,scale=size/100;
     const mode=o.mode||(o.air?'air':o.pet?'happy':o.nervous?'nervous':o.push?'push':Math.abs(o.speed||0)>5?'walk':'rest');
     const loaded=['push','anticipate','brace','slide','heave','backpush','turn'].includes(mode),effort=o.effort??(loaded?.76:0),phase=o.stroke??((t*.44)%1);
     let collection=rigs.get(c);if(!collection){collection=new Map();rigs.set(c,collection);}
     const key=o.id??seed;let state=collection.get(key);const target=poseFor(mode,t,effort,phase,o.speed||0,state?.gait||0);
+    if(o.overhead){target.left=[-32,-94];target.right=[31,-95];}
+    if(o.parkour){
+        const {kind,phase:q=0}=o.parkour,flap=Math.sin(t*19);
+        if(['flutter','fly'].includes(kind)){target.left=[-66,-53+flap*32];target.right=[62,-53+flap*32];target.tilt=Math.sin(t*5)*.06;}
+        if(kind==='hang'){target.left=[-25,-115];target.right=[25,-115];target.feet=[-9,9];target.tilt=Math.sin(t*3)*.08;}
+        if(kind==='grind'){target.hip=[-12,-9];target.chest=[-4,-40];target.head=[2,-66];target.feet=[-26,17];target.left=[-60,-56];target.right=[53,-48];target.tilt=-.17+Math.sin(t*9)*.045;}
+        if(kind==='point'){target.left=[-28,-35];target.right=[61,-65];target.turn=.5;target.tilt=-.08;}
+        if(kind==='balance'){target.left=[-60,-48+Math.sin(t*8)*8];target.right=[57,-49-Math.sin(t*8)*8];target.tilt=Math.sin(t*6)*.13;}
+        if(kind==='tiptoe'){target.left=[-31,-29];target.right=[34,-31];target.chest=[-9,-48];target.head=[-7,-74];target.tilt=.14;}
+        if(kind==='scramble'){target.left=[-47,-41];target.right=[43,-43];target.tilt=-.24;}
+        if(kind==='climb'){target.left=[-22,-79+Math.sin(t*11)*16];target.right=[30,-83-Math.sin(t*11)*16];target.tilt=-.12;}
+        if(kind==='kong'){target.left=[-25,-17-Math.max(0,Math.sin(q*Math.PI*4))*32];target.right=[35,-18-Math.max(0,Math.sin(q*Math.PI*4))*32];target.chest=[8,-43];target.head=[15,-68];target.tilt=.3;target.feet=[-18,-6];}
+        if(kind==='leap'||kind==='triple'){target.left=[-48,-73];target.right=[42,-66];target.feet=[-18,18];target.tilt=-.15;}
+        if(kind==='crouch'||kind==='land'){target.hip=[-3,-7];target.chest=[-4,-35];target.head=[-2,-61];target.left=[-35,-18];target.right=[33,-17];}
+    }
     if(['upset','crying'].includes(o.emotion)){target.head[1]+=4;target.tilt+=.09;target.chest[1]+=2;target.head[0]+=Math.sin(t*7)*.5;}
     const reset=!state||t<state.t||Math.hypot(x-state.x,y-state.y)>size*1.7||size!==state.size;
     if(reset){state={t,x,y,size,p:structuredClone(target),feet:[],nextFoot:0,gait:0,mode,soft:{p:0,v:0},sway:{p:0,v:0},headLag:{p:0,v:0},vy:0};collection.set(key,state);}
@@ -281,8 +296,9 @@ export function drawMeowl(c,x,y,size,o={}){
             foot.age=Math.min(1,foot.age+dt/Math.max(.07,duration));
             const u=foot.age,ease=u*u*(3-2*u);foot.x=mix(foot.from,foot.to,ease);fy=ground(foot.x)-Math.sin(u*Math.PI)*size*(loaded?.025:.045);
         }
-        if(!o.ground&&!loaded&&Math.abs(o.speed||0)>5){const stride=state.gait+i*Math.PI;feet.push([p.feet[i]+Math.sin(stride)*4,-Math.max(0,Math.cos(stride))*4]);}
+        if(o.parkour?.kind==='grind')feet.push([p.feet[i],0]);
         else if(air)feet.push([p.feet[i]+Math.sin(t*7+i*2)*3,Math.sin(t*7+i*2)*3+1]);
+        else if(!o.ground&&!loaded&&Math.abs(o.speed||0)>5){const stride=state.gait+i*Math.PI;feet.push([p.feet[i]+Math.sin(stride)*4,-Math.max(0,Math.cos(stride))*4]);}
         else feet.push(local(foot.x,fy));
     }
     // A foot must replant before the drawing can stretch beyond its leg bones.
@@ -301,11 +317,14 @@ export function drawMeowl(c,x,y,size,o={}){
     // Never let a distant terrain sample pull the feet through the body.
     for(let i=0;i<2;i++){feet[i][0]=clamp(feet[i][0],p.hip[0]-23,p.hip[0]+23);feet[i][1]=clamp(feet[i][1],p.hip[1]+9,p.hip[1]+24);}
     p.chest[1]=clamp(p.chest[1],p.hip[1]-43,p.hip[1]-26);p.head[1]=clamp(p.head[1],p.chest[1]-31,p.chest[1]-21);
+    // Bone limits apply in both axes, including a retreating rock and extreme poses.
+    for(const [child,parent,max]of[['chest','hip',45],['head','chest',31]]){const dx=p[child][0]-p[parent][0],dy=p[child][1]-p[parent][1],d=Math.hypot(dx,dy);if(d>max){p[child][0]=p[parent][0]+dx/d*max;p[child][1]=p[parent][1]+dy/d*max;}}
     const hands=[p.left.slice(),p.right.slice()];
     if(o.cargoOffset)for(const hand of hands)hand[0]+=o.cargoOffset;
     if(o.rock?.contact&&face===1&&['push','brace','slide','heave'].includes(mode)){
         for(let i=0;i<2;i++){const desiredY=y+hands[i][1]*scale,contactX=rockEdge(o.rock.vertices,desiredY,x+hands[i][0]*scale);if(contactX>=x-size*.05&&contactX<x+size*.7)hands[i]=local(contactX-2*scale,desiredY);}
     }
+    for(let i=0;i<2;i++){const shoulder=[p.chest[0]+(i?16:-17),p.chest[1]+(i?8:5)],dx=hands[i][0]-shoulder[0],dy=hands[i][1]-shoulder[1],d=Math.hypot(dx,dy),reach=o.overhead||air?79:loaded?39:48;if(d>reach){hands[i]=[shoulder[0]+dx/d*reach,shoulder[1]+dy/d*reach];}}
     c.save();c.translate(x,y);c.scale(scale*face,scale);c.lineCap='round';c.lineJoin='round';
     feet.forEach((foot,i)=>{
         // A crooked pen flourish gives each short bird foot three toes.
