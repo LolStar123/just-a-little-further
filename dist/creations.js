@@ -57,11 +57,11 @@ export const projects={
     "title": "poe item pricer",
     "short": "PoE statistics",
     "category": "GAME ECONOMIES / STATISTICS",
-    "caption": "Turns item variants and market observations into expected-value and risk sheets.",
+    "caption": "Explore item-price datasets, compare Watcher's Eye variants and check expected profit and risk.",
     "description": "Residential-proxy collection logs item prices for the wider pipeline. Variant probabilities and buy-in costs feed linked sheets for expected value, dispersion and profit factor. Missing prices stay visible instead of becoming invented bargains.",
     "scene": "poe",
     "note": "",
-    "detail": "A game got me into statistics. The cheapest listing is not always a usable price. Inspect three original spreadsheets, recalculate 114 historical outcomes and browse 3,741 modifier pairs.",
+    "detail": "A game got me into statistics. The cheapest listing is not always a usable price. Search 3,741 priced Watcher's Eye pairs, model 105,995 three-mod combinations and compare eight item datasets.",
     "github": "https://github.com/LolStar123/poe-item-pricer",
     "demo": "https://lolstar123.github.io/poe-item-pricer/",
     "url": "https://github.com/LolStar123/poe-item-pricer",
@@ -76,8 +76,8 @@ export const projects={
         "url": "https://github.com/LolStar123/poe-item-pricer"
       }
     ],
-    "demoDescription": "Inspect three original spreadsheets, recalculate 114 historical outcomes and browse 3,741 modifier pairs.",
-    "demoScope": "Original workbook assumptions and real modifier catalogue. No live trade or proxy connection."
+    "demoDescription": "Search 3,741 priced Watcher's Eye pairs, model 105,995 three-mod combinations and compare eight item datasets.",
+    "demoScope": "August 2026 asking-price archive. Three-mod values are modelled; probability assumptions and missing coverage stay visible."
   },
   "tfl": {
     "title": "tube reliability",
