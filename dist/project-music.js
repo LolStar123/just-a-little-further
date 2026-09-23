@@ -3,7 +3,7 @@ const themes={tfl:[0,7,12,7],scraper:[0,4,7,11],pipeline:[0,7,4,9],poe:[0,3,7,10
 const arrangements={
  tfl:[88,0,'triangle',.08,[0,7,4,9]],scraper:[76,2,'sine',.13,[0,4,9,7]],pipeline:[94,-2,'triangle',.03,[0,9,4,7]],poe:[72,-5,'sine',.17,[0,3,10,7]],commute:[84,5,'sine',.1,[0,7,9,4]],smoothtato:[78,0,'sine',.16,[0,9,4,7]],mtxtato:[70,7,'sine',.12,[0,4,11,7]],deadlock:[96,-7,'triangle',.07,[0,3,7,10]],baxter:[90,3,'triangle',.14,[0,4,9,7]],botato:[102,-2,'triangle',.12,[0,7,3,10]],halo:[74,2,'sine',.04,[0,4,11,7]],liquidation:[86,-3,'triangle',.15,[0,7,9,4]],ocr:[98,5,'sine',.06,[0,3,7,10]]};
 export function projectMusic(mix,onChange){
- let key=null,gain=null,next=0,step=0,volume=.098,nodes=new Set();
+ let key=null,gain=null,next=0,step=0,volume=.0882,nodes=new Set();
  function level(){if(gain){const t=mix.context.currentTime;gain.gain.cancelScheduledValues(t);gain.gain.setTargetAtTime(key&&mix.enabled&&!document.hidden?volume*.24:0,t,.35);}}
  function ensure(){if(gain)return;const a=mix.initialize();gain=a.createGain();gain.gain.value=0;const filter=a.createBiquadFilter();filter.type='lowpass';filter.frequency.value=1800;gain.connect(filter);filter.connect(mix.limiter);}
  function note(semitone,at,length,amp,type='sine'){const a=mix.context,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=196*2**(semitone/12);g.gain.setValueAtTime(0,at);g.gain.linearRampToValueAtTime(amp,at+.025);g.gain.exponentialRampToValueAtTime(.0001,at+length);o.connect(g);g.connect(gain);o.start(at);o.stop(at+length+.03);nodes.add(o);o.onended=()=>{nodes.delete(o);o.disconnect();g.disconnect();};}

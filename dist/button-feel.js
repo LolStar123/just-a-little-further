@@ -31,7 +31,17 @@ if(!window.__buttonFeel){
     document.addEventListener('pointerover',e=>{const b=e.target.closest?.('button');if(b&&b!==pressedButton&&!b.contains(e.relatedTarget)&&e.pointerType!=='touch')bounce(b,false);});
     document.addEventListener('click',e=>{
         const b=e.target.closest?.('button');if(!b||b.disabled)return;
-        sound.bus.element=b;sound.active(true);sound.mix.enable(true);sound.play('click',{level:.95});bounce(b,true);
+        sound.bus.element=b;sound.active(true);sound.mix.enable(true);
+        if(b.id==='boot-push'){
+            // The first gesture resumes audio asynchronously. Do not lose its click.
+            const at=performance.now();
+            Promise.all([sound.mix.context.resume(),sound.mix.loadSamples()]).then(()=>{
+                if(performance.now()-at>900||!b.isConnected)return;
+                sound.play('click',{level:1.15});
+                setTimeout(()=>{if(b.isConnected)sound.play('spring',{level:.28});},85);
+            }).catch(()=>{});
+        }else sound.play('click',{level:.95});
+        bounce(b,true);
         if(b.classList.contains('squish-yoshi')){
             const mascot=b.querySelector('img'),current=getComputedStyle(mascot).scale;mascot.getAnimations().forEach(a=>a.cancel());
             b.dataset.squishes=String(Number(b.dataset.squishes||0)+1);sound.play('squish',{level:1.2,id:'yoshi'});

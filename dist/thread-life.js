@@ -5,6 +5,13 @@ import {SceneSound} from './soundscape.js';
 export function threadLife(svg,path){
     const ns='http://www.w3.org/2000/svg',hit=document.createElementNS(ns,'path');
     hit.style.cssText='stroke:transparent;stroke-width:26px;fill:none;pointer-events:stroke;cursor:grab;touch-action:none';svg.append(hit);
+    // The opaque hill canvas sits above the page wire. Show the SAME deformed
+    // exit points over that canvas, clipped exactly to its bounds.
+    const hillWire=document.createElementNS(ns,'svg'),hillInk=document.createElementNS(ns,'path');
+    hillWire.classList.add('hill-thread');hillWire.setAttribute('aria-hidden','true');hillWire.append(hillInk);
+    hillWire.style.cssText='position:absolute;inset:0;width:100%;height:100%;overflow:hidden;pointer-events:none';
+    hillInk.style.cssText='fill:none;stroke:#656054;stroke-width:1.15;stroke-linecap:round;stroke-linejoin:round;opacity:.7';
+    document.querySelector('#interaction-surface').append(hillWire);
     const guide=document.createElement('div');guide.className='line-guide';guide.innerHTML='<p></p><canvas width="288" height="288" aria-label="The little guide meowl"></canvas>';const guideLayer=document.createElement('div');guideLayer.style.cssText='position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:4';guideLayer.append(guide);document.body.append(guideLayer);
     const c=guide.querySelector('canvas').getContext('2d');c.scale(2,2);
     c.canvas.style.pointerEvents='none';const pet=document.createElement('button');guide.append(pet);pet.style.cssText='position:absolute;left:34px;top:40px;width:76px;height:84px;border:0;background:transparent;padding:0;pointer-events:auto;touch-action:none;cursor:grab';pet.tabIndex=0;pet.setAttribute('aria-label','Throw the guide meowl. Space gives a little hop.');
@@ -36,6 +43,7 @@ export function threadLife(svg,path){
             return[p[0]+dx*weight,p[1]+dy*weight];
         });
         window.__inkPhysicsPoints=shape;
+        const exit=shape.slice(tugStart);hillInk.setAttribute('d',exit.map(([x,y],i)=>`${i?'L':'M'}${x.toFixed(2)},${y.toFixed(2)}`).join(' '));
         const d=shape.map(([x,y],i)=>`${i?'L':'M'}${x.toFixed(2)},${y.toFixed(2)}`).join(' ');path.setAttribute('d',d);hit.setAttribute('d',d);
     }
     function nearest(x,y){let result=0,best=Infinity;for(let i=0;i<base.length;i++){const d=(base[i][0]-x)**2+(base[i][1]-y)**2;if(d<best){best=d;result=i;}}return result;}
@@ -90,7 +98,7 @@ export function threadLife(svg,path){
             for(let distance=170;distance<=480;distance+=50){const candidate=pointAt(Math.max(0,Math.min(total,travel+direction*distance))),gap=Math.hypot(candidate.x-actor.x,candidate.y-actor.y);if(gap>65&&gap<230&&candidate.y>actor.y-80&&candidate.y<actor.y+155){shortcut=candidate;}}
             // The viewport chooses a real perch. Never move the perch off its wire.
             const perchAt=(x,y)=>{let best=Infinity,pick=target;for(const p of shape){if(p[0]<viewLeft+45||p[0]>viewLeft+viewWidth-45||p[1]<viewTop+70||p[1]>viewBottom-22)continue;const score=Math.hypot(p[0]-x,p[1]-y);if(score<best){best=score;pick={x:p[0],y:p[1]};}}return {...pick};};
-            routeCache={near,ahead,target,shortcut,perchAt,committedExit:crossingTubeLoop?target:null};
+            routeCache={near,ahead,target,shortcut,perchAt,remaining:Math.abs(destination-travel),committedExit:crossingTubeLoop?target:null};
             sceneCache=sceneRects.find(r=>actor.y>=r.top-100&&actor.y<r.bottom+130)||null;
             targetAt=now+90;
         }

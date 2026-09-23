@@ -96,3 +96,20 @@ Evidence: `docs/qa/botato-recovery-qa.json` and `docs/qa/type-qa.json`.
 Verification: syntax checks; browser quote cycling; desktop/mobile/wide guide observation; opening screenshots; observed partial typed strings; real pointer drag displaced the upper exit by 58px horizontally and 46px vertically and released normally. Opening uses a drawing reveal for canvas artwork, not individual stroke reconstruction of raster assets.
 
 - [x] Remove redundant manual cycle buttons from all nine rotating mini-scenes, HALO replay and hardware next-lot. Keep Botato loot movement and the main hill interactions.
+
+## Recovered wrong-chat requests, 23 September
+- [x] Recovered the actual saved clipboard image: chunky ?my fav meowlz? annotation and curled arrow beneath Baxter. Added readable bold lettering, slight wonk and restrained stepped arrow movement.
+- [x] Rename Deadlock heading and panel title to ?deadlock statistical analysis?. Lead with top 100 and conditional win rates informing gameplay.
+- [x] Remove Deadlock's status/colour narration and redundant compare button (button already removed in v41). Keep the statistics running.
+- [x] Lower both default background and project music gains by exactly 10%, from .098 to .0882. SFX unchanged.
+
+Copy audit: retained the user-supplied top-100 claim; no invented performance improvement. Rejected generic ?unlock insights?, ?data-driven solutions? and ?cutting-edge analysis?. Long-form prose quotas do not fit a two-sentence project caption.
+
+- [x] Boot button escalates PUSH. / PUUUSH! / PUUUUUUSH!!! across its three presses, with mechanical key travel, shared spring release and recorded click plus quiet boing. First click waits for the audio context to resume.
+
+- [x] Repair the mountain/wire join above the opaque hero canvas: render the same deforming exit points in a clipped overlay; no fixed duplicate curve.
+- [x] Halve train recording gain from .33 to .165; music remains separately reduced by 10%.
+
+- [x] Guide progress watchdog: after 1.8 seconds without gaining ground toward a distant perch, leap over a nearby loop or flutter to a fixed wire landing. Four-second cooldown; no position assignment/teleport.
+
+- [x] Probability plinks and happy-outlier plinks 20% quieter; comedic blink plinks unchanged.

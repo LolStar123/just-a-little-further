@@ -202,10 +202,10 @@ export const projects={
     "demoScope": "Actual catalogue, mapping confidence and asset paths. No game-file patching in the browser."
   },
   "deadlock": {
-    "title": "deadlock / conditional win probability",
+    "title": "deadlock statistical analysis",
     "short": "Deadlock analysis",
     "category": "GAMES / STATISTICS",
-    "caption": "Compares match conditions to find which stats are most associated with winning.",
+    "caption": "Top 100 Deadlock player. I use conditional win rates to optimise my gameplay and measure what makes a difference.",
     "description": "Collect match data, take comparable checkpoints and split matches by a condition. Compare win rates for economy, damage, objectives and other stats, with sample sizes and uncertainty beside each result.",
     "scene": "deadlock",
     "note": "",

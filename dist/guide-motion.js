@@ -38,13 +38,26 @@ export class GuideMotion{
    if(this.age>.3&&this.vy>0&&this.y>=this.cheerFloor-5){if(!this.cheerBounced){this.cheerBounced=true;this.vy=-230;}else{this.cheerBounced=false;this.state('flutter');}}
    return;
   }
-  const {near,ahead,target,shortcut}=route,sceneKey=viewport.top<90?'landing':scene?.key||'travel';
+  const {near,ahead,shortcut}=route;let target=route.target;const sceneKey=viewport.top<90?'landing':scene?.key||'travel';
   if(this.time>this.sayAt||sceneKey!==this.lastScene){this.say(sceneKey==='landing'?'landing':sceneKey!==this.lastScene?sceneKey:(this.moveCount%3?'travel':sceneKey));this.lastScene=sceneKey;}
   if(route.committedExit&&!['held','thrown','cheer','flutter','fly'].includes(this.mode)){
    this.attentionBounce=0;this.triplet=0;this.airTarget=null;this.landingPoint=null;this.state('flutter');this.text='this loop? shortcut. follow me!';this.sayAt=this.time+5;
   }
   const bandTop=viewport.top+(viewport.bottom-viewport.top)*.8;
   const offscreen=this.y<viewport.top-130||this.y>viewport.bottom+130;
+  // Watch actual progress, not repeated state changes around the same curl.
+  const routeDistance=Math.hypot(target.x-this.x,target.y-this.y);
+  if(!this.progressGoal||Math.hypot(target.x-this.progressGoal.x,target.y-this.progressGoal.y)>90){this.progressGoal={...target};this.bestDistance=routeDistance;this.stalledFor=0;}
+  if(routeDistance<this.bestDistance-22){this.bestDistance=routeDistance;this.stalledFor=0;}
+  else if(routeDistance>115&&['run','air','land','crouch'].includes(this.mode))this.stalledFor=(this.stalledFor||0)+dt;
+  else if(routeDistance<100)this.stalledFor=0;
+  if(this.stalledFor>1.8&&this.time>(this.bypassAfter||0)&&!this.held){
+   this.stalledFor=0;this.bypassAfter=this.time+4;this.attentionBounce=0;this.triplet=0;
+   this.text=['this curl? taking a shortcut!','tiny wings. big shortcut.','coming! hopping over this bit.'][this.moveCount++%3];this.contextText=this.text;this.sayAt=this.time+4;
+   if(routeDistance<310&&Math.abs(target.y-this.y)<160)this.jump(target,'kong');
+   else{this.bypassTarget={...target};this.state('flutter');}
+  }
+  if(this.bypassTarget){if(Math.hypot(this.bypassTarget.x-route.target.x,this.bypassTarget.y-route.target.y)>350)this.bypassTarget=null;else target=this.bypassTarget;}
   const distance=Math.hypot(target.x-this.x,target.y-this.y);
   const ledge=scene?.key==='botato'&&!this.releasedLedges.has(scene.top)&&viewport.top<scene.top+180&&scene.top+64>=bandTop&&scene.top+64<viewport.bottom-16;
   if(this.mode==='hang'&&(!scene||!ledge)){this.releasedLedges.add(this.hangPoint?.y);this.state('flutter');}
@@ -63,7 +76,7 @@ export class GuideMotion{
    this.vy+=clamp(dy/(d||1)*wanted-this.vy,-3000,3000)*dt*3*flap;
    if(d<9&&Math.hypot(this.vx,this.vy)<55){
     if(ledge){this.hangPoint=goal;this.hangScroll=viewport.top;this.state('hang');this.text="your turn. i'll hang about.";this.sayAt=this.time+10;}
-    else{this.landingPoint={...goal};this.state('land');this.nextMove=this.time+.2;}
+    else{this.bypassTarget=null;this.landingPoint={...goal};this.state('land');this.nextMove=this.time+.2;}
    }
   }else if(this.mode==='air'){
    this.vy+=920*dt;

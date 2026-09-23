@@ -2,7 +2,7 @@ import {drawMeowl} from './little-creatures.js';
 import {sharedMix} from './soundscape.js';
 import './button-feel.js';
 const overlay=document.createElement('div');overlay.id='little-boot';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label','Give meowl three pushes to enter');
-overlay.innerHTML='<div class="boot-art"><span>just a little further</span><canvas width="340" height="145" aria-hidden="true"></canvas><button id="boot-push">PUUUUSH!!!</button><p class="push-hint" aria-live="polite">help meowl by clicking 3 times</p><p class="boot-progress" role="status"></p></div>';
+overlay.innerHTML='<div class="boot-art"><span>just a little further</span><canvas width="340" height="145" aria-hidden="true"></canvas><button id="boot-push">PUSH.</button><p class="push-hint" aria-live="polite">help meowl by clicking 3 times</p><p class="boot-progress" role="status"></p></div>';
 document.body.append(overlay);
 const button=overlay.querySelector('button'),status=overlay.querySelector('.boot-progress'),hint=overlay.querySelector('.push-hint'),c=overlay.querySelector('canvas').getContext('2d');
 let pushes=0,loaded=false,done=false,failed=false,shown=0,time=0,last=0,raf=0,keyboardEntry=false;
@@ -13,6 +13,7 @@ function drawEntrance(){
  const duration=reduced?180:2850;
  const path=document.querySelector('.pen-thread path');
  if(path&&!reduced){const pts=window.__inkPhysicsPoints||[];let visible=0;for(let i=1;i<pts.length;i++){if(pts[i][1]>innerHeight)break;visible+=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);}const firstPage=Math.min(.8,visible/(path.getTotalLength()||1));path.setAttribute('pathLength','1000');const ink=path.animate([{strokeDasharray:'1000 1000',strokeDashoffset:1000},{strokeDasharray:'1000 1000',strokeDashoffset:1000*(1-firstPage),offset:.7},{strokeDasharray:'1000 1000',strokeDashoffset:0}],{duration:2550,easing:'cubic-bezier(.25,.05,.35,1)'});ink.finished.finally(()=>path.removeAttribute('pathLength'));}
+ const hillInk=document.querySelector('.hill-thread path');if(hillInk)hillInk.animate([{opacity:0},{opacity:.7}],{duration:reduced?180:550,delay:reduced?0:1500,fill:'backwards'});
  const canvas=document.querySelector('#playground');
  if(canvas)canvas.animate(reduced?[{opacity:0},{opacity:1}]:[{opacity:0,clipPath:'polygon(0 0,0 0,0 100%,0 100%)'},{opacity:.7,clipPath:'polygon(0 0,36% 0,42% 12%,35% 25%,43% 38%,36% 52%,44% 66%,38% 80%,45% 100%,0 100%)',offset:.42},{opacity:1,clipPath:'polygon(0 0,100% 0,100% 12%,100% 25%,100% 38%,100% 52%,100% 66%,100% 80%,100% 100%,0 100%)'}],{duration:reduced?180:2100,easing:'ease-out'});
  const pieces=[...document.querySelectorAll('#world header,.sound-settings,.introduction,.pencil-note,.knot,.bottom-edge,.meowl-thought,.sketch-chapter,.sketch-foot,.line-guide')];
@@ -20,7 +21,7 @@ function drawEntrance(){
  window.__entrance={started:performance.now(),duration};setTimeout(()=>{window.__entrance.finished=true;},duration);
 }
 function finish(){if(!loaded||pushes<3||done)return;done=true;drawEntrance();inert(false);overlay.classList.add('finished');cancelAnimationFrame(raf);setTimeout(()=>{overlay.remove();if(keyboardEntry)document.querySelector('#help')?.focus({preventScroll:true});dispatchEvent(new Event('meowl-enter'));},250);}
-button.addEventListener('click',e=>{keyboardEntry=e.detail===0;sharedMix().enable(true);pushes=Math.min(3,pushes+1);const left=3-pushes;hint.textContent=left?'help meowl by clicking '+left+(left===1?' time':' times'):'you helped. little guy appreciates it.';status.textContent=pushes===3&&!loaded?'preparing the hill...':'';button.textContent=pushes===3?'made it.':'PUUUUSH!!!';finish();});
+button.addEventListener('click',e=>{keyboardEntry=e.detail===0;sharedMix().enable(true);pushes=Math.min(3,pushes+1);const left=3-pushes;hint.textContent=left?'help meowl by clicking '+left+(left===1?' time':' times'):'you helped. little guy appreciates it.';status.textContent=pushes===3&&!loaded?'preparing the hill...':'';button.textContent=['PUSH.','PUUUSH!','PUUUUUUSH!!!','made it.'][pushes];finish();});
 function draw(now){
  const dt=Math.min(.04,(now-(last||now))/1000);last=now;time+=dt;shown+=(pushes/3-shown)*(1-Math.exp(-dt*8));c.clearRect(0,0,340,145);
  const ground=x=>139-x*.24+Math.sin(x*.17)*1.5+Math.sin(x*.43)*.7;

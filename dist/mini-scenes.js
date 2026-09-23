@@ -16,13 +16,18 @@ const specs={
  mtxtato:['a little aura goes a long way','change the effect','effects from the app catalogue'],
  tfl:['the Tube gets a leaderboard','delay a different line','sample service history'],
  commute:['a week of getting there','add a commute day','example fares / check current prices before buying'],
- deadlock:['what actually changes the odds?','compare another stat','sample matches / association, not causation'],
+ deadlock:['what actually changes the odds?','','sample matches / association, not causation'],
  baxter:['one helper is never enough','send another task','example task / no live agent run']
 };
 export function miniScene(scene,canvas,wake,sfx){
  const $=s=>document.querySelector(s),spec=specs[scene]||specs.pipeline;
  $('.caption').textContent=spec[0];
  $('#scene').innerHTML=`<canvas class="toy mini-toy" id="mini-art" aria-label="${spec[0]}"></canvas><p class="toy-note" id="toy-note" aria-live="polite"></p><p class="disclosure">${spec[2]}</p>`;
+ if(scene==='deadlock')$('#toy-note').hidden=true;
+ if(scene==='baxter'){
+  const note=document.createElement('aside');note.className='baxter-favourite';note.innerHTML='<svg viewBox="0 0 90 92" aria-hidden="true"><path d="M79 80 C42 88 17 64 34 48 C52 31 63 63 42 62 C12 60 13 23 59 14 M40 12 Q52 13 61 13 Q62 23 63 34"/></svg><span>my fav<br><b>meowlz</b></span>';
+  $('#scene').append(note);
+ }
  const artHeight=['deadlock','poe'].includes(scene)?430:330;
  const a=canvas('mini-art'),state={scene,choice:0,actions:0,cycles:0,elapsed:0,clock:0,routeTime:0,transition:1},note=$('#toy-note');
  let previous=null,paperBag=[];const counts={scraper:paperTitles.length,pipeline:5,smoothtato:4,mtxtato:3,tfl:3,commute:5,deadlock:6,baxter:4,poe:3};
@@ -35,7 +40,7 @@ export function miniScene(scene,canvas,wake,sfx){
  state.ratings=[1000,1000,1000];state.ratingTargets=[1000,1000,1000];state.lastTrainEvent=-1;
  function caption(){
   const n=state.choice;
-  note.textContent=({poe:["Watcher's Eye",'Timeless jewels','Sublime Vision'][n%3]+' / prices to risk sheets.',scraper:paperTitles[n]+' / collecting paper '+(state.cycles+1)+'.',pipeline:'clean market data. test on the next unseen period.',smoothtato:presets[n]+': '+['all effects visible.','particles and bloom off.','decorative props and skill FX off.','shadows, reflections and fog off.'][n],mtxtato:auraStyles[n%3].name,tfl:['Central','Victoria','Northern'][n%3]+' is delayed. each checkpoint updates the ratings.',commute:(n%5+1)+' days: '+((n%5+1)*6===24?'both cost the same in this example.':((n%5+1)*6<24?'single journeys':'the weekly ticket')+' cost less in this example.'),deadlock:'Compare '+deadlockStats[n]+', holding the game stage fixed.',baxter:['baxter sorts the request','the product manager scopes it','the developer builds it','the verifier checks it'][Math.min(3,Math.floor(state.elapsed/2.4))]})[scene];
+  note.textContent=({poe:["Watcher's Eye",'Timeless jewels','Sublime Vision'][n%3]+' / prices to risk sheets.',scraper:paperTitles[n]+' / collecting paper '+(state.cycles+1)+'.',pipeline:'clean market data. test on the next unseen period.',smoothtato:presets[n]+': '+['all effects visible.','particles and bloom off.','decorative props and skill FX off.','shadows, reflections and fog off.'][n],mtxtato:auraStyles[n%3].name,tfl:['Central','Victoria','Northern'][n%3]+' is delayed. each checkpoint updates the ratings.',commute:(n%5+1)+' days: '+((n%5+1)*6===24?'both cost the same in this example.':((n%5+1)*6<24?'single journeys':'the weekly ticket')+' cost less in this example.'),deadlock:'',baxter:['baxter sorts the request','the product manager scopes it','the developer builds it','the verifier checks it'][Math.min(3,Math.floor(state.elapsed/2.4))]})[scene];
  }
  function change(manual=false){
   if(scene!=='scraper'){previous=document.createElement('canvas');previous.width=a.el.width;previous.height=a.el.height;previous.getContext('2d').drawImage(a.el,0,0);}
@@ -256,7 +261,6 @@ export function miniScene(scene,canvas,wake,sfx){
    if(a.el.dataset.threadPoints!==thread){a.el.dataset.threadPoints=thread;if(woven)parent.dispatchEvent(new Event('ink-anchors'));}
    state.conditional={stat:deadlockStats[n],sample:d.selected,counted:sample,wins:d.wins,probability:d.probability,urn:n===5};
    state.distribution={...d,metric:metric.name,unit:metric.unit,values:matches.slice(0,sample).map(m=>m.value),points,windowUpdates,densityScale:peak};
-   if(sample===total)note.textContent=(d.excess>1?'a few very weird games. ':'mostly the usual suspects. ')+'green wins. rust loses. grey: outside the filter.';
   }else{
    const names=['baxter','product manager','developer','verifier'],home=[49,174,299,424],leg=Math.min(2,Math.floor(t/2.4)),q=Math.min(1,(t-leg*2.4)/2.4),travel=Math.min(1,q/.78),ease=travel*travel*(3-2*travel),done=t>=7.2;
    const carrier=done?3:leg,positions=[...home];

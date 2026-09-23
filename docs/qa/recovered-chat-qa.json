@@ -1,0 +1,24 @@
+[
+  {
+    "width": 1440,
+    "note": {
+      "bottom": 401.91485595703125,
+      "height": 422,
+      "width": 601,
+      "viewport": 601
+    },
+    "music": 0.0882,
+    "errors": []
+  },
+  {
+    "width": 390,
+    "note": {
+      "bottom": 370.412109375,
+      "height": 400,
+      "width": 335,
+      "viewport": 335
+    },
+    "music": 0.0882,
+    "errors": []
+  }
+]

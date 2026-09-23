@@ -113,10 +113,10 @@ export class Soundscape {
         let cut=null;
         if(pluck){
             const blink=kind==='blink',buffer=this.buffers[variant],rate=(blink?1.55:options.good?1.19:1)*(blink?.98+Math.random()*.04:.97+Math.random()*.06);
-            this.sample(bus,buffer,0,Math.min(blink?.14:.17,buffer.duration),(blink?.18:options.good?.12:.0765)*level,rate);
+            this.sample(bus,buffer,0,Math.min(blink?.14:.17,buffer.duration),(blink?.18:options.good?.096:.0612)*level,rate);
         }else{
             cut=cuts[variant];
-            const gains={step:.115,paper:.08,train:.33,meow:.14,yap:.15,squish:.20,place:.12,swish:.09,aura:.13,stone:.18,chip:.12,friction:.065,slurp:.15,click:.16,spring:.14,roll:.11,trip:.15,data:.095,impact:.25,blast:.23};
+            const gains={step:.115,paper:.08,train:.165,meow:.14,yap:.15,squish:.20,place:.12,swish:.09,aura:.13,stone:.18,chip:.12,friction:.065,slurp:.15,click:.16,spring:.14,roll:.11,trip:.15,data:.095,impact:.25,blast:.23};
             const rate=kind==='impact'?.88+Math.random()*.06:.98+Math.random()*.04,length=this.sample(bus,this.recorded,cut.offset,cut.duration,gains[kind]*level,rate);
             if(kind==='meow'||kind==='yap')this.voices.set(bus.key+':'+(options.id||'main'),{start:now,end:now+length,variant,envelope:this.envelopes.get(cut.cut)||[0,1,0]});
         }

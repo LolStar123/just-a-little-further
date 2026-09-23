@@ -115,3 +115,5 @@ body.tugging-thread,body.tugging-thread *{user-select:none!important;cursor:grab
 .chapter-copy .researcher-note{font:16.96px/1.45 Reader,Georgia,serif;color:var(--ink);width:210px;max-width:70%;margin:20px 0 24px 28%;rotate:-2deg;animation:none}.researcher-note .aside-opening,.researcher-note .aside-correction{rotate:0}.researcher-note .aside-correction{margin-left:9px}.researcher-note s{text-decoration-style:solid}@media(max-width:760px){.chapter-copy .researcher-note{font-size:15.9px;margin-left:25%;margin-bottom:24px}}
 
 .poetato-sticker:not(.has-yoshi-arrow){margin-top:24px}
+
+#little-boot #boot-push{min-width:min(290px,78vw);border-width:1.5px 1.5px 5px;border-radius:3px 5px 2px 4px;background:var(--paper);transform-origin:center bottom;font-size:29px;letter-spacing:.01em}

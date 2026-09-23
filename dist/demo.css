@@ -28,3 +28,5 @@ html.embedded,html.embedded body{background:transparent}
 .woven .disclosure,.woven .mini-disclosure,.woven .source-note{display:none}
 
 .disclosure{display:none}
+
+.baxter-favourite{display:flex;align-items:center;justify-content:center;gap:6px;margin:0 10% 8px auto;width:max-content;max-width:85%;color:#38372f;transform:rotate(-5deg);pointer-events:none}.baxter-favourite svg{width:65px;height:78px;flex:none;fill:none;stroke:currentColor;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;transform:rotate(7deg)}.baxter-favourite span{font:800 clamp(26px,7vw,38px)/.96 Reader,Georgia,serif;letter-spacing:-.035em;-webkit-text-stroke:.65px currentColor}.baxter-favourite b{display:inline-block;transform:rotate(4deg) translateX(8px);font-weight:800}.baxter-favourite svg path{animation:favourite-wiggle 1.5s steps(1,end) infinite;transform-origin:center}@keyframes favourite-wiggle{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}@media(prefers-reduced-motion:reduce){.baxter-favourite svg path{animation:none}}

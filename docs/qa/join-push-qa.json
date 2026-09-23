@@ -1,0 +1,64 @@
+[
+  {
+    "width": 1440,
+    "labels": [
+      "PUSH.",
+      "PUUUSH!",
+      "PUUUUUUSH!!!"
+    ],
+    "sounds": [
+      "click",
+      "spring",
+      "click",
+      "spring",
+      "click",
+      "spring"
+    ],
+    "join": {
+      "gap": 0.004693832191299815,
+      "points": 9865
+    },
+    "bypass": {
+      "x": 579.1521791321,
+      "maxStep": 6.619096661659796,
+      "history": [
+        {
+          "mode": "flutter",
+          "kind": "flutter",
+          "at": 1.8083333333333294
+        }
+      ]
+    }
+  },
+  {
+    "width": 390,
+    "labels": [
+      "PUSH.",
+      "PUUUSH!",
+      "PUUUUUUSH!!!"
+    ],
+    "sounds": [
+      "click",
+      "spring",
+      "click",
+      "spring",
+      "click",
+      "spring"
+    ],
+    "join": {
+      "gap": 0.0036333363288764357,
+      "points": 7485
+    },
+    "bypass": {
+      "x": 579.1521791321,
+      "maxStep": 6.619096661659796,
+      "history": [
+        {
+          "mode": "flutter",
+          "kind": "flutter",
+          "at": 1.8083333333333294
+        }
+      ]
+    }
+  }
+]
