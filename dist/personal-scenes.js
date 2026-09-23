@@ -37,13 +37,23 @@ export function personalScene(scene,canvas,wake,sfx){
    for(let j=0;j<5;j++){
     const [x,y]=seats[j],selected=j===active,lift=reduced.matches?0:selected?Math.sin(phase*Math.PI)*8:Math.sin(time*1.6+j)*2;
     c.save();c.translate(x,y-30-lift);c.strokeStyle=selected?olive:ink;c.lineWidth=1.5;
-    if(j===0){ // A little competitive-game soul orb, with a wandering glint.
-     c.beginPath();c.ellipse(0,-7,12,15,.1,0,Math.PI*2);c.stroke();line(c,[[-9,-18],[-3,-27],[4,-22],[9,-15]],olive,1.2);line(c,[[-5,-7],[-2,-4],[2,-8]],ink,1.4);
-     const glint=reduced.matches?0:Math.sin(time*4)*4;line(c,[[17+glint,-16],[21+glint,-16]],olive,1);line(c,[[19+glint,-18],[19+glint,-14]],olive,1);
-    }else if(j===1){ // Watcher's Eye: a blinking, slightly suspicious piece of loot.
-     const blink=reduced.matches?1:Math.abs(Math.sin(time*1.3))<.13?.12:1;c.save();c.scale(1,blink);c.beginPath();c.ellipse(0,-8,19,11,0,0,Math.PI*2);c.stroke();c.beginPath();c.arc(Math.sin(time)*4,-8,4,0,Math.PI*2);c.stroke();c.restore();line(c,[[-20,7],[-12,11],[9,8],[19,11]],olive,.8);
-    }else if(j===2){ // A hand-drawn arena banner.
-     line(c,[[-16,14],[-15,-27]],ink,1.3);const flutter=reduced.matches?0:Math.sin(time*5)*5;line(c,[[-15,-25],[0,-28+flutter],[19,-22],[12,-10],[0,-14+flutter],[-15,-12]],'#936957',1.6);line(c,[[-7,-21],[8,-14]],ink,1.6);
+    if(j===0){ // Deadlock's eight-part wheel and little watching eye.
+     c.save();c.translate(0,-8);c.rotate(reduced.matches?0:Math.sin(time*1.7)*.07);
+     for(let k=0;k<8;k++){const angle=k*Math.PI/4+.04;const pts=[];for(let q=0;q<=5;q++){const t=angle+q*.11,r=20+(q%2?.7:-.5);pts.push([Math.cos(t)*r,Math.sin(t)*r]);}line(c,pts,ink,2);line(c,[[Math.cos(angle)*12,Math.sin(angle)*12],[Math.cos(angle)*21,Math.sin(angle)*21]],ink,1.3);}
+     line(c,[[-12,0],[-6,-6],[1,-8],[8,-4],[12,0],[5,6],[-2,7],[-9,3],[-12,0]],ink,1.3);
+     c.beginPath();c.ellipse(Math.sin(time)*1.3,0,3,4,0,0,Math.PI*2);c.fillStyle=ink;c.fill();c.restore();
+    }else if(j===1){ // A badly minted divine orb, bald brow and all.
+     c.save();c.rotate(reduced.matches?0:Math.sin(time*2)*.06);
+     line(c,[[-14,9],[-20,-3],[-17,-21],[-9,-29],[5,-30],[17,-23],[20,-9],[13,9],[4,15],[-6,14],[-14,9]],'#987a35',1.8);
+     line(c,[[-16,-16],[-8,-20],[-1,-15],[5,-19],[15,-15]],'#a2884f',1.3);
+     line(c,[[-13,-10],[-6,-12],[-4,-8],[-11,-7],[-13,-10]],ink,1.6);line(c,[[5,-10],[12,-12],[14,-8],[6,-7],[5,-10]],ink,1.6);
+     line(c,[[1,-10],[-2,-1],[3,1],[5,-2]],'#987a35',1.3);line(c,[[-8,6],[-2,4],[6,5],[10,7]],ink,1.3);line(c,[[-6,10],[3,11],[7,9]],'#987a35',1);
+     line(c,[[-13,-22],[-6,-25],[7,-25],[14,-20]],'#b49959',.8);c.restore();
+    }else if(j===2){ // Dota's cut diagonal and two ragged windows.
+     c.save();c.rotate(reduced.matches?-.05:Math.sin(time*1.8)*.065-.05);
+     const red='#a44f40';line(c,[[-20,-28],[19,-26],[21,10],[-18,13],[-20,-28]],red,2);
+     line(c,[[-14,-23],[17,4],[10,9],[-18,-18],[-14,-23]],red,2);
+     line(c,[[5,-23],[15,-22],[16,-10],[5,-23]],red,1.8);line(c,[[-15,-6],[-4,7],[-14,8],[-15,-6]],red,1.8);c.restore();
     }else if(j===3){ // A little fan of cards keeps reshuffling, with the label anchored below.
      for(let k=0;k<3;k++){c.save();c.rotate((k-1)*.2+(selected&&!reduced.matches?Math.sin(time*7+k)*.12:0));line(c,[[-11,-23],[10,-25],[12,6],[-10,8],[-11,-23]],k===1?'#ec302b':ink,1.2);text(c,k===1?'A':'7',0,-5,14);c.restore();}
     }else{ // Indomie sandwich. The steam is the motion, the text stays put.
