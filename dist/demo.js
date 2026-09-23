@@ -55,7 +55,7 @@ function sceneAudio(){
 
 if(scene==='halo'){
     $('.caption').textContent='a very fictional interview';
-    $('#scene').innerHTML=`<div class="call"><p class="question">“Tell me about something you’ve built.”</p><div class="portrait"><canvas id="candidate-art" aria-hidden="true"></canvas><p id="thought">there was definitely a thought here.</p></div><div class="cue"><header><strong>HALO</strong><span class="timer" aria-label="Example response time">0.00s</span></header><p class="answer">finding a thread…</p><div class="progress" aria-hidden="true"><span></span></div></div></div><div class="controls"><button id="replay">try again</button></div>`;
+    $('#scene').innerHTML=`<div class="call"><p class="question">“Tell me about something you’ve built.”</p><div class="portrait"><canvas id="candidate-art" aria-hidden="true"></canvas><p id="thought">there was definitely a thought here.</p></div><div class="cue"><header><strong>HALO</strong><span class="timer" aria-label="Example response time">0.00s</span></header><p class="answer">finding a thread…</p><div class="progress" aria-hidden="true"><span></span></div></div></div>`;
     const scenarios=[
         {question:'Tell me about something you have built.',thought:'where do i even start?',answer:'Start with Botato. You built it to handle the repetitive bits in Path of Exile.',after:'oh. right. that thing i built.'},
         {question:'What draws you to working with AI?',thought:'a normal question. words, please.',answer:'Talk about HALO: audio, screen context and one useful sentence when your brain goes blank.',after:'something useful. that is the point.'},
@@ -75,7 +75,7 @@ if(scene==='halo'){
         $('.answer').textContent='finding a thread...' ;$('#thought').textContent=scenarios[halo.scenario].thought;
         timer.textContent='0.00s';bar.style.transform='scaleX(0)';wake();
     }
-    $('#replay').onclick=nextScenario;nextScenario();
+    nextScenario();
     advance=dt=>{
         if(halo.done){halo.hold=(halo.hold||0)+dt;if(halo.hold>2.6)nextScenario();return;}halo.elapsed=Math.min(halo.duration,halo.elapsed+dt);
         const label=halo.elapsed.toFixed(2)+'s';if(timer.textContent!==label)timer.textContent=label;
@@ -85,7 +85,7 @@ if(scene==='halo'){
     draw=()=>{a.clear();drawMeowl(a.c,a.w*.5,a.h-4,89,{id:'interview',time,mode:halo.done&&halo.hold>.26?'happy':'nervous',look:halo.done?2:0,voice:sfx.mouth('interview'),drool:halo.done?Math.max(0,1-halo.hold/.26):Math.min(1,halo.elapsed/2.8)});const x=a.w*.76,y=a.h-15;toyProp(a.c,'cue-note',x,y,30,28,(c)=>{line(c,[[x-14,y-28],[x+14,y-27],[x+13,y],[x-15,y],[x-14,y-28]],'#a19986',1);line(c,[[x-8,y-19],[x+8,y-19],[x-7,y-13],[x+5,y-13]],'#a19986',.8);});};
 }else if(scene==='botato'||scene==='liquidation'){
     const bot=scene==='botato';$('.caption').textContent=bot?'a tiny detour of its own':'the hunt, in miniature';
-    $('#scene').innerHTML=`<canvas class="toy" id="${bot?'botato-art':'liquidation-art'}" tabindex="0" aria-label="${bot?'Meowl pathfinder. Tap the floor or move the loot.':'A meowl inspects hardware from a liquidation lot.'}"></canvas><p class="toy-note" id="toy-note"></p><div class="controls"><button id="next">${bot?'move the loot':'inspect the next lot'}</button></div>`;
+    $('#scene').innerHTML=`<canvas class="toy" id="${bot?'botato-art':'liquidation-art'}" tabindex="0" aria-label="${bot?'Meowl pathfinder. Tap the floor or move the loot.':'A meowl inspects hardware from a liquidation lot.'}"></canvas><p class="toy-note" id="toy-note"></p>${bot?'<div class="controls"><button id="next">move the loot</button></div>':''}`;
     const a=canvas(bot?'botato-art':'liquidation-art'),note=$('#toy-note');
     if(bot){
         robot={x:40,y:220,cameraX:240,cameraY:320,target:[885,560],route:[],blocked:[],rocks:rocks.map(r=>r.points),routeMs:0};
@@ -163,8 +163,8 @@ if(scene==='halo'){
         lot={index:30,elapsed:0,stage:1,x:75,y:280,vx:0,vy:0,carrying:true,camera:1,placed:30};
         // Successive supported shells contain 1, 3, 5 ... cards. There is no final lap/reset.
         const slot=index=>{const radius=Math.floor(Math.sqrt(index)),offset=index-radius*radius,row=Math.floor(offset/2);return{x:310+(radius-row)*(offset%2?1:-1)*24,y:280-row*22};};
-        $('#next').textContent='another gpu. obviously.';
-        $('#next').onclick=()=>{lot.hurryUntil=time+4;wake();};
+
+
         advance=dt=>{
             lot.elapsed+=dt;
             const cell=slot(lot.index),target=lot.carrying?{x:cell.x,y:cell.y+27}:{x:40,y:280};

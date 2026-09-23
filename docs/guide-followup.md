@@ -94,3 +94,5 @@ Evidence: `docs/qa/botato-recovery-qa.json` and `docs/qa/type-qa.json`.
 - [x] Shorten project links to demo and github, including panel data.
 
 Verification: syntax checks; browser quote cycling; desktop/mobile/wide guide observation; opening screenshots; observed partial typed strings; real pointer drag displaced the upper exit by 58px horizontally and 46px vertically and released normally. Opening uses a drawing reveal for canvas artwork, not individual stroke reconstruction of raster assets.
+
+- [x] Remove redundant manual cycle buttons from all nine rotating mini-scenes, HALO replay and hardware next-lot. Keep Botato loot movement and the main hill interactions.

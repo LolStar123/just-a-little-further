@@ -22,7 +22,7 @@ const specs={
 export function miniScene(scene,canvas,wake,sfx){
  const $=s=>document.querySelector(s),spec=specs[scene]||specs.pipeline;
  $('.caption').textContent=spec[0];
- $('#scene').innerHTML=`<canvas class="toy mini-toy" id="mini-art" aria-label="${spec[0]}"></canvas><p class="toy-note" id="toy-note" aria-live="polite"></p><div class="controls"><button id="next">${spec[1]}</button></div><p class="disclosure">${spec[2]}</p>`;
+ $('#scene').innerHTML=`<canvas class="toy mini-toy" id="mini-art" aria-label="${spec[0]}"></canvas><p class="toy-note" id="toy-note" aria-live="polite"></p><p class="disclosure">${spec[2]}</p>`;
  const artHeight=['deadlock','poe'].includes(scene)?430:330;
  const a=canvas('mini-art'),state={scene,choice:0,actions:0,cycles:0,elapsed:0,clock:0,routeTime:0,transition:1},note=$('#toy-note');
  let previous=null,paperBag=[];const counts={scraper:paperTitles.length,pipeline:5,smoothtato:4,mtxtato:3,tfl:3,commute:5,deadlock:6,baxter:4,poe:3};
@@ -47,7 +47,7 @@ export function miniScene(scene,canvas,wake,sfx){
   state.cycles++;if(manual)state.actions++;
   if(scene!=='scraper'||!manual)state.elapsed=0;state.transition=scene==='scraper'?1:0;caption();draw();wake();
  }
- $('#next').onclick=()=>change(true);caption();
+ caption();
  if(scene==='poe'||scene==='deadlock'){
   const details=document.createElement('details');details.className='stat-method';
   const summary=document.createElement('summary');summary.textContent=scene==='poe'?'from trade logs to a buying decision':'from match data to a useful comparison';
