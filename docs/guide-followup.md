@@ -48,3 +48,9 @@ The loading treatment follows the existing reference sweep's decisions: consiste
 Replaced both uncertain attributions with exact excerpts from Marcus Aurelius in George Long's public-domain translation: [Meditations 5.1](https://classics.mit.edu/Antoninus/meditations.5.five.html), about rising to human work, and [4.31](https://classics.mit.edu/Antoninus/meditations.4.four.html), about loving the craft one has learned. Byline: only the name. The Onion and the other two correctly credited original lines remain.
 
 `hill-followup.json` records three real pointer throws at each viewport, the cheer state, pulled cliff-exit displacement and the three-control layout. `impact-quotes-qa.json` verifies a hard held-rock collision and all five visible quote/byline pairs. `loading-qa.json` delays the actual scraper request, verifies the loader, then releases it and checks removal with zero horizontal overflow.
+
+## Attention pass
+
+- [x] Higher greeting hops, wider sideways movement, alternating rebound jumps and two-wing waving. Pausing near a project also invites an attention routine; scrolling clears the queued rebound.
+- [x] Cheer pom-poms are substantially larger, one bright red and one blue.
+- [x] Real-browser checks at desktop and mobile observed ten greeting jumps across a 14-second watch, then successful pursuit after scrolling during a cheer. Reduced-motion mode produced no automatic jumps. Evidence: `docs/qa/attention-qa.json`.

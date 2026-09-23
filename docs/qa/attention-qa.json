@@ -1,0 +1,27 @@
+[
+  {
+    "width": 1440,
+    "jumpsIn14s": 10,
+    "kinds": [
+      "starhop",
+      "peek",
+      "hello"
+    ],
+    "scrollChaseY": 1967.9249967669414,
+    "errors": []
+  },
+  {
+    "width": 390,
+    "jumpsIn14s": 10,
+    "kinds": [
+      "starhop",
+      "peek",
+      "hello"
+    ],
+    "scrollChaseY": 1950.9339827173728,
+    "errors": []
+  },
+  {
+    "reducedMotionAutoJumps": 0
+  }
+]

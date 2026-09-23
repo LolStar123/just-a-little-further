@@ -249,6 +249,7 @@ export function drawMeowl(c,x,y,size,o={}){
         if(kind==='hang'){target.left=[-25,-115];target.right=[25,-115];target.feet=[-9,9];target.tilt=Math.sin(t*3)*.08;}
         if(kind==='grind'){target.hip=[-12,-9];target.chest=[-4,-40];target.head=[2,-66];target.feet=[-26,17];target.left=[-60,-56];target.right=[53,-48];target.tilt=-.17+Math.sin(t*9)*.045;}
         if(kind==='wave'||kind==='hello'||kind==='peek'){target.left=[-36,-65];target.right=[40+Math.sin(t*15)*17,-100+Math.cos(t*15)*10];target.turn=0;target.tilt=Math.sin(t*7)*.06;target.head=[0,-77];}
+        if(kind==='hello'){target.left=[-48+Math.sin(t*19)*15,-103+Math.cos(t*19)*13];target.right=[48+Math.cos(t*21)*16,-100+Math.sin(t*21)*15];target.feet=[-22,22];target.turn=0;target.tilt=Math.sin(t*9)*.11;}
         if(kind==='starhop'){target.left=[-64,-94];target.right=[64,-94];target.feet=[-24,24];target.turn=0;target.tilt=Math.sin(t*10)*.07;}
         if(kind==='point'){target.left=[-28,-35];target.right=[61,-65];target.turn=.5;target.tilt=-.08;}
         if(kind==='balance'){target.left=[-60,-48+Math.sin(t*8)*8];target.right=[57,-49-Math.sin(t*8)*8];target.tilt=Math.sin(t*6)*.13;}
@@ -347,7 +348,7 @@ export function drawMeowl(c,x,y,size,o={}){
     if(o.parkour?.kind==='cheer'){
         for(const [j,hand]of hands.entries()){
             c.save();c.translate(...hand);c.rotate(Math.sin(t*20+j)*.4);
-            for(let i=0;i<24;i++){const a=i*Math.PI/12,r=13+Math.sin(i*2.7+t*17)*3;c.beginPath();c.moveTo(0,0);c.quadraticCurveTo(Math.cos(a+.25)*r*.7,Math.sin(a+.25)*r*.7,Math.cos(a)*r,Math.sin(a)*r);c.strokeStyle=i%3===0?'#b07b38':i%3===1?'#60715d':ink;c.lineWidth=1.3;c.stroke();}
+            for(let i=0;i<40;i++){const a=i*Math.PI/20,r=30+Math.sin(i*2.7+t*17)*6;c.beginPath();c.moveTo(0,0);c.quadraticCurveTo(Math.cos(a+.25)*r*.7,Math.sin(a+.25)*r*.7,Math.cos(a)*r,Math.sin(a)*r);c.strokeStyle=j?'#326bc1':'#ec302b';c.lineWidth=i%3===0?2.4:1.7;c.stroke();}
             c.restore();
         }
     }
