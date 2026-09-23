@@ -51,7 +51,7 @@ The existing paper, pen, hill-to-signature line and quiet audio stay. VST/webcam
 - [x] Drag/release/cancel, rapid buttons, keyboard entry, reduced-motion feedback.
 - [x] Erosion endurance, manual squash, bounded anatomy and line continuity checks.
 - [x] Audio variety, mouth timing, project crossfades and offscreen suspension.
-- [ ] Build, publish site, push source to GitHub, verify deployed version.
+- [x] Build, publish site, push source to GitHub, verify deployed version.
 
 ## Evidence, 23 September 2026
 
@@ -64,3 +64,5 @@ The existing paper, pen, hill-to-signature line and quiet audio stay. VST/webcam
 
 The six clean kitten phrases are edited variants from three original licensed clips. Project music is original provisional synthesis; the friend's linked instrumental is logged, not inserted. The guide's return and helper vaulting are stylised bounded controllers rather than a general platform-game AI. Background scenery was retained because the shortened layout did not need more clouds. The VST and webcam comments remain inspiration rather than extra products.
 
+
+Public deployment verified: all fourteen sections present, three-push entrance and matrix scene running, no page errors. JavaScript/CSS matched the pushed source after line-ending normalisation; the audio bank matched byte for byte.

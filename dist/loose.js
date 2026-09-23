@@ -23,7 +23,7 @@ const auraField=new AuraField();
 const hillSound=new SceneSound('hill',canvas),mix=hillSound.mix;musicPlayer(mix);
 let heardChips=0,heardMode='';
 const hero={x:0,y:0,vx:0,vy:0,size:110,pet:0,cheer:0,held:false,mode:'rest',phase:0,effort:0};
-document.querySelector('.project-knots').innerHTML=trail.map((id,i)=>`<button class="knot" data-project="${id}" aria-label="${i+1}. ${projects[id].title}"><span class="knot-dot" aria-hidden="true">${pokerMarker(i+1)}</span><span class="knot-name"><span class="wide-name">${projects[id].title}</span><span class="small-name">${projects[id].short}</span></span></button>`).join('');
+document.querySelector('.project-knots').innerHTML=trail.map((id,i)=>`<button class="knot" data-project="${id}" aria-label="${i+1}. ${projects[id].title}"><span class="knot-dot" aria-hidden="true">${pokerMarker(i+1)}</span><span class="knot-name"><span class="wide-name">${projects[id].short||projects[id].title}</span><span class="small-name">${projects[id].short}</span></span></button>`).join('');
 let panelOpen=false,project=null,returnFocus=null;
 let trailIndex=0;
 function selectCreation(index){

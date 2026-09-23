@@ -46,7 +46,7 @@ export function threadLife(svg,path){
             if(!petDrag){petVX+=(-petX*12-petVX*4)*dt;petVY+=(-petY*16-petVY*4)*dt;petX+=petVX*dt;petY+=petVY*dt;}
             guide.style.left=Math.max(0,Math.min(innerWidth-88,p.x-44+petX))+'px';guide.style.top=(p.y-82+petY-(flip?Math.sin((phase-8)/.8*Math.PI)*25:0))+'px';
             c.clearRect(0,0,88,88);c.save();if(flip&&!reduced.matches){c.translate(44,47);c.rotate((phase-8)/.8*Math.PI*2);c.translate(-44,-47);}drawMeowl(c,44,82,48,{id:'guide',time,mode,emotion:trip?'worried':'relieved',speed:Math.abs(speed),facing:speed<0?-1:1,voice:sound.mouth('guide')});c.restore();
-            const texts=['follow me!','hey, wait up!!','this way. probably.','nailed it.','tiny legs. big plans.'];words.textContent=trip?'meant to do that.':texts[Math.floor(time/5)%texts.length];sound.chirp('guide',time,[9,15],true,{level:.6});
+            const texts=['follow me!','hey, wait up!!','this way. probably.','nailed it.','tiny legs. big plans.'];words.textContent=trip?'meant to do that.':texts[Math.floor(time/5)%texts.length];const guideLeft=parseFloat(guide.style.left);words.style.left=Math.max(8-guideLeft,Math.min(-20,innerWidth-guideLeft-words.offsetWidth-8))+'px';sound.chirp('guide',time,[9,15],true,{level:.6});
         }
         wake();
     }

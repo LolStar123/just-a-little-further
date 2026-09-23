@@ -10,7 +10,7 @@ export function personalScene(scene,canvas,wake,sfx){
  const a=canvas('personal-art'),state={clock:0,scene},note=document.querySelector('#personal-note');
  const labels=['deadlock','path of exile','poker','halo','indomie sandwich','little code projects'];
  const inputs=['Adds cold damage','GrAnd Des1gn','Adds fire damage','Remarkab|e'];
- function text(c,str,x,y,size=17){c.font=size+'px Reader,Georgia,serif';c.fillStyle=ink;c.textAlign='center';c.fillText(str,x,y);}
+ function text(c,str,x,y,size=17){const scale=Math.min(a.w/480,a.h/350);c.font=Math.max(size,12.5/Math.max(.1,scale))+'px Reader,Georgia,serif';c.fillStyle=ink;c.textAlign='center';c.fillText(str,x,y);}
  function line(c,p,color=ink,w=1.2){inkPath(c,p,color,w);}
  function draw(){
   if(!a.w||!a.h)return;a.clear();const c=a.c,s=Math.min(a.w/480,a.h/350),ox=(a.w-480*s)/2,oy=(a.h-350*s)/2;c.save();c.translate(ox,oy);c.scale(s,s);
@@ -24,7 +24,7 @@ export function personalScene(scene,canvas,wake,sfx){
    for(let i=0;i<6;i++){
     const x=34+i%3*151,y=28+Math.floor(i/3)*56,visible=phase>i*.48;
     line(c,[[x,y],[x+132,y+1],[x+131,y+39],[x-1,y+41],[x,y]],'#a19986',.8);
-    if(visible)text(c,labels[i],x+65,y+25,i===4?13:15);
+    if(visible){if(i>=4){const words=i===4?['indomie','sandwich']:['little code','projects'];words.forEach((word,j)=>text(c,word,x+65,y+16+j*19,15));}else text(c,labels[i],x+65,y+25,15);}
     else for(let j=0;j<5;j++)line(c,[[x+8+j*23,y+32],[x+20+j*23,y+8]],'#b4a993',.7);
    }
    const values=phase<3.7?m:inv,title=phase<3.7?'A':phase<6?'A inverse':'A × A inverse = I';text(c,title,103,171,18);
