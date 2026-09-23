@@ -139,3 +139,11 @@ Verification: three stamp stages measured centred within .01px on 1440px and 390
 ## Pole exit and Divine Orb
 - [x] A pole descent turning into a horizontal run now plants a foot and kicks toward a real future point on the line, with seven short-lived ink dust puffs and recorded spring/contact sounds.
 - [x] Botato loot is an original rough Divine Orb face drawing, also used for the offscreen marker. Existing prop identity and retrieval remain intact. Icon reference: https://www.poewiki.net/wiki/Divine_Orb ; visual reference inspected via https://buyboost.com/data/products/2464/divine-orb-preview.webp (reference only, no downloaded artwork shipped).
+
+## 23 September: invitation, chart windows and faster guide
+- [x] Larger coloured help, ruin and cheer keys; reset stays secondary.
+- [x] Lift quote 22px desktop / 18px mobile.
+- [x] TfL live chart: 1h, 6h, 24h, week, month, year, all-time buttons; real observation filtering, shared candle selection and visible date range.
+- [x] Remove accidental short-lookahead speed cap; faster scamper, climb and slide with frame-rate steering on the wire.
+- [x] Pole sliding tolerates small curls for 280ms and wider descending angles, while retaining real corner kick-offs.
+- [x] Desktop/mobile button checks; 3 hairpin radii; left/right pole exits; all TfL windows at desktop/mobile and existing dashboard browser audit.

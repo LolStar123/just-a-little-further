@@ -103,7 +103,7 @@ export function threadLife(svg,path){
             const perchAt=(x,y)=>{let best=Infinity,pick=target;for(const p of shape){if(p[0]<viewLeft+45||p[0]>viewLeft+viewWidth-45||p[1]<viewTop+70||p[1]>viewBottom-22)continue;const score=Math.hypot(p[0]-x,p[1]-y);if(score<best){best=score;pick={x:p[0],y:p[1]};}}return {...pick};};
             routeCache={near,ahead,target,shortcut,perchAt,goodbye,direction,cornerExit:pointAt(Math.max(0,Math.min(total,travel+direction*Math.min(96,Math.abs(destination-travel))))),remaining:Math.abs(destination-travel),committedExit:crossingTubeLoop?target:null};
             sceneCache=sceneRects.find(r=>actor.y>=r.top-100&&actor.y<r.bottom+130)||null;
-            targetAt=now+90;
+            targetAt=now+(['run','land','crouch'].includes(actor.mode)?16:90);
         }
         const paused=document.body.classList.contains('panel-open')||!!document.querySelector('#little-boot:not(.finished)');
         if(!paused)actor.tick(dt,routeCache,{top:viewTop,bottom:viewBottom,width:viewWidth,left:viewLeft},sceneCache,reduced.matches);

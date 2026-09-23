@@ -121,7 +121,11 @@ export class GuideMotion{
    else if(ledge&&Math.abs(this.y-scene.top)<150){this.state('flutter');}
    else{
     const previousTerrain=this.kind;
-    this.kind=dy>12&&Math.abs(dx)<12?'pole':slope<-.7?'climb':slope>.35&&(!scene||this.y>scene.bottom-15)?'grind':slope>.85?'scramble':['halo','baxter'].includes(sceneKey)?'tiptoe':sceneKey==='mtxtato'?'balance':'scamper';
+    // Hold the slide through hand-drawn bumps; leave only for a sustained exit.
+    const descending=dy>8&&Math.abs(dx)<18;
+    if(descending)this.poleGrace=.28;else this.poleGrace=Math.max(0,(this.poleGrace||0)-dt);
+    const slide=descending||(previousTerrain==='pole'&&this.poleGrace>0&&dy>-10);
+    this.kind=slide?'pole':slope<-.7?'climb':slope>.35&&(!scene||this.y>scene.bottom-15)?'grind':slope>.85?'scramble':['halo','baxter'].includes(sceneKey)?'tiptoe':sceneKey==='mtxtato'?'balance':'scamper';
     const exit=route.cornerExit;
     if(previousTerrain==='pole'&&this.kind!=='pole'&&exit&&Math.abs(exit.x-this.x)>28&&Math.abs(exit.y-this.y)<100&&!reduced){
      this.kickPoint={x:near.x,y:near.y};this.kickDirection=Math.sign(exit.x-this.x);this.kickCount=(this.kickCount||0)+1;
@@ -130,7 +134,7 @@ export class GuideMotion{
      this.x+=this.vx*dt;this.y+=this.vy*dt;return;
     }
     // Footfalls drive travel: speed pulses at the planted steps instead of a constant glide.
-    const pace=this.kind==='pole'?260*(1+.07*Math.sin(this.time*9)):(this.kind==='climb'?210:this.kind==='grind'?675:405)*(1+.32*Math.sin(this.time*16)),speed=Math.min(pace,d*8);
+    const pace=this.kind==='pole'?520*(1+.07*Math.sin(this.time*9)):(this.kind==='climb'?420:this.kind==='grind'?950:780)*(1+.26*Math.sin(this.time*19)),speed=Math.min(pace,d*32,Math.max(40,(route.remaining??distance)*8));
     this.vx+=(dx/(d||1)*speed-this.vx)*(1-Math.exp(-dt*12));this.vy+=(dy/(d||1)*speed-this.vy)*(1-Math.exp(-dt*12));
     if(!reduced&&this.kind!=='pole'&&this.time>this.nextMove){
      this.moveCount++;let kind='leap',goal=shortcut||ahead;
