@@ -3,8 +3,20 @@ import {toyPose} from './toy-interactions.js';
 export const art={ready:true,style:'scribble'};
 export const ready=Promise.resolve(true);
 const TAU=Math.PI*2, clamp=(v,a,b)=>Math.max(a,Math.min(b,v)), mix=(a,b,t)=>a+(b-a)*t;
+const hoverPointer={x:0,y:0,active:false},hoverRects=new WeakMap();
+addEventListener('pointermove',e=>{hoverPointer.x=e.clientX;hoverPointer.y=e.clientY;hoverPointer.active=e.pointerType!=='touch';},{passive:true});
+document.addEventListener('mouseleave',()=>{hoverPointer.active=false;});
+addEventListener('blur',()=>{hoverPointer.active=false;});
+function mouseOverMeowl(c,x,y,size){
+    if(!hoverPointer.active||!c.canvas.isConnected)return false;
+    let cached=hoverRects.get(c.canvas);const now=performance.now();
+    if(!cached||now-cached.at>16){cached={at:now,r:c.canvas.getBoundingClientRect()};hoverRects.set(c.canvas,cached);}
+    const r=cached.r;if(!r.width||!r.height)return false;
+    const local=new DOMPoint((hoverPointer.x-r.left)*c.canvas.width/r.width,(hoverPointer.y-r.top)*c.canvas.height/r.height).matrixTransform(c.getTransform().inverse());
+    return ((local.x-x)/(size*.48))**2+((local.y-(y-size*.53))/(size*.58))**2<1;
+}
 const rigs=new WeakMap(), ink='#353833', faint='#72756b', paper='#eeeae0';
-function pancake(c,x,y,size,t,age,ground,voice=0){
+function pancake(c,x,y,size,t,age,ground,voice=0,waving=false){
     const spread=Math.min(1,age/.12),w=size*(.55+spread*.22),h=size*.10;
     const earth=dx=>ground?ground(x+dx)-y:0;
     const warp=([dx,dy])=>[dx,dy+earth(dx)];
@@ -23,6 +35,7 @@ function pancake(c,x,y,size,t,age,ground,voice=0){
     pen([[-2,-h*.22],[0,-h*.10],[2,-h*.22]],.8);
     if(voice>.03)oval(c,0,earth(0)-h*.13,2+voice*2,Math.max(.5,voice*1.8),'#62544a',.6);
     for(const side of [-1,1]){pen([[side*w*.3,-h*.35],[side*w*.49,-h*.66]],.65);pen([[side*w*.32,-h*.18],[side*w*.54,-h*.21]],.65);}
+    if(waving){const tip=w*.65+Math.sin(t*17)*5;curl([w*.4,-h*.2],[w*.65,-h-18],[tip,-h-24],1.1);curl([w*.4,-h*.2],[w*.75,-h-12],[tip+5,-h-20],.8);}
     c.restore();return{style:'scribble',mode:'flattened',squish:1,feet:[{x:x-w*.6,y:y+earth(-w*.6)},{x:x+w*.6,y:y+earth(w*.6)}],hands:[{x:x-w,y:y+earth(-w)},{x:x+w,y:y+earth(w)}],head:{x,y:y-h*.5},hip:{x,y},groundOutline:outline};
 }
 
@@ -234,7 +247,9 @@ function workCostume(c,p,role,t){
 }
 export function drawMeowl(c,x,y,size,o={}){
     const toy=toyPose(c,o.id||'meowl',x,y,size,o,drawMeowl);if(toy.hidden)return{hands:[{x,y},{x,y}],head:{x,y:y-size*.7},hip:{x,y},feet:[{x,y},{x,y}],hidden:true};x=toy.x;y=toy.y;o=toy.options;
-    if(o.mode==='flattened')return pancake(c,x,y,size,o.time||0,o.splatAge||0,o.ground,o.voice||0);
+    const interaction=o.mode==='held'?'squirm':(o.hovered||mouseOverMeowl(c,x,y,size))?'wave':null;
+    if(c.canvas.isConnected){c.canvas.__meowlResponses??={};c.canvas.__meowlResponses[o.id||'meowl']=interaction;}
+    if(o.mode==='flattened')return pancake(c,x,y,size,o.time||0,o.splatAge||0,o.ground,o.voice||0,interaction==='wave');
     const t=o.time||0,seed=o.seed||0,scale=size/100;
     const mode=o.mode||(o.air?'air':o.pet?'happy':o.nervous?'nervous':o.push?'push':Math.abs(o.speed||0)>5?'walk':'rest');
     const loaded=['push','anticipate','brace','slide','heave','backpush','turn'].includes(mode),effort=o.effort??(loaded?.76:0),phase=o.stroke??((t*.44)%1);
@@ -263,6 +278,16 @@ target.hip=[-12,-9];target.chest=[-4,-40];target.head=[2,-66];target.feet=[-26,1
         if(kind==='kong'){target.left=[-25,-17-Math.max(0,Math.sin(q*Math.PI*4))*32];target.right=[35,-18-Math.max(0,Math.sin(q*Math.PI*4))*32];target.chest=[8,-43];target.head=[15,-68];target.tilt=.3;target.feet=[-18,-6];}
         if(kind==='leap'||kind==='triple'){target.left=[-48,-73];target.right=[42,-66];target.feet=[-18,18];target.tilt=-.15;}
         if(kind==='crouch'||kind==='land'){target.hip=[-3,-7];target.chest=[-4,-35];target.head=[-2,-61];target.left=[-35,-18];target.right=[33,-17];}
+    }
+    // Hover and holding are universal, independent of the scene's job or costume.
+    if(interaction==='wave'){
+        target.right=[42+Math.sin(t*17)*13,-98+Math.cos(t*17)*8];target.head=[0,-77];target.turn=0;target.tilt=Math.sin(t*6)*.05;
+        o={...o,rock:null};
+    }else if(interaction==='squirm'){
+        const wriggle=Math.sin(t*19),kick=Math.sin(t*23);
+        target.hip=[wriggle*5,-15];target.chest=[-wriggle*4,-51];target.head=[wriggle*3,-77+Math.sin(t*13)*2];
+        target.left=[-43,-53+kick*20];target.right=[45,-53-kick*20];target.feet=[-13-wriggle*7,13+wriggle*7];target.tilt=wriggle*.17;target.turn=0;
+        o={...o,air:true,ground:undefined,rock:null};
     }
     if(['upset','crying'].includes(o.emotion)){target.head[1]+=4;target.tilt+=.09;target.chest[1]+=2;target.head[0]+=Math.sin(t*7)*.5;}
     const reset=!state||t<state.t||Math.hypot(x-state.x,y-state.y)>size*1.7||size!==state.size;

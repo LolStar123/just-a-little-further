@@ -16,6 +16,8 @@ export function threadLife(svg,path){
     const c=guide.querySelector('canvas').getContext('2d');c.scale(2,2);
     c.canvas.style.pointerEvents='none';const pet=document.createElement('button');guide.append(pet);pet.style.cssText='position:absolute;left:34px;top:40px;width:76px;height:84px;border:0;background:transparent;padding:0;pointer-events:auto;touch-action:none;cursor:grab';pet.tabIndex=0;pet.setAttribute('aria-label','Throw the guide meowl. Space gives a little hop.');
     let actor=null,petDrag=null,petLast=0,targetAt=0,targetIndex=0,worldHeight=0,routeCache=null,sceneCache=null;
+    pet.addEventListener('pointerenter',e=>{if(actor&&e.pointerType!=='touch')actor.hovered=true;});
+    pet.addEventListener('pointerleave',()=>{if(actor)actor.hovered=false;});
     pet.addEventListener('pointerdown',e=>{if(!actor)return;petDrag={id:e.pointerId,x:e.clientX-actor.x,y:e.clientY+scrollY-actor.y};actor.hold();pet.setPointerCapture(e.pointerId);petLast=performance.now();});
     pet.addEventListener('pointermove',e=>{if(!petDrag)return;const now=performance.now();actor.drag(e.clientX-petDrag.x,e.clientY+scrollY-petDrag.y,(now-petLast)/1000);petLast=now;});
     const dropPet=()=>{if(!petDrag)return;const drag=petDrag;petDrag=null;actor.release();if(pet.hasPointerCapture(drag.id))pet.releasePointerCapture(drag.id);};
@@ -124,7 +126,7 @@ export function threadLife(svg,path){
             guide.style.transform=`translate3d(${actor.x-72}px,${actor.y-scrollY-112}px,0)`;
             c.clearRect(0,0,144,144);c.save();c.translate(72,86);c.rotate(reduced.matches?0:actor.rotation);c.translate(-72,-86);
             const airborne=actor.kind==='pole'||['air','fly','flutter','thrown','held','hang','cheer'].includes(actor.mode),mode=actor.mode==='held'?'held':airborne?'air':actor.mode==='crouch'?'anticipate':actor.mode==='land'?'brace':'scurry';
-            drawMeowl(c,72,112,55,{id:'guide',time,mode,air:airborne,parkour:actor.pose,effort:airborne||Math.hypot(actor.vx,actor.vy)>180?.88:.25,sweat:airborne||Math.hypot(actor.vx,actor.vy)>180,emotion:actor.mode==='thrown'?'panic':'relieved',speed:Math.hypot(actor.vx,actor.vy),facing:actor.facing,voice:sound.mouth('guide'),landed:actor.mode==='land'?1:0});c.restore();
+            drawMeowl(c,72,112,55,{id:'guide',hovered:actor.hovered,time,mode,air:airborne,parkour:actor.pose,effort:airborne||Math.hypot(actor.vx,actor.vy)>180?.88:.25,sweat:airborne||Math.hypot(actor.vx,actor.vy)>180,emotion:actor.mode==='thrown'?'panic':'relieved',speed:Math.hypot(actor.vx,actor.vy),facing:actor.facing,voice:sound.mouth('guide'),landed:actor.mode==='land'?1:0});c.restore();
             if(actor.kind==='grind'){c.strokeStyle='#a08a57';c.lineWidth=.8;for(let i=0;i<4;i++){const u=(time*4+i*.23)%1;c.globalAlpha=1-u;c.beginPath();c.moveTo(72-actor.facing*u*24,112+u*3);c.lineTo(72-actor.facing*(u*24+5),112+u*6);c.stroke();}c.globalAlpha=1;sound.beat('grind',Math.floor(time*2),'friction',{level:.2});}
             if(speechText!==actor.text){speechText=actor.text;speechLetters=Array.from(speechText);speechCount=0;typeAt=now;speechSizer.textContent=speechText;speechInk.textContent='';words.setAttribute('aria-label',speechText);}
             if(now>=typeAt&&speechCount<speechLetters.length){const letter=speechLetters[speechCount++];speechInk.textContent=speechLetters.slice(0,speechCount).join('');if(speechCount%2===0&&letter.trim())sound.play('click',{id:'typing',level:.055});typeAt=now+(/[.!?]/.test(letter)?115:letter===','?100:48);}

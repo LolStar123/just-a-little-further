@@ -90,10 +90,11 @@ export function toyPose(c,id,x,y,size,options,painter){
     return{x:local.x,y:local.y,options:{...options,mode:item.held?'held':item.vy<-30?'spring':item.mode,air:item.held||Math.abs(item.vy)>30,ground:undefined,speed:item.vx,facing:item.vx<0?-1:1,emotion:item.held?'panic':'determined'}};
 }
 export function toyBusy(canvas){const world=worlds.get(canvas);return !!world&&(!!world.held||[...world.props.values(),...world.actors.values()].some(p=>p.active&&performance.now()-p.lastFrame<200));}
-export function toyProp(c,id,x,y,w,h,paint){
+export function toyProp(c,id,x,y,w,h,paint,options={}){
     const result=itemFor(c,id,x,y,w,h,false);
     if(result){
         const {item,matrix}=result;
+        item.needsRescue=!!options.rescue;
         if(!item.pageActive&&(!item.sprite||performance.now()-(item.spriteAt||0)>180)){
             item.spriteAt=performance.now();const pad=4,sprite=item.sprite||document.createElement('canvas'),sw=Math.ceil(item.box.w+pad*2),sh=Math.ceil(item.box.h+pad*2);sprite.width=sw;sprite.height=sh;
             const ctx=sprite.getContext('2d');ctx.setTransform(matrix.a,matrix.b,matrix.c,matrix.d,matrix.e-item.home.x+item.box.w/2+pad,matrix.f-item.home.y+item.box.h+pad);ctx.strokeStyle=c.strokeStyle;ctx.fillStyle=c.fillStyle;ctx.font=c.font;ctx.lineWidth=c.lineWidth;paint(ctx);item.sprite=sprite;

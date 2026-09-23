@@ -43,7 +43,7 @@ function positionThought(dt){
         copy.getAnimations().forEach(a=>a.cancel());copy.animate([{opacity:.2,transform:'translateY(4px) scale(.96)'},{opacity:1,transform:'translateY(-3px) scale(1.025)'},{transform:'translateY(1px) scale(.995)'},{transform:'none'}],{duration:420,easing:'ease-out'});
     }
     const width=el.offsetWidth,height=el.offsetHeight,origin=canvas.getBoundingClientRect();
-    const obstacles=[$('.pencil-note'),$('.introduction'),$('.bottom-edge'),...document.querySelectorAll('.knot-name')].map(el=>{const r=el.getBoundingClientRect();return {left:r.left-origin.left,right:r.right-origin.left,top:r.top-origin.top,bottom:r.bottom-origin.top};});
+    const obstacles=[$('.introduction'),$('.bottom-edge'),...document.querySelectorAll('.knot-name')].map(el=>{const r=el.getBoundingClientRect();return {left:r.left-origin.left,right:r.right-origin.left,top:r.top-origin.top,bottom:r.bottom-origin.top};});
     const rock=physics.rock.bounds;obstacles.push({left:rock.min.x-10,right:rock.max.x+10,top:rock.min.y-10,bottom:rock.max.y+10},{left:hero.x-hero.size*.6,right:hero.x+hero.size*.6,top:hero.y-hero.size*1.1,bottom:hero.y+15});
     const candidates=[...(W<760?[[W*.07,340]]:[]),[hero.x-hero.size*.7-width-14,hero.y-hero.size*.9],[hero.x+hero.size*.7+14,hero.y-hero.size*.9],[hero.x-width*.5,hero.y+50]];
     const choices=candidates.map(([x,y])=>{x=clamp(x,12,W-width-12);y=clamp(y,95,H-height-8);const area=obstacles.reduce((sum,r)=>sum+Math.max(0,Math.min(x+width,r.right)-Math.max(x,r.left))*Math.max(0,Math.min(y+height,r.bottom)-Math.max(y,r.top)),0);return{x,y,area};});
@@ -260,9 +260,7 @@ $('#help').addEventListener('click',()=>{toyMotionRequested=true;if(paused)setPa
 $('#reset').addEventListener('click',()=>{cancelGrab();auraField.clear();physics.reset();hero.pet=0;hero.cheer=0;particles.length=0;ripples.length=0;scuffs.length=0;status('another morning. another go.');updateCharacters(0);wake();});
 $('#encourage').addEventListener('click',()=>{dispatchEvent(new Event('meowl-cheer'));if(paused)setPause(false);hero.cheer=3;hero.pet=0;used();status('go on, little guy.');playTone('pet');wake();});
 function setPause(value){paused=value;hillSound.active(!paused&&worldVisible&&!panelOpen);cancelGrab();if(paused){cancelAnimationFrame(frame);frame=0;}last=0;wake();}
-const quoteAuthors=["- author unknown", "- albert camus", "- marcus aurelius", "- seneca", "- samuel beckett", "- proverb", "- atul"];
-const quotes=["The only man who ever beat you offers a rematch every morning. Take it.", "One must imagine Sisyphus happy.", "Love the art, poor as it may be, which thou hast learned, and be content with it.", "For sometimes it is an act of bravery even to live.", "Try again. Fail again. Fail better.", "Necessity is the mother of invention.", "The treadmill has sped up. The onion held the line. So must I."];let quote=0;
-$('#next-quote').addEventListener('click',()=>{quote=(quote+1)%quotes.length;$('#quote').textContent=quotes[quote];$('#quote-author').textContent=quoteAuthors[quote];$('#quote').getAnimations().forEach(a=>a.cancel());$('#quote').animate([{opacity:.2},{opacity:1}],{duration:300});});
+
 
 function openPanel(key=null,trigger){
     dispatchEvent(new CustomEvent('project-music',{detail:key}));

@@ -37,6 +37,7 @@ export function personalScene(scene,canvas,wake,sfx){
    for(let j=0;j<5;j++){
     const [x,y]=seats[j],selected=j===active,lift=reduced.matches?0:selected?Math.sin(phase*Math.PI)*8:Math.sin(time*1.6+j)*2;
     c.save();c.translate(x,y-30-lift);c.strokeStyle=selected?olive:ink;c.lineWidth=1.5;
+    toyProp(c,['deadlock-emblem','divine-orb','dota-emblem','poker-hand','indomie-sandwich'][j],0,16,52,60,c=>{
     if(j===0){ // Deadlock's eight-part wheel and little watching eye.
      c.save();c.translate(0,-8);c.rotate(reduced.matches?0:Math.sin(time*1.7)*.07);
      for(let k=0;k<8;k++){const angle=k*Math.PI/4+.04;const pts=[];for(let q=0;q<=5;q++){const t=angle+q*.11,r=20+(q%2?.7:-.5);pts.push([Math.cos(t)*r,Math.sin(t)*r]);}line(c,pts,ink,2);line(c,[[Math.cos(angle)*12,Math.sin(angle)*12],[Math.cos(angle)*21,Math.sin(angle)*21]],ink,1.3);}
@@ -59,6 +60,7 @@ export function personalScene(scene,canvas,wake,sfx){
      line(c,[[-24,-10],[-19,-19],[15,-19],[24,-10],[-24,-10],[-19,7],[18,7],[24,-10]],'#946313',1.4);line(c,[[-20,-3],[-11,-7],[-3,-1],[6,-6],[14,-1],[21,-5]],olive,1.5);
      for(let k=0;k<3;k++){const sway=reduced.matches?0:Math.sin(time*3+k)*4;line(c,[[-12+k*12,-24],[-15+k*12+sway,-30],[-10+k*12,-36]],ink,.9);}
     }
+    },{rescue:true});
     c.restore();atoms[j].words.forEach((word,i)=>text(c,word,x,y+i*20,18));
     if(selected){const spread=20+Math.sin(phase*Math.PI)*23;line(c,[[x-spread,y+26],[x-7,y+28],[x+spread,y+25]],olive,1.1);}
    }

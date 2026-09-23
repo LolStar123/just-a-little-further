@@ -1,0 +1,23 @@
+{
+  "hoverAndSquirmScenes": [
+    "interests",
+    "baxter",
+    "tfl",
+    "scraper",
+    "pipeline",
+    "poe",
+    "deadlock",
+    "commute",
+    "smoothtato",
+    "mtxtato",
+    "halo",
+    "botato",
+    "liquidation"
+  ],
+  "hill": {
+    "held": 4294967295,
+    "allCollide": true,
+    "rock": 4294967295,
+    "collision": true
+  }
+}

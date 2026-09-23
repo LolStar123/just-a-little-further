@@ -1,0 +1,36 @@
+{
+  "depths": [
+    {
+      "hit": 30,
+      "depth": 343.18155298313854,
+      "visible": true
+    },
+    {
+      "hit": 60,
+      "depth": 574.6806199388888,
+      "visible": true
+    },
+    {
+      "hit": 90,
+      "depth": 764.1552835309983,
+      "visible": true
+    },
+    {
+      "hit": 120,
+      "depth": 927.1304217891145,
+      "visible": true
+    },
+    {
+      "hit": 150,
+      "depth": 1074.0212238193849,
+      "visible": true
+    },
+    {
+      "hit": 180,
+      "depth": 1203.5527612476697,
+      "visible": true
+    }
+  ],
+  "regenerated": true,
+  "visible": true
+}

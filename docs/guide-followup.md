@@ -153,3 +153,10 @@ Verification: three stamp stages measured centred within .01px on 1440px and 390
 - [x] HALO translucent uneven blue marker area; meowl speech outlined with a tail.
 - [x] Off-the-clock divine orb, Deadlock wheel/eye and red Dota square doodles; poker and sandwich preserved. Deadlock reference: https://statlocker.gg/images/deadlock-logo.png
 - [x] Panel demo/github links have an explicit wrapping flex row and 28px gap.
+
+## Calmer landing and tactile meowls
+- [x] Remove landing quote, author and shuffle control, including its event listener and obstacle reference.
+- [x] All five off-the-clock doodles are independent draggable physics props; the desk meowl rescues each in a queue and returns to work. Five simultaneous throws recovered successfully.
+- [x] Shared mouse-hover wing wave and held squirm for all drawn meowls, including hero and guide; flattened meowl can give a tiny wing wave. Verified 13 project scenes plus main and guide.
+- [x] Main hill meowl retains full collision masks while held, thrown, fluttering and repositioning; rock collisions also remain enabled. Physical rock crossing uses a lift-over route. Project helper recovery remains collision-free.
+- [x] Eroded fracture mouths regenerate in fresh material while preserving structural damage. Checked 180 repeated impacts and fully buried fracture renewal.
