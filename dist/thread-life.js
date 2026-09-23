@@ -62,9 +62,17 @@ export function threadLife(svg,path){
             const landing=scrollY<90,wantedY=landing?innerHeight-55:scrollY+innerHeight*.68;
             let best=Infinity;
             for(let i=0;i<base.length;i+=2){const score=Math.abs(base[i][1]-wantedY)+Math.abs(base[i][0]-(landing?innerWidth-100:innerWidth*.78))*(landing?.8:.14);if(score<best){targetIndex=i;best=score;}}
-            const j=nearest(actor.x,actor.y);travel=lengths[j];
-            const destination=lengths[targetIndex]+(landing?Math.sin(time*.8)*80:Math.sin(time*.45)*35),direction=destination>=travel?1:-1;
-            const ahead=pointAt(Math.max(0,Math.min(total,travel+direction*110))),near=pointAt(travel),target=pointAt(Math.max(0,Math.min(total,destination)));
+            // Nearby branches of a loop are not interchangeable footholds.
+            // Stay on the current stretch unless flight has deliberately crossed it.
+            let j=nearest(actor.x,actor.y);
+            if(routeCache&&!['fly','flutter','thrown','held','cheer'].includes(actor.mode)){
+                let bestLocal=Infinity,local=j;
+                for(let i=tugStart;i<base.length;i++){const arc=Math.abs(lengths[i]-travel);if(arc>650)continue;const score=Math.hypot(shape[i][0]-actor.x,shape[i][1]-actor.y)+arc*.12;if(score<bestLocal){bestLocal=score;local=i;}}
+                if(bestLocal<260)j=local;
+            }
+            travel=lengths[j];
+            const destination=lengths[targetIndex],direction=destination>=travel?1:-1;
+            const ahead=pointAt(Math.max(0,Math.min(total,travel+direction*Math.min(110,Math.abs(destination-travel))))),near=pointAt(travel),target=pointAt(Math.max(0,Math.min(total,destination)));
             // Loops offer real shortcuts: select a reachable future foothold, then leap through space.
             let shortcut=null;
             for(let distance=170;distance<=480;distance+=50){const candidate=pointAt(Math.max(0,Math.min(total,travel+direction*distance))),gap=Math.hypot(candidate.x-actor.x,candidate.y-actor.y);if(gap>65&&gap<230&&candidate.y>actor.y-80&&candidate.y<actor.y+155){shortcut=candidate;}}

@@ -59,12 +59,12 @@ export class GuideMotion{
    this.vy+=clamp(dy/(d||1)*wanted-this.vy,-3000,3000)*dt*3*flap;
    if(d<9&&Math.hypot(this.vx,this.vy)<55){
     if(ledge){this.hangPoint=goal;this.hangScroll=viewport.top;this.state('hang');this.text="your turn. i'll hang about.";this.sayAt=this.time+10;}
-    else{this.state('land');this.nextMove=this.time+.8;}
+    else{this.landingPoint={...goal};this.state('land');this.nextMove=this.time+.8;}
    }
   }else if(this.mode==='air'){
    this.vy+=920*dt;
    const goal=this.airTarget||near;
-   if(this.age>.2&&this.vy>0&&this.y>=goal.y-8&&Math.abs(this.x-goal.x)<42){this.state('land');this.nextMove=this.time+(sceneKey==='landing'?.28:.7);}
+   if(this.age>.2&&this.vy>0&&this.y>=goal.y-8&&Math.abs(this.x-goal.x)<42){this.landingPoint={...goal};this.state('land');this.nextMove=this.time+(sceneKey==='landing'?.28:.7);}
    else if(this.age>(this.jumpDuration||.8)+.4||offscreen&&distance>550)this.state('flutter');
    if(this.kind==='triple'&&this.triplet===3&&!reduced)this.rotation=Math.PI*2*clamp(this.age/(this.jumpDuration||.8),0,1);
    if(this.kind==='kong')this.rotation=Math.sin(this.age/(this.jumpDuration||.8)*Math.PI)*.65*this.facing;
@@ -72,21 +72,21 @@ export class GuideMotion{
    this.vx*=Math.exp(-14*dt);this.vy*=Math.exp(-14*dt);
    if(this.age>.18)this.jump(this.planned.target,this.planned.kind);
   }else if(this.mode==='land'){
-   this.vx*=Math.exp(-12*dt);this.vy+=(near.y-this.y)*80*dt-this.vy*16*dt;
+   const foot=this.landingPoint||near;this.vx+=(foot.x-this.x)*65*dt-this.vx*16*dt;this.vy+=(foot.y-this.y)*80*dt-this.vy*16*dt;
    if(this.age>.18){
-    if(this.attentionBounce&&!reduced&&this.idleTime>1){this.attentionBounce=0;this.reboundJump=true;this.jump({x:clamp(this.x-this.facing*28,48,viewport.width-48),y:near.y},'starhop');}
+    if(this.attentionBounce&&!reduced&&this.idleTime>1){this.attentionBounce=0;this.reboundJump=true;this.jump({x:clamp(this.x-this.facing*28,48,viewport.width-48),y:foot.y},'starhop');}
     else if(this.triplet>0&&this.triplet<3){this.triplet++;this.jump({x:this.x+this.facing*(38+this.triplet*17),y:near.y},'triple');this.vy-=this.triplet*35;}
     else{this.triplet=0;this.state('run');}
    }
   }else{
    const dx=ahead.x-this.x,dy=ahead.y-this.y,d=Math.hypot(dx,dy),slope=dy/(Math.abs(dx)+8);
    if(offscreen&&distance>300||Math.hypot(near.x-this.x,near.y-this.y)>100){this.state('fly');}
-   else if(sceneKey==='landing'||this.idleTime>3&&!ledge&&distance<180){
+   else if(sceneKey==='landing'||!ledge&&distance<75&&this.idleTime>.6){
     // A local attention routine: full-body wave, high hop, then an occasional rebound.
-    this.kind='wave';this.vx*=Math.exp(-dt*12);this.vy+=(near.y-this.y)*60*dt-this.vy*14*dt;
+    this.kind='wave';const perch=this.landingPoint&&Math.hypot(this.landingPoint.x-this.x,this.landingPoint.y-this.y)<100?this.landingPoint:near;this.vx*=Math.exp(-dt*12);this.vy+=(perch.y-this.y)*60*dt-this.vy*14*dt;
     if(!reduced&&this.time>this.nextMove){
      this.moveCount++;const kind=['hello','peek','starhop'][this.moveCount%3],side=this.moveCount%2?1:-1;
-     this.planned={kind,target:{x:clamp(this.x+side*(52+this.moveCount%3*19),48,viewport.width-48),y:near.y}};
+     this.planned={kind,target:{x:clamp(this.x+side*(52+this.moveCount%3*19),48,viewport.width-48),y:perch.y}};
      this.attentionBounce=this.moveCount%2===0?1:0;this.state('crouch');this.nextMove=this.time+.55;
      if(sceneKey==='landing'&&this.time>this.sayAt-.8)this.say('landing');
     }

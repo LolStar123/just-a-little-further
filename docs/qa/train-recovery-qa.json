@@ -1,0 +1,44 @@
+[
+  {
+    "width": 1440,
+    "cases": [
+      {
+        "train": 0,
+        "returned": true,
+        "clockResumed": true
+      },
+      {
+        "train": 1,
+        "returned": true,
+        "clockResumed": true
+      },
+      {
+        "train": 2,
+        "returned": true,
+        "clockResumed": true
+      }
+    ],
+    "errors": []
+  },
+  {
+    "width": 390,
+    "cases": [
+      {
+        "train": 0,
+        "returned": true,
+        "clockResumed": true
+      },
+      {
+        "train": 1,
+        "returned": true,
+        "clockResumed": true
+      },
+      {
+        "train": 2,
+        "returned": true,
+        "clockResumed": true
+      }
+    ],
+    "errors": []
+  }
+]

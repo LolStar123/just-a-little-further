@@ -214,10 +214,10 @@ export function miniScene(scene,canvas,wake,sfx){
    for(let i=0;i<3;i++){
     const y=82+i*80;path(c,[[118,y],[349,y+Math.sin(i)*3]],i===n%3?'#98766a':soft,1.5);
     for(let j=0;j<5;j++){c.beginPath();c.arc(126+j*52,y,3,0,Math.PI*2);c.fillStyle=paper;c.fill();c.stroke();}
-    const phase=(state.clock/4+i*.19)%1,x=126+(i===n%3?Math.min(phase,.40):phase)*208;
+    const phase=(state.routeTime/4+i*.19)%1,x=126+(i===n%3?Math.min(phase,.40):phase)*208;
     toyProp(c,'train-'+i,x,y-3,25,16,(c)=>path(c,[[x-10,y-14],[x+10,y-13],[x+11,y-3],[x-9,y-3],[x-10,y-14]],ink,1.5));
     label(c,names[i],57,y+4,18);label(c,String(Math.round(state.ratings[i])),404,y+5,25);
-   }label(c,'reliability elo',388,32,13);owl(c,190+Math.sin(state.clock*.5)*70,280,'conductor',43,{mode:'walk',speed:28,costume:'verifier'});sfx.chirp('tflconductor',state.clock,[14,22]);
+   }label(c,'reliability elo',388,32,13);owl(c,190+Math.sin(state.routeTime*.5)*70,280,'conductor',43,{mode:'walk',speed:28,costume:'verifier'});sfx.chirp('tflconductor',state.clock,[14,22]);
   }else if(scene==='commute'){
    const days=n%5+1,pay=days*6,weekly=24,max=32;
    for(let i=0;i<5;i++){page(c,42+i*78,44,50,58);label(c,['M','T','W','T','F'][i],67+i*78,127);if(i<days)path(c,[[52+i*78,71],[62+i*78,82],[81+i*78,56]],gold,2);}
@@ -277,7 +277,7 @@ export function miniScene(scene,canvas,wake,sfx){
  }
  return{state,draw,advance(dt){const movementDt=toyBusy(a.el)?0:dt;state.elapsed+=movementDt;state.routeTime+=movementDt;state.clock+=dt;state.transition=Math.min(1,state.transition+dt/.45);if(state.elapsed>=duration)change();if(scene==='baxter')caption();
   if(scene==='tfl'){
-   const event=Math.floor(state.clock/.8);
+   const event=Math.floor(state.routeTime/.8);
    if(event!==state.lastTrainEvent){
     state.lastTrainEvent=event;const loser=state.choice,winner=(loser+1+event%2)%3,expected=1/(1+10**((state.ratingTargets[loser]-state.ratingTargets[winner])/400)),delta=18*(1-expected);
     state.ratingTargets[winner]+=delta;state.ratingTargets[loser]-=delta;

@@ -1,0 +1,56 @@
+[
+  {
+    "pass": "before",
+    "scroll": 180,
+    "sampleFrames": 962,
+    "horizontalReversals": 4
+  },
+  {
+    "pass": "before",
+    "scroll": 400,
+    "sampleFrames": 968,
+    "horizontalReversals": 5
+  },
+  {
+    "pass": "before",
+    "scroll": 650,
+    "sampleFrames": 927,
+    "horizontalReversals": 2
+  },
+  {
+    "pass": "after",
+    "scroll": 180,
+    "sampleFrames": 964,
+    "horizontalReversals": 1
+  },
+  {
+    "pass": "after",
+    "scroll": 400,
+    "sampleFrames": 961,
+    "horizontalReversals": 2
+  },
+  {
+    "pass": "after",
+    "scroll": 650,
+    "sampleFrames": 952,
+    "horizontalReversals": 0
+  },
+  {
+    "pass": "phone",
+    "scroll": 180,
+    "sampleFrames": 952,
+    "horizontalReversals": 1
+  },
+  {
+    "pass": "phone",
+    "scroll": 400,
+    "sampleFrames": 987,
+    "horizontalReversals": 2
+  },
+  {
+    "pass": "phone",
+    "scroll": 650,
+    "sampleFrames": 992,
+    "horizontalReversals": 2
+  }
+]

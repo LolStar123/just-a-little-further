@@ -54,3 +54,12 @@ Replaced both uncertain attributions with exact excerpts from Marcus Aurelius in
 - [x] Higher greeting hops, wider sideways movement, alternating rebound jumps and two-wing waving. Pausing near a project also invites an attention routine; scrolling clears the queued rebound.
 - [x] Cheer pom-poms are substantially larger, one bright red and one blue.
 - [x] Real-browser checks at desktop and mobile observed ten greeting jumps across a 14-second watch, then successful pursuit after scrolling during a cheer. Reduced-motion mode produced no automatic jumps. Evidence: `docs/qa/attention-qa.json`.
+
+## Tube corner and train handoff
+
+- [x] Removed the oscillating destination and bounded lookahead at the destination. Nearby loop branches are selected with route continuity; landing uses the committed jump endpoint instead of a newly selected line segment.
+- [x] Train and conductor positions use the interaction-aware movement clock. Rescue holds their home positions steady, then the normal animation resumes after both return.
+- [x] All three trains thrown and returned on desktop and mobile; no stranded bodies, resumed route clock and no browser errors.
+- [x] Removed researcher and all three Poetato arrows. Researcher aside uses the readable 15/16px body font; mascots, squish controls and links remain.
+
+Six-second route watches at three scroll positions on desktop and mobile are recorded in `docs/qa/corner-routing-qa.json`. Intended attention-hop reversals remain. Train handoffs are in `docs/qa/train-recovery-qa.json`.
