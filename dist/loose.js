@@ -148,10 +148,7 @@ function drawGround(){
     const ridge=new Path2D();ridge.moveTo(0,physics.ground(0));
     for(const [x,y]of physics.contour().slice(1))ridge.lineTo(x,y);
     c.strokeStyle='#393a36';c.lineWidth=1.3;c.stroke(ridge);
-    const fullH=$('#world').offsetHeight,bookWidth=document.querySelector('.sketchbook').offsetWidth,margin=W<760?10:Math.max(24,(W-bookWidth)/2+22);
-    const end=[W*.963,physics.ground(W*.963)],slope=(end[1]-physics.ground(W*50/52))/(W*.963-W*50/52),exit=new Path2D();exit.moveTo(...end);
-    for(const controls of hillExit(W,end,slope,fullH,margin,H))exit.bezierCurveTo(...controls);
-    c.lineWidth=1.15;c.strokeStyle='#656054';c.globalAlpha=.7;c.stroke(exit);c.globalAlpha=1;
+    // The shared SVG owns the loose cliff exit, including its tug deformation.
     // Only structural fractures are drawn. Erosion clips away exposed material.
     c.save();c.beginPath();c.moveTo(0,physics.ground(0));
     for(let i=1;i<=50;i++)c.lineTo(i*W/52,physics.ground(i*W/52));
@@ -263,8 +260,8 @@ $('#help').addEventListener('click',()=>{toyMotionRequested=true;if(paused)setPa
 $('#reset').addEventListener('click',()=>{cancelGrab();auraField.clear();physics.reset();hero.pet=0;hero.cheer=0;particles.length=0;ripples.length=0;scuffs.length=0;status('another morning. another go.');updateCharacters(0);wake();});
 $('#encourage').addEventListener('click',()=>{dispatchEvent(new Event('meowl-cheer'));if(paused)setPause(false);hero.cheer=3;hero.pet=0;used();status('go on, little guy.');playTone('pet');wake();});
 function setPause(value){paused=value;hillSound.active(!paused&&worldVisible&&!panelOpen);cancelGrab();if(paused){cancelAnimationFrame(frame);frame=0;}last=0;wake();}
-const quoteAuthors=['- marcus aurelius','- marcus aurelius','- chatgpt','- chatgpt','- atul'];
-const quotes=["I am rising to the work of a human being.","Love the art, poor as it may be, which thou hast learned, and be content with it.","The boulder rolled back. It didn't erase the strength you built pushing it.","It's been a hard road. You still get to see where it leads.","The treadmill has sped up. The onion held the line. So must I."];let quote=0;
+const quoteAuthors=["- author unknown", "- albert camus", "- marcus aurelius", "- seneca", "- samuel beckett", "- proverb", "- atul"];
+const quotes=["The only man who ever beat you offers a rematch every morning. Take it.", "One must imagine Sisyphus happy.", "Love the art, poor as it may be, which thou hast learned, and be content with it.", "For sometimes it is an act of bravery even to live.", "Try again. Fail again. Fail better.", "Necessity is the mother of invention.", "The treadmill has sped up. The onion held the line. So must I."];let quote=0;
 $('#next-quote').addEventListener('click',()=>{quote=(quote+1)%quotes.length;$('#quote').textContent=quotes[quote];$('#quote-author').textContent=quoteAuthors[quote];$('#quote').getAnimations().forEach(a=>a.cancel());$('#quote').animate([{opacity:.2},{opacity:1}],{duration:300});});
 
 function openPanel(key=null,trigger){

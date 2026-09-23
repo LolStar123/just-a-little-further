@@ -64,15 +64,15 @@ export function threadLife(svg,path){
         if(now>targetAt||!routeCache){
             const landing=scrollY<90;if(landing)tubeEntryDone=false;const wantedY=viewTop+viewHeight*.91;
             let best=Infinity;
-            for(let i=0;i<base.length;i+=2){const score=Math.abs(base[i][1]-wantedY)+Math.abs(base[i][0]-(landing?innerWidth-100:innerWidth*.78))*(landing?.8:.14);if(score<best){targetIndex=i;best=score;}}
+            for(let i=0;i<base.length;i+=2){const p=shape[i],outside=p[0]<viewLeft+45||p[0]>viewLeft+viewWidth-45||p[1]<viewTop+90||p[1]>viewBottom-22;const score=Math.abs(p[1]-wantedY)+Math.abs(p[0]-(landing?viewLeft+viewWidth-100:viewLeft+viewWidth*.78))*(landing?.35:.14)+(outside?10000:0);if(score<best){targetIndex=i;best=score;}}
             // The large arrival loop is decoration, not a place to pace forever.
             // Once the reader scrolls, commit to the first scene's entrance below it.
             const tubeEntry=guideEntries.tfl;
             let crossingTubeLoop=false;
             if(!landing&&Number.isInteger(tubeEntry)){
-                const entry=pointAt(lengths[tubeEntry]);entry.y=Math.max(viewTop+viewHeight*.83,Math.min(viewBottom-32,entry.y));
+                const entry=pointAt(lengths[tubeEntry]);
                 if(Math.hypot(actor.x-entry.x,actor.y-entry.y)<38)tubeEntryDone=true;
-                if(targetIndex<tubeEntry){targetIndex=tubeEntry;crossingTubeLoop=!tubeEntryDone;}
+                if(targetIndex<tubeEntry&&entry.y>viewTop+90&&entry.y<viewBottom-22&&entry.x>viewLeft+42&&entry.x<viewLeft+viewWidth-42){targetIndex=tubeEntry;crossingTubeLoop=!tubeEntryDone;}
             }
             // Nearby branches of a loop are not interchangeable footholds.
             // Stay on the current stretch unless flight has deliberately crossed it.
@@ -88,9 +88,9 @@ export function threadLife(svg,path){
             // Loops offer real shortcuts: select a reachable future foothold, then leap through space.
             let shortcut=null;
             for(let distance=170;distance<=480;distance+=50){const candidate=pointAt(Math.max(0,Math.min(total,travel+direction*distance))),gap=Math.hypot(candidate.x-actor.x,candidate.y-actor.y);if(gap>65&&gap<230&&candidate.y>actor.y-80&&candidate.y<actor.y+155){shortcut=candidate;}}
-            for(const p of[near,ahead,target,shortcut])if(p)p.x=Math.max(viewLeft+42,Math.min(viewLeft+viewWidth-42,p.x));
-            target.y=Math.max(viewTop+viewHeight*.83,Math.min(viewBottom-32,target.y));
-            routeCache={near,ahead,target,shortcut,committedExit:crossingTubeLoop?target:null};
+            // The viewport chooses a real perch. Never move the perch off its wire.
+            const perchAt=(x,y)=>{let best=Infinity,pick=target;for(const p of shape){if(p[0]<viewLeft+45||p[0]>viewLeft+viewWidth-45||p[1]<viewTop+70||p[1]>viewBottom-22)continue;const score=Math.hypot(p[0]-x,p[1]-y);if(score<best){best=score;pick={x:p[0],y:p[1]};}}return {...pick};};
+            routeCache={near,ahead,target,shortcut,perchAt,committedExit:crossingTubeLoop?target:null};
             sceneCache=sceneRects.find(r=>actor.y>=r.top-100&&actor.y<r.bottom+130)||null;
             targetAt=now+90;
         }
@@ -105,8 +105,7 @@ export function threadLife(svg,path){
             drawMeowl(c,72,112,55,{id:'guide',time,mode,air:airborne,parkour:actor.pose,effort:airborne||Math.hypot(actor.vx,actor.vy)>180?.88:.25,sweat:airborne||Math.hypot(actor.vx,actor.vy)>180,emotion:actor.mode==='thrown'?'panic':'relieved',speed:Math.hypot(actor.vx,actor.vy),facing:actor.facing,voice:sound.mouth('guide'),landed:actor.mode==='land'?1:0});c.restore();
             if(actor.kind==='grind'){c.strokeStyle='#a08a57';c.lineWidth=.8;for(let i=0;i<4;i++){const u=(time*4+i*.23)%1;c.globalAlpha=1-u;c.beginPath();c.moveTo(72-actor.facing*u*24,112+u*3);c.lineTo(72-actor.facing*(u*24+5),112+u*6);c.stroke();}c.globalAlpha=1;sound.beat('grind',Math.floor(time*2),'friction',{level:.2});}
             if(speechText!==actor.text){speechText=actor.text;speechLetters=Array.from(speechText);speechCount=0;typeAt=now;speechSizer.textContent=speechText;speechInk.textContent='';words.setAttribute('aria-label',speechText);}
-            if(reduced.matches){speechInk.textContent=speechText;speechCount=speechLetters.length;}
-            else if(now>=typeAt&&speechCount<speechLetters.length){const letter=speechLetters[speechCount++];speechInk.textContent=speechLetters.slice(0,speechCount).join('');if(speechCount%2===0&&letter.trim())sound.play('click',{id:'typing',level:.055});typeAt=now+(/[.!?]/.test(letter)?115:letter===','?70:23);}
+            if(now>=typeAt&&speechCount<speechLetters.length){const letter=speechLetters[speechCount++];speechInk.textContent=speechLetters.slice(0,speechCount).join('');if(speechCount%2===0&&letter.trim())sound.play('click',{id:'typing',level:.055});typeAt=now+(/[.!?]/.test(letter)?115:letter===','?100:48);}
             words.classList.toggle('typing',speechCount<speechLetters.length);
             // The caption shares the actor transform on every frame, including flips and jumps.
             const w=words.offsetWidth,h=words.offsetHeight,guideLeft=actor.x-72,guideTop=actor.y-112;

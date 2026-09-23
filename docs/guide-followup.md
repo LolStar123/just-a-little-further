@@ -80,3 +80,17 @@ Evidence: `docs/qa/botato-recovery-qa.json` and `docs/qa/type-qa.json`.
 - [x] Off-the-clock dots use an explicit 0,1,2,3,2,1 count with reserved width and a slight fade; reduced motion removes the fade, not the count.
 
 `docs/qa/bottom-guide-qa.json` checks screen position at four scroll offsets in three viewport shapes. `docs/qa/dots-zoom-qa.json` records the actual dot sequence and a 1.5x visual-viewport zoom check. `docs/qa/loop-exit-qa.json` covers first-scene checkpoint arrivals before the subsequent viewport anchoring pass.
+
+
+## 23 September: wire, opening, words
+- [x] Readable loading countdown in 22px reading font.
+- [x] Keep the rematch and Onion lines; remove ChatGPT entries and repeated authors. Add Camus, Seneca, Beckett and the necessity proverb. Sources in credits; rematch attribution remains unknown.
+- [x] Remove viewport-clamped invisible landing surfaces. Choose real wire coordinates.
+- [x] Bottom fifth is a destination preference; remove flight triggered solely by leaving that screen band.
+- [x] Resting uses attention hops, waves and direct requests to scroll down.
+- [x] Visible letter-by-letter chatter at 48ms per character, also when reduced motion is enabled.
+- [x] Opening draws the continuous SVG stroke and progressively reveals the canvas, with staggered text and entity fades; finishes within 2.85 seconds. Reduced-motion version uses short fades.
+- [x] Remove the fixed duplicate canvas cliff-exit stroke so only the deformable shared SVG owns that segment. Pointer drag verified on its upper stretch.
+- [x] Shorten project links to demo and github, including panel data.
+
+Verification: syntax checks; browser quote cycling; desktop/mobile/wide guide observation; opening screenshots; observed partial typed strings; real pointer drag displaced the upper exit by 58px horizontally and 46px vertically and released normally. Opening uses a drawing reveal for canvas artwork, not individual stroke reconstruction of raster assets.

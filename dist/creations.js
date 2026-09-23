@@ -14,7 +14,7 @@ export const projects={
       "url": "demo.html?scene=ocr"
     },
     {
-      "label": "github / code",
+      "label": "github",
       "url": "https://github.com/LolStar123/meowl-corner/blob/main/examples/ocr_match.py"
     }
   ]
@@ -31,14 +31,14 @@ export const projects={
     "github": "https://github.com/LolStar123/quant-research-scraper",
     "demo": "https://lolstar123.github.io/quant-research-scraper/",
     "url": "https://github.com/LolStar123/quant-research-scraper",
-    "link": "github / code",
+    "link": "github",
     "links": [
       {
-        "label": "try the working demo",
+        "label": "demo",
         "url": "https://lolstar123.github.io/quant-research-scraper/"
       },
       {
-        "label": "github / code",
+        "label": "github",
         "url": "https://github.com/LolStar123/quant-research-scraper"
       }
     ],
@@ -54,17 +54,17 @@ export const projects={
     "scene": "pipeline",
     "note": "",
     "url": "https://github.com/LolStar123/markets-backtesting",
-    "link": "github / code",
+    "link": "github",
     "detail": "An attractive backtest has to survive the next window. Run a walk-forward strategy on 5,351 SPY observations and inspect 50 archived research results.",
     "github": "https://github.com/LolStar123/markets-backtesting",
     "demo": "https://lolstar123.github.io/markets-backtesting/",
     "links": [
       {
-        "label": "try the working demo",
+        "label": "demo",
         "url": "https://lolstar123.github.io/markets-backtesting/"
       },
       {
-        "label": "github / code",
+        "label": "github",
         "url": "https://github.com/LolStar123/markets-backtesting"
       }
     ],
@@ -83,14 +83,14 @@ export const projects={
     "github": "https://github.com/LolStar123/poe-item-pricer",
     "demo": "https://lolstar123.github.io/poe-item-pricer/",
     "url": "https://github.com/LolStar123/poe-item-pricer",
-    "link": "github / code",
+    "link": "github",
     "links": [
       {
-        "label": "try the working demo",
+        "label": "demo",
         "url": "https://lolstar123.github.io/poe-item-pricer/"
       },
       {
-        "label": "github / code",
+        "label": "github",
         "url": "https://github.com/LolStar123/poe-item-pricer"
       }
     ],
@@ -106,17 +106,17 @@ export const projects={
     "scene": "tfl",
     "note": "",
     "url": "https://github.com/LolStar123/tfl-reliability",
-    "link": "github / code",
+    "link": "github",
     "detail": "A leaderboard backed by the service history, rather than one bad commute. Follow all 11 Tube ratings on a live history chart, compare the leaderboard and inspect the original QuantiHack archive.",
     "github": "https://github.com/LolStar123/tfl-reliability",
     "demo": "https://lolstar123.github.io/tfl-reliability/",
     "links": [
       {
-        "label": "try the working demo",
+        "label": "demo",
         "url": "https://lolstar123.github.io/tfl-reliability/"
       },
       {
-        "label": "github / code",
+        "label": "github",
         "url": "https://github.com/LolStar123/tfl-reliability"
       }
     ],
@@ -135,14 +135,14 @@ export const projects={
     "github": "https://github.com/LolStar123/london-commute-calculator",
     "demo": "https://lolstar123.github.io/london-commute-calculator/",
     "url": "https://github.com/LolStar123/london-commute-calculator",
-    "link": "github / code",
+    "link": "github",
     "links": [
       {
-        "label": "try the working demo",
+        "label": "demo",
         "url": "https://lolstar123.github.io/london-commute-calculator/"
       },
       {
-        "label": "github / code",
+        "label": "github",
         "url": "https://github.com/LolStar123/london-commute-calculator"
       }
     ],
@@ -158,17 +158,17 @@ export const projects={
     "scene": "smoothtato",
     "note": "",
     "url": "https://github.com/LolStar123/smoothtato-preview",
-    "link": "github / code",
+    "link": "github",
     "detail": "Fewer particles competing with the thing about to kill you. Edit 68 real visual categories across five presets and export a desktop-compatible STATO1 configuration.",
     "github": "https://github.com/LolStar123/smoothtato-preview",
     "demo": "https://lolstar123.github.io/smoothtato-preview/",
     "links": [
       {
-        "label": "try the working demo",
+        "label": "demo",
         "url": "https://lolstar123.github.io/smoothtato-preview/"
       },
       {
-        "label": "github / code",
+        "label": "github",
         "url": "https://github.com/LolStar123/smoothtato-preview"
       }
     ],
@@ -184,17 +184,17 @@ export const projects={
     "scene": "mtxtato",
     "note": "",
     "url": "https://github.com/LolStar123/mtxtato-catalogue",
-    "link": "github / code",
+    "link": "github",
     "detail": "Same skill. A completely different wardrobe. Browse 1,489 skill effects with real previews, build a loadout and export its app configuration.",
     "github": "https://github.com/LolStar123/mtxtato-catalogue",
     "demo": "https://lolstar123.github.io/mtxtato-catalogue/",
     "links": [
       {
-        "label": "try the working demo",
+        "label": "demo",
         "url": "https://lolstar123.github.io/mtxtato-catalogue/"
       },
       {
-        "label": "github / code",
+        "label": "github",
         "url": "https://github.com/LolStar123/mtxtato-catalogue"
       }
     ],
@@ -213,14 +213,14 @@ export const projects={
     "github": "https://github.com/LolStar123/deadlock-match-analysis",
     "demo": "https://lolstar123.github.io/deadlock-match-analysis/",
     "url": "https://github.com/LolStar123/deadlock-match-analysis",
-    "link": "github / code",
+    "link": "github",
     "links": [
       {
-        "label": "try the working demo",
+        "label": "demo",
         "url": "https://lolstar123.github.io/deadlock-match-analysis/"
       },
       {
-        "label": "github / code",
+        "label": "github",
         "url": "https://github.com/LolStar123/deadlock-match-analysis"
       }
     ],
@@ -236,17 +236,17 @@ export const projects={
     "scene": "baxter",
     "note": "",
     "url": "https://github.com/LolStar123/baxter",
-    "link": "github / code",
+    "link": "github",
     "detail": "A worker saying finished is not the same as proof. Run ten real jobs, inspect generated reports and watch independent verification stop a broken workflow.",
     "github": "https://github.com/LolStar123/baxter",
     "demo": "https://lolstar123.github.io/baxter/",
     "links": [
       {
-        "label": "try the working demo",
+        "label": "demo",
         "url": "https://lolstar123.github.io/baxter/"
       },
       {
-        "label": "github / code",
+        "label": "github",
         "url": "https://github.com/LolStar123/baxter"
       }
     ],
@@ -265,14 +265,14 @@ export const projects={
     "github": "https://github.com/LolStar123/botato-navigation",
     "demo": "https://lolstar123.github.io/botato-navigation/",
     "url": "https://github.com/LolStar123/botato-navigation",
-    "link": "github / code",
+    "link": "github",
     "links": [
       {
-        "label": "try the working demo",
+        "label": "demo",
         "url": "https://lolstar123.github.io/botato-navigation/"
       },
       {
-        "label": "github / code",
+        "label": "github",
         "url": "https://github.com/LolStar123/botato-navigation"
       }
     ],
@@ -288,17 +288,17 @@ export const projects={
     "scene": "halo",
     "note": "",
     "url": "https://github.com/LolStar123/halo",
-    "link": "github / code",
+    "link": "github",
     "detail": "Keep the thread when your brain briefly leaves the meeting. Load meeting notes, find matching evidence and read or edit one sentence at a time.",
     "github": "https://github.com/LolStar123/halo",
     "demo": "https://lolstar123.github.io/halo/",
     "links": [
       {
-        "label": "try the working demo",
+        "label": "demo",
         "url": "https://lolstar123.github.io/halo/"
       },
       {
-        "label": "github / code",
+        "label": "github",
         "url": "https://github.com/LolStar123/halo"
       }
     ],
@@ -317,14 +317,14 @@ export const projects={
     "github": "https://github.com/LolStar123/hardware-hunt",
     "demo": "https://lolstar123.github.io/hardware-hunt/",
     "url": "https://github.com/LolStar123/hardware-hunt",
-    "link": "github / code",
+    "link": "github",
     "links": [
       {
-        "label": "try the working demo",
+        "label": "demo",
         "url": "https://lolstar123.github.io/hardware-hunt/"
       },
       {
-        "label": "github / code",
+        "label": "github",
         "url": "https://github.com/LolStar123/hardware-hunt"
       }
     ],

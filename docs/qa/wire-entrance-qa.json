@@ -1,0 +1,201 @@
+[
+  {
+    "width": 1440,
+    "cases": [
+      {
+        "scroll": 0,
+        "maxGroundGap": 3.569990537431792,
+        "modes": [
+          "air",
+          "run",
+          "land",
+          "crouch"
+        ]
+      },
+      {
+        "scroll": 240,
+        "maxGroundGap": 16.896362503551263,
+        "modes": [
+          "land",
+          "air",
+          "crouch",
+          "run"
+        ]
+      },
+      {
+        "scroll": 1000,
+        "maxGroundGap": 13.272088053849115,
+        "modes": [
+          "run",
+          "crouch",
+          "land",
+          "air",
+          "flutter"
+        ]
+      }
+    ],
+    "quotes": [
+      [
+        "the only man who ever beat you offers a rematch every morning. take it.",
+        "- author unknown"
+      ],
+      [
+        "one must imagine sisyphus happy.",
+        "- albert camus"
+      ],
+      [
+        "love the art, poor as it may be, which thou hast learned, and be content with it.",
+        "- marcus aurelius"
+      ],
+      [
+        "for sometimes it is an act of bravery even to live.",
+        "- seneca"
+      ],
+      [
+        "try again. fail again. fail better.",
+        "- samuel beckett"
+      ],
+      [
+        "necessity is the mother of invention.",
+        "- proverb"
+      ],
+      [
+        "the treadmill has sped up. the onion held the line. so must i.",
+        "- atul"
+      ]
+    ],
+    "errors": []
+  },
+  {
+    "width": 390,
+    "cases": [
+      {
+        "scroll": 0,
+        "maxGroundGap": 5.297743549624892,
+        "modes": [
+          "run",
+          "air",
+          "crouch",
+          "land"
+        ]
+      },
+      {
+        "scroll": 240,
+        "maxGroundGap": 6.807085286924561,
+        "modes": [
+          "air",
+          "run",
+          "land",
+          "crouch"
+        ]
+      },
+      {
+        "scroll": 1000,
+        "maxGroundGap": 1.7825379168569884,
+        "modes": [
+          "land",
+          "crouch",
+          "air",
+          "flutter"
+        ]
+      }
+    ],
+    "quotes": [
+      [
+        "the only man who ever beat you offers a rematch every morning. take it.",
+        "- author unknown"
+      ],
+      [
+        "one must imagine sisyphus happy.",
+        "- albert camus"
+      ],
+      [
+        "love the art, poor as it may be, which thou hast learned, and be content with it.",
+        "- marcus aurelius"
+      ],
+      [
+        "for sometimes it is an act of bravery even to live.",
+        "- seneca"
+      ],
+      [
+        "try again. fail again. fail better.",
+        "- samuel beckett"
+      ],
+      [
+        "necessity is the mother of invention.",
+        "- proverb"
+      ],
+      [
+        "the treadmill has sped up. the onion held the line. so must i.",
+        "- atul"
+      ]
+    ],
+    "errors": []
+  },
+  {
+    "width": 2048,
+    "cases": [
+      {
+        "scroll": 0,
+        "maxGroundGap": 11.998111204482045,
+        "modes": [
+          "air",
+          "run",
+          "land",
+          "crouch"
+        ]
+      },
+      {
+        "scroll": 240,
+        "maxGroundGap": 1.076449488080867,
+        "modes": [
+          "air",
+          "run",
+          "land",
+          "crouch"
+        ]
+      },
+      {
+        "scroll": 1000,
+        "maxGroundGap": 0.527959704556633,
+        "modes": [
+          "land",
+          "crouch",
+          "air",
+          "flutter"
+        ]
+      }
+    ],
+    "quotes": [
+      [
+        "the only man who ever beat you offers a rematch every morning. take it.",
+        "- author unknown"
+      ],
+      [
+        "one must imagine sisyphus happy.",
+        "- albert camus"
+      ],
+      [
+        "love the art, poor as it may be, which thou hast learned, and be content with it.",
+        "- marcus aurelius"
+      ],
+      [
+        "for sometimes it is an act of bravery even to live.",
+        "- seneca"
+      ],
+      [
+        "try again. fail again. fail better.",
+        "- samuel beckett"
+      ],
+      [
+        "necessity is the mother of invention.",
+        "- proverb"
+      ],
+      [
+        "the treadmill has sped up. the onion held the line. so must i.",
+        "- atul"
+      ]
+    ],
+    "errors": []
+  }
+]

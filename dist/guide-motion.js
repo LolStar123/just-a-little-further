@@ -1,7 +1,7 @@
 // A world-space actor. Only construction assigns a position; every later move integrates velocity.
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const lines={
- landing:["heyyyyyy! down here!","helloooooo! tiny guy. big plans.","hey! hey! look what i found!","pssst. come on, come on!","over here! follow my little feet!","you! yes, you! little scroll?","c'monnnn! there's good stuff below.","hellooo! i saved you a tour!"],
+ landing:["heyyy! scroll down!","c'mon, hurry upppppp!","come downnnn!","helloooo? little scroll please?","hey! there's more down here!","c'monnn. follow me down!","scroll down! i have things to show you!","pssst. down here. pleeease!"],
  tfl:["eleven lines. one tiny league table.","the trains are competing. i'm walking."],
  scraper:["papers! quick, before he finds another.","that notebook is getting suspiciously full."],
  pipeline:["test it on data it hasn't seen.","mind the loop. i'm taking the scenic shortcut."],
@@ -16,7 +16,7 @@ const lines={
  liquidation:["he's carrying the whole margin."],
  ocr:["pixels in. useful numbers out."],
  interests:["we made it. have a nose around."],
- travel:["keep scrolling. there's some good stuff down there.","wait for my tiny legs!","this way. probably.","i have a route. mostly.","one more little detour.","you scroll. i'll handle the acrobatics.","coming! give me a wingbeat.","nearly there. probably."]
+ travel:["keep scrolling down! there's good stuff below!","wait for my tiny legs!","this way. probably.","i have a route. mostly.","one more little detour.","you scroll. i'll handle the acrobatics.","coming! give me a wingbeat.","nearly there. probably."]
 };
 export class GuideMotion{
  constructor(point){this.x=point.x;this.y=point.y;this.vx=0;this.vy=0;this.mode='run';this.kind='scamper';this.age=0;this.time=0;this.nextMove=.35;this.idleTime=0;this.lastScroll=0;this.attentionBounce=0;this.moveCount=0;this.facing=1;this.held=false;this.history=[];this.bags=new Map();this.text='psst. follow me!';this.sayAt=0;this.lastScene='';this.releasedLedges=new Set();this.airTarget=null;this.triplet=0;this.rotation=0;}
@@ -27,7 +27,7 @@ export class GuideMotion{
  release(){this.held=false;this.state('thrown');this.text='wheeeee!';this.sayAt=this.time+3;}
  cheer(){if(this.held)return;this.cheerBounced=false;this.cheerFloor=this.y;this.vx=0;this.vy=-650;this.state('cheer');this.text='GO LITTLE GUYYYY!!';this.contextText=this.text;this.sayAt=this.time+4;}
  hop(){if(this.held)return;this.vy=-330;this.state('air','leap');this.airTarget=null;}
- jump(target,kind){target={...target,x:clamp(target.x,(this.pageLeft||0)+45,(this.pageLeft||0)+(this.pageWidth||1440)-45)};this.airTarget={...target};const duration=['hello','starhop','peek'].includes(kind)?(this.reboundJump?.68:1.08+(this.moveCount%3)*.12):clamp(Math.hypot(target.x-this.x,target.y-this.y)/320,.5,1.15);this.vx=clamp((target.x-this.x)/duration,-620,620);this.vy=(target.y-this.y)/duration-460*duration;this.jumpDuration=duration;this.reboundJump=false;this.state('air',kind);}
+ jump(target,kind){target={...target};this.airTarget={...target};const duration=['hello','starhop','peek'].includes(kind)?(this.reboundJump?.68:1.08+(this.moveCount%3)*.12):clamp(Math.hypot(target.x-this.x,target.y-this.y)/320,.5,1.15);this.vx=clamp((target.x-this.x)/duration,-620,620);this.vy=(target.y-this.y)/duration-460*duration;this.jumpDuration=duration;this.reboundJump=false;this.state('air',kind);}
  tick(dt,route,viewport,scene,reduced=false){
   this.time+=dt;this.age+=dt;this.rotation=0;this.pageWidth=viewport.width;this.pageLeft=viewport.left||0;
   const scrolling=Math.abs(viewport.top-this.lastScroll)>2;this.idleTime=scrolling?0:this.idleTime+dt;this.lastScroll=viewport.top;
@@ -45,7 +45,6 @@ export class GuideMotion{
   }
   const bandTop=viewport.top+(viewport.bottom-viewport.top)*.8;
   const offscreen=this.y<viewport.top-130||this.y>viewport.bottom+130;
-  if(!['held','thrown','air','crouch','cheer','flutter','fly','hang'].includes(this.mode)&&(this.y<bandTop-12||this.y>viewport.bottom-16)){this.attentionBounce=0;this.landingPoint=null;this.state('fly');}
   const distance=Math.hypot(target.x-this.x,target.y-this.y);
   const ledge=scene?.key==='botato'&&!this.releasedLedges.has(scene.top)&&viewport.top<scene.top+180&&scene.top+64>=bandTop&&scene.top+64<viewport.bottom-16;
   if(this.mode==='hang'&&(!scene||!ledge)){this.releasedLedges.add(this.hangPoint?.y);this.state('flutter');}
@@ -64,7 +63,7 @@ export class GuideMotion{
    this.vy+=clamp(dy/(d||1)*wanted-this.vy,-3000,3000)*dt*3*flap;
    if(d<9&&Math.hypot(this.vx,this.vy)<55){
     if(ledge){this.hangPoint=goal;this.hangScroll=viewport.top;this.state('hang');this.text="your turn. i'll hang about.";this.sayAt=this.time+10;}
-    else{this.landingPoint={...goal};this.state('land');this.nextMove=this.time+.8;}
+    else{this.landingPoint={...goal};this.state('land');this.nextMove=this.time+.2;}
    }
   }else if(this.mode==='air'){
    this.vy+=920*dt;
@@ -79,21 +78,21 @@ export class GuideMotion{
   }else if(this.mode==='land'){
    const foot=this.landingPoint||near;this.vx+=(foot.x-this.x)*65*dt-this.vx*16*dt;this.vy+=(foot.y-this.y)*80*dt-this.vy*16*dt;
    if(this.age>.18){
-    if(this.attentionBounce&&!reduced&&this.idleTime>1){this.attentionBounce=0;this.reboundJump=true;this.jump({x:clamp(this.x-this.facing*28,this.pageLeft+48,this.pageLeft+viewport.width-48),y:foot.y},'starhop');}
+    if(this.attentionBounce&&!reduced&&this.idleTime>1){this.attentionBounce=0;this.reboundJump=true;this.jump(route.perchAt(this.x-this.facing*28,foot.y),'starhop');}
     else if(this.triplet>0&&this.triplet<3){this.triplet++;this.jump({x:this.x+this.facing*(38+this.triplet*17),y:near.y},'triple');this.vy-=this.triplet*35;}
     else{this.triplet=0;this.state('run');}
    }
   }else{
    const dx=ahead.x-this.x,dy=ahead.y-this.y,d=Math.hypot(dx,dy),slope=dy/(Math.abs(dx)+8);
    if(offscreen&&distance>300||Math.hypot(near.x-this.x,near.y-this.y)>100){this.state('fly');}
-   else if(sceneKey==='landing'||!ledge&&distance<75&&this.idleTime>.6){
+   else if(!ledge&&distance<100&&this.idleTime>.35){
     // A local attention routine: full-body wave, high hop, then an occasional rebound.
-    this.kind='wave';const perch=this.landingPoint&&Math.hypot(this.landingPoint.x-this.x,this.landingPoint.y-this.y)<100?this.landingPoint:near;this.vx*=Math.exp(-dt*12);this.vy+=(perch.y-this.y)*60*dt-this.vy*14*dt;
+    this.kind='wave';const perch=route.perchAt(this.x,this.y);this.vx+=(perch.x-this.x)*60*dt-this.vx*14*dt;this.vy+=(perch.y-this.y)*60*dt-this.vy*14*dt;
     if(!reduced&&this.time>this.nextMove){
      this.moveCount++;const kind=['hello','peek','starhop'][this.moveCount%3],side=this.moveCount%2?1:-1;
-     this.planned={kind,target:{x:clamp(this.x+side*(52+this.moveCount%3*19),this.pageLeft+48,this.pageLeft+viewport.width-48),y:perch.y}};
+     this.planned={kind,target:route.perchAt(this.x+side*(52+this.moveCount%3*19),perch.y)};
      this.attentionBounce=this.moveCount%2===0?1:0;this.state('crouch');this.nextMove=this.time+.55;
-     if(sceneKey==='landing'&&this.time>this.sayAt-.8)this.say('landing');
+     if(this.time>this.sayAt-.8)this.say('landing');
     }
    }
    else if(ledge&&Math.abs(this.y-scene.top)<150){this.state('flutter');}
@@ -122,8 +121,8 @@ export class GuideMotion{
   if(Math.abs(this.vx)>12)this.facing=this.vx<0?-1:1;
   // No position snaps, even on scroll, resize, route changes or recovery.
   this.x+=this.vx*dt;this.y+=this.vy*dt;
-  if(this.x<this.pageLeft+38&&this.vx<0)this.vx=Math.abs(this.vx)*.45;
-  if(this.x>this.pageLeft+viewport.width-38&&this.vx>0)this.vx=-Math.abs(this.vx)*.45;
+  if(this.x<this.pageLeft+4&&this.vx<0)this.vx=Math.abs(this.vx)*.45;
+  if(this.x>this.pageLeft+viewport.width-4&&this.vx>0)this.vx=-Math.abs(this.vx)*.45;
  }
  get pose(){return {kind:['air','crouch','land','hang','flutter','fly'].includes(this.mode)?this.mode==='air'?this.kind:this.mode:this.kind,phase:this.age/(this.jumpDuration||1)};}
 }
