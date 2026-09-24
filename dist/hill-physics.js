@@ -567,13 +567,13 @@ export class HillPhysics {
             }
             if(gap<5&&!this.drag)b.torque-=b.angularVelocity*b.inertia*.000045;
             for(const body of [b,this.actor])if(body){const speed=Math.hypot(body.velocity.x,body.velocity.y);if(speed>24)Body.setVelocity(body,{x:body.velocity.x/speed*24,y:body.velocity.y/speed*24});Body.setAngularVelocity(body,clamp(body.angularVelocity,-.30,.30));}
-            Engine.update(this.engine,1000/180);this.containRock();this.accumulator-=step;
+            Engine.update(this.engine,1000/180);this.containRock();this.containMeowl();this.accumulator-=step;
             for(let i=this.chips.length-1;i>=0;i--)if(this.time-this.chips[i].born>12){Composite.remove(this.engine.world,this.chips[i].body);this.chips.splice(i,1);}
         }
     }
-    rockSurfaceLimit(x){
+    rockSurfaceLimit(x,b=this.rock){
         // Support the actual rotating polygon, including terrain knots under edges.
-        const b=this.rock;let ceiling=Infinity;
+        let ceiling=Infinity;
         for(let i=0;i<b.vertices.length;i++){
             const a=b.vertices[i],z=b.vertices[(i+1)%b.vertices.length],steps=Math.max(1,Math.ceil(Math.abs(z.x-a.x)/6));
             for(let j=0;j<=steps;j++){const t=j/steps,ox=a.x+(z.x-a.x)*t-b.position.x,oy=a.y+(z.y-a.y)*t-b.position.y;ceiling=Math.min(ceiling,this.ground(x+ox)-oy);}
@@ -589,6 +589,19 @@ export class HillPhysics {
         Body.setPosition(b,{x,y});let velocity={x:hitSide?0:vx,y:vy};
         if(hitGround){const slope=this.slope(x),norm=Math.hypot(slope,1),nx=slope/norm,ny=-1/norm,inward=velocity.x*nx+velocity.y*ny;if(inward<0){velocity.x-=inward*nx;velocity.y-=inward*ny;}}
         Body.setVelocity(b,velocity);
+    }
+    containMeowl(){
+        const a=this.actor;if(!a)return;
+        const margin=Math.max(this.actorWidth/2+3,this.actorSize*.58);
+        const x=clamp(a.position.x,margin,this.w*.963-margin);
+        const ceiling=this.splat?this.ground(x)-this.actorHeight/2:this.rockSurfaceLimit(x,a);
+        const y=Math.min(a.position.y,ceiling);
+        if(x===a.position.x&&y===a.position.y)return;
+        const hitSide=x!==a.position.x,hitGround=y<a.position.y;
+        let velocity={x:hitSide?0:a.velocity.x,y:a.velocity.y};
+        Body.setPosition(a,{x,y});
+        if(hitGround){const slope=this.slope(x),norm=Math.hypot(slope,1),nx=slope/norm,ny=-1/norm,v=velocity.x*nx+velocity.y*ny;if(v<0){velocity.x-=v*nx;velocity.y-=v*ny;}this.grounded=true;}
+        Body.setVelocity(a,velocity);
     }
     bodyAt(x,y){
         const vertices=this.rock.vertices;
@@ -613,6 +626,7 @@ export class HillPhysics {
             const cx=clamp(x-p.x,left+3,this.w*.963-right-3);
             x=cx+p.x;y=Math.min(y,this.rockSurfaceLimit(cx)+p.y);
         }
+        if(this.drag.bodyB===this.actor){const a=this.actor,p=this.drag.pointB,margin=Math.max(this.actorWidth/2+3,this.actorSize*.58),cx=clamp(x-p.x,margin,this.w*.963-margin);x=cx+p.x;y=Math.min(y,this.rockSurfaceLimit(cx,a)+p.y);}
         this.drag.pointA.x=clamp(x,8,this.w-8);this.drag.pointA.y=clamp(y,35,this.boundaryDepth-35);
         const t=performance.now();this.dragSamples.push({x:this.drag.pointA.x,y:this.drag.pointA.y,t});this.dragSamples=this.dragSamples.filter(s=>t-s.t<90);
     }

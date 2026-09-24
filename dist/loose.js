@@ -110,7 +110,7 @@ function hillAudio(){
 function updateCharacters(dt){
     const a=physics.actor,b=physics.rock;if(!a)return;
     const prev=hero.x;hero.pet=Math.max(0,hero.pet-dt);hero.cheer=Math.max(0,hero.cheer-dt);
-    hero.x=a.position.x;hero.y=physics.splat?physics.ground(hero.x):a.position.y+physics.actorHeight/2+physics.lane*hero.size*.24;hero.vx=a.velocity.x*60;hero.vy=a.velocity.y*60;
+    hero.x=a.position.x;hero.y=physics.splat?physics.ground(hero.x):Math.min(a.position.y+physics.actorHeight/2,physics.ground(hero.x));hero.vx=a.velocity.x*60;hero.vy=a.velocity.y*60;
     hero.held=physics.drag?.bodyB===a;hero.mode=physics.mode;hero.effort=physics.effort;hero.emotion=physics.emotion;hero.emotionAge=physics.time-physics.emotionSince;
     hero.phase+=Math.abs(hero.x-prev)*.14;
     if(physics.catchCount>catchSeen){catchSeen=physics.catchCount;shake=2;status('okay. okay. i have it.');playTone('thud',.35);}
@@ -212,7 +212,7 @@ function render(dt){
     c.save();if(!quietToy()){c.translate(shake>.02?Math.sin(time*70)*shake*.35:0,0);}
     drawPower();
     c.save();drawStone();
-    hero.pose=drawMeowl(c,hero.x,hero.y,hero.size,{voice:hillSound.mouth('hero'),parkour:hero.mode==='flutter'?{kind:'flutter'}:hero.mode==='tossed'?{kind:'fall'}:null,ground:x=>physics.ground(x)+physics.lane*hero.size*.24,rock:{contact:!physics.actorFlight&&!hero.held&&(physics.contact||physics.gripGrace),vertices:physics.rock.vertices},splatAge:physics.splat?.age||0,stroke:physics.stroke,time,air:hero.held||!!physics.actorFlight||!physics.splat&&physics.ground(hero.x)-(physics.actor.position.y+physics.actorHeight/2)>hero.size*.22,mode:hero.mode,emotion:hero.emotion,emotionAge:hero.emotionAge,speed:hero.vx,phase:hero.phase,effort:hero.effort,pet:hero.pet>0,landed:physics.landed,facing:physics.facing,look:clamp((physics.rock.position.x-hero.x)/20,-4,4)});
+    hero.pose=drawMeowl(c,hero.x,hero.y,hero.size,{voice:hillSound.mouth('hero'),parkour:hero.mode==='flutter'?{kind:'flutter'}:hero.mode==='tossed'?{kind:'fall'}:null,ground:x=>physics.ground(x),rock:{contact:!physics.actorFlight&&!hero.held&&(physics.contact||physics.gripGrace),vertices:physics.rock.vertices},splatAge:physics.splat?.age||0,stroke:physics.stroke,time,air:hero.held||!!physics.actorFlight||!physics.splat&&physics.ground(hero.x)-(physics.actor.position.y+physics.actorHeight/2)>hero.size*.22,mode:hero.mode,emotion:hero.emotion,emotionAge:hero.emotionAge,speed:hero.vx,phase:hero.phase,effort:hero.effort,pet:hero.pet>0,landed:physics.landed,facing:physics.facing,look:clamp((physics.rock.position.x-hero.x)/20,-4,4)});
     c.restore();drawPower(true);drawParticles(dt);c.restore();
     if(!art.ready){c.fillStyle='#b4c5cb';c.font='14px Plex, sans-serif';c.textAlign='center';c.fillText('the meowl is on his way…',W*.59,H*.56);c.textAlign='left';}
 }
