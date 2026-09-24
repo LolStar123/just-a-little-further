@@ -209,3 +209,12 @@ Music references: https://viva.pressbooks.pub/openmusictheory/chapter/altered-an
 - [x] Removed the separate cosmetics project section and unified descriptions.
 - [x] Consolidated both working browser editors, data, preview icons, code and tests into LolStar123/smoothtato-preview with graphics/cosmetics tabs. Old repo points to the unified home.
 - [x] Both model suites and browser audits passed; portfolio desktop/mobile and two-actor checks passed.
+
+## Combined quant research and backtesting
+
+- [x] One portfolio section, title and description for papers through walk-forward tests.
+- [x] Two independent animated meowls; paper counter and sound remain.
+- [x] Legacy pipeline scene opens the combined illustration.
+- [x] One GitHub repository includes both working demos and original Python research.
+- [x] Seven model tests and both browser audits pass, including changed-cost reruns and exports.
+- [x] Combined illustration checked on desktop and mobile without page errors or overflow.

@@ -10,7 +10,7 @@ const paperTitles=['fluid mechanics','options pricing','gamma scalping','market 
 const auraStyles=[{name:'Celestial Aura',file:'celestial_aura_effect.png',color:'#796098',kind:'orbit'},{name:'Celestial Aura III',file:'celestial_aura_effect_iii.png',color:'#8767a0',kind:'nova'},{name:'Divine Righteous Fire',file:'divine_righteous_fire_effect.png',color:'#b19150',kind:'fire'}];
 const specs={
  poe:['prices become probabilities','try another item family','sample prices / no live trade quotes'],
- scraper:['collecting papers','collect another paper','sample reading list'],
+ scraper:['papers to walk-forward tests','collect another paper','sample reading list'],
  pipeline:['market data to walk-forward tests','shuffle the data','sample market data'],
  smoothtato:['less clutter. more wardrobe.','change the preset','presets from the app'],
  mtxtato:['a little aura goes a long way','change the effect','effects from the app catalogue'],
@@ -104,6 +104,7 @@ export function miniScene(scene,canvas,wake,sfx){
   if(scene==='smoothtato'){sfx.chirp('smoothtatoeffect-clear',clock,17);sfx.chirp('smoothtatoeffect-aura',clock+3,19);}
   if(voiceId)sfx.chirp(scene+voiceId,clock,['poe','deadlock'].includes(scene)?18:13);
   if(scene==='scraper'){const lap=Math.floor(state.routeTime/2.5),placing=state.routeTime%2.5>=1.625;sfx.beat('paper-handoff',lap+':'+(placing?'place':'grab'),'paper',{id:'paper-handoff',level:placing?1.12:1});}
+  if(scene==='scraper'){sfx.chirp('scrapersort',clock+3,17);sfx.beat('research-data',Math.floor(clock/1.4),'data',{level:.45});}
   if(scene==='pipeline'&&t<3.3)sfx.beat('shuffle',state.cycles+':'+Math.floor(t/(t<.9?.42:.65)),'data',{level:.65});
   if(scene==='commute')sfx.beat('steps',Math.floor(clock*3.2),'step',{level:.55});
   if(scene==='tfl')sfx.beat('chug',Math.floor(clock/1.85),'train',{level:.85});
@@ -126,7 +127,7 @@ export function miniScene(scene,canvas,wake,sfx){
   const anchor=((a.h-artHeight*s)/2+floor*s).toFixed(2);if(a.el.dataset.threadY!==anchor){a.el.dataset.threadY=anchor;if(woven)parent.dispatchEvent(new Event('ink-anchors'));}
   // Loose stems join each stationary drawing to the page's travelling stroke.
   // Moving papers, trains and creatures remain free to move through that world.
-  const stems={poe:[],scraper:[[37,146,15,234,40,253],[430,193,451,249,419,253]],pipeline:[[42,195,12,286,40,295],[441,220,468,287,437,295]],smoothtato:[[135,223,123,250,160,251],[350,223,377,249,403,251]],mtxtato:[[26,103,12,238,58,251],[348,225,387,250,420,251]],tfl:[[118,82,98,271,132,280],[349,242,456,270,449,280]],commute:[[42,102,15,311,40,328],[404,102,460,304,433,328]],baxter:[]}[scene]||[];
+  const stems={poe:[],scraper:[[24,147,12,234,40,253],[237,164,246,240,257,253],[463,167,470,240,448,251]],pipeline:[[42,195,12,286,40,295],[441,220,468,287,437,295]],smoothtato:[[135,223,123,250,160,251],[350,223,377,249,403,251]],mtxtato:[[26,103,12,238,58,251],[348,225,387,250,420,251]],tfl:[[118,82,98,271,132,280],[349,242,456,270,449,280]],commute:[[42,102,15,311,40,328],[404,102,460,304,433,328]],baxter:[]}[scene]||[];
   c.beginPath();for(const [x,y,cx,cy,ex,ey]of stems){c.moveTo(x,y);c.quadraticCurveTo(cx,Math.min(cy,Math.max(y,floorAt(ex))),ex,floorAt(ex));}c.strokeStyle=soft;c.lineWidth=.65;c.stroke();
   if(!['deadlock','poe'].includes(scene)){
    const points=floorPoints;
@@ -169,13 +170,22 @@ export function miniScene(scene,canvas,wake,sfx){
    state.priceDistribution={...d,points,domain:priceDomain,values:prices.slice(0,count).map(r=>r.value),windowUpdates:priceUpdates};
    note.textContent='50k variants. proxy logs. risk sheets.';
   }else if(scene==='scraper'){
-   for(let i=0;i<3;i++)page(c,36+i*15,85-i*6);
-   page(c,338,73,92,120);label(c,'sources',70,188);label(c,'notebook',384,219);
-   const outbound=u<.65,travel=outbound?u/.65:1-(u-.65)/.35,x=105+220*travel*travel*(3-2*travel);state.runner={x,phase:u,outbound};
-   owl(c,x,247,'mini',59,{mode:outbound?'carry':'scurry',overhead:outbound,effort:.84,speed:outbound?150:210,facing:outbound?1:-1,emotion:'worried',cargo:outbound?(ctx,grip)=>page(ctx,grip.x-35,grip.y-70,70,74):null});
-   label(c,paperTitles[n],240,292,21);
+   label(c,'collect papers',117,34,20);label(c,'test the idea',359,34,20);
+   for(let i=0;i<3;i++)page(c,24+i*9,104-i*5,35,43);
+   page(c,180,88,57,76);
+   const outbound=u<.65,travel=outbound?u/.65:1-(u-.65)/.35,x=72+108*travel*travel*(3-2*travel);state.runner={x,phase:u,outbound};
+   owl(c,x,247,'mini',65,{mode:outbound?'carry':'scurry',overhead:outbound,effort:.84,speed:outbound?150:210,facing:outbound?1:-1,emotion:'worried',cargo:outbound?(ctx,grip)=>page(ctx,grip.x-30,grip.y-63,60,66):null});
+   const phase=state.clock%4.2,cycle=Math.floor(state.clock/4.2),progress=Math.min(1,phase/3.5);
+   const values=Array.from({length:8},(_,i)=>Math.sin(i*1.1+cycle)*19+Math.cos(i*.6+cycle)*14+45);
+   path(c,[[263,92],[263,167],[463,167]],soft,.8);
+   path(c,values.slice(0,Math.max(2,Math.ceil(progress*8))).map((v,i)=>[270+i*26,163-v]),ink,1.4);
+   path(c,[[366,81],[367,169]],gold,1);
+   label(c,'train',307,190,15);label(c,'unseen',419,190,15);
+   owl(c,355+Math.sin(state.clock*2)*7,247,'sort',66,{mode:'push',effort:.6,speed:15});
+   state.pipeline={raw:values,progress};
+   label(c,paperTitles[n],240,291,19);
    state.papersCollected=Math.floor((state.routeTime+.875)/2.5);
-   label(c,state.papersCollected+' papers collected',240,318,15);
+   label(c,state.papersCollected+' papers collected',120,318,15);label(c,'walk-forward / costs',359,318,15);
 
   }else if(scene==='pipeline'){
    const shuffle=Math.floor(t/.42),raw=[7,2,9,4,6,3].map((v,i)=>(v+n*(i+1))%10+1),rank=[...raw].map((v,i)=>({v,i})).sort((a,b)=>a.v-b.v);

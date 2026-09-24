@@ -1,5 +1,5 @@
 // Project copy describes the work. Demo inputs are labelled in each runnable example.
-export const trail=["scraper", "pipeline", "poe", "tfl", "commute", "smoothtato", "deadlock", "baxter", "botato", "halo", "liquidation"];
+export const trail=["scraper", "poe", "tfl", "commute", "smoothtato", "deadlock", "baxter", "botato", "halo", "liquidation"];
 export const projects={
   "ocr": {
   "title": "poe / OCR crafting prototype",
@@ -20,14 +20,14 @@ export const projects={
   ]
 },
   "scraper": {
-    "title": "quant finance research scraper",
-    "short": "quant scraper",
+    "title": "quant research & backtesting",
+    "short": "quant research",
     "category": "FINANCE / RESEARCH",
-    "caption": "Collects papers, removes duplicates and keeps the source beside each research idea.",
-    "description": "Search for a topic, collect paper metadata, then deduplicate by DOI or title. The reading list keeps titles, dates and source links together so an interesting idea can become a testable strategy.",
+    "caption": "Collects research papers, then tests market ideas on unseen data after costs.",
+    "description": "Collect papers with their sources, remove duplicates and turn research ideas into Python market tests. Lag signals, deduct trading costs and use walk-forward windows to check performance on unseen periods.",
     "scene": "scraper",
     "note": "",
-    "detail": "Less time reopening the same papers. More time checking the idea. Search 320 real papers, collect live Crossref results and export a saved reading list.",
+    "detail": "Search 320 papers, collect live Crossref results, then explore walk-forward tests on 5,351 SPY observations and 50 archived strategy results.",
     "github": "https://github.com/LolStar123/quant-research-scraper",
     "demo": "https://lolstar123.github.io/quant-research-scraper/",
     "url": "https://github.com/LolStar123/quant-research-scraper",
@@ -42,34 +42,8 @@ export const projects={
         "url": "https://github.com/LolStar123/quant-research-scraper"
       }
     ],
-    "demoDescription": "Search 320 real papers, collect live Crossref results and export a saved reading list.",
+    "demoDescription": "Search and export papers, run a walk-forward backtest and inspect the strategy archive.",
     "demoScope": "Real Crossref metadata; full papers stay with their publishers."
-  },
-  "pipeline": {
-    "title": "market backtesting pipeline",
-    "short": "market backtests",
-    "category": "DATA / RESEARCH",
-    "caption": "Tests trading ideas on unseen periods, after costs, to separate signal from noise.",
-    "description": "Clean the price history, lag the trading signal, deduct execution costs and test on later periods. Walk-forward checks show whether a rule survives beyond the data used to choose it.",
-    "scene": "pipeline",
-    "note": "",
-    "url": "https://github.com/LolStar123/markets-backtesting",
-    "link": "github",
-    "detail": "An attractive backtest has to survive the next window. Run a walk-forward strategy on 5,351 SPY observations and inspect 50 archived research results.",
-    "github": "https://github.com/LolStar123/markets-backtesting",
-    "demo": "https://lolstar123.github.io/markets-backtesting/",
-    "links": [
-      {
-        "label": "demo",
-        "url": "https://lolstar123.github.io/markets-backtesting/"
-      },
-      {
-        "label": "github",
-        "url": "https://github.com/LolStar123/markets-backtesting"
-      }
-    ],
-    "demoDescription": "Run a walk-forward strategy on 5,351 SPY observations and inspect 50 archived research results.",
-    "demoScope": "Actual historical data; costs and training choices are editable. Historical results do not promise future returns."
   },
   "poe": {
     "title": "poe / variant pricing and expected value",
