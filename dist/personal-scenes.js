@@ -40,30 +40,52 @@ export function personalScene(scene,canvas,wake,sfx){
    const thread=[[35,42],[68,23],[137,30],[201,14],[278,29],[339,13],[445,34],[453,113],[377,128],[313,120],[249,143],[182,120],[87,134],[47,215],[85,236],[194,246]];
    line(c,thread,'#b2aa98',.75);
    for(let j=0;j<5;j++){
-    const [x,y]=seats[j],selected=j===active,lift=reduced.matches?0:selected?Math.sin(phase*Math.PI)*8:Math.sin(time*1.6+j)*2;
-    c.save();c.translate(x,y-30-lift);c.strokeStyle=selected?olive:ink;c.lineWidth=1.5;
-    toyProp(c,['deadlock-emblem','divine-orb','dota-emblem','poker-hand','indomie-sandwich'][j],0,16,52,60,c=>{
+    const [x,y]=seats[j],selected=j===active,lift=reduced.matches?0:selected?Math.sin(phase*Math.PI)*10:Math.sin(time*(1.7+j*.11)+j)*4;
+    c.save();c.translate(x,y-30-lift);c.rotate(reduced.matches?0:Math.sin(time*(1.6+j*.17)+j*1.3)*[.09,.12,.1,.025,.035][j]);c.strokeStyle=selected?olive:ink;c.lineWidth=1.5;
+    toyProp(c,['deadlock-emblem','divine-orb','dota-emblem','poker-hand','indomie-sandwich'][j],0,16,j===3?82:52,60,c=>{
     if(j===0){ // Deadlock's eight-part wheel and little watching eye.
-     c.save();c.translate(0,-8);c.rotate(reduced.matches?0:Math.sin(time*1.7)*.07);
+     c.save();c.translate(0,-8);c.rotate(reduced.matches?0:Math.sin(time*1.7)*.11);
      for(let k=0;k<8;k++){const angle=k*Math.PI/4+.04;const pts=[];for(let q=0;q<=5;q++){const t=angle+q*.11,r=20+(q%2?.7:-.5);pts.push([Math.cos(t)*r,Math.sin(t)*r]);}line(c,pts,ink,2);line(c,[[Math.cos(angle)*12,Math.sin(angle)*12],[Math.cos(angle)*21,Math.sin(angle)*21]],ink,1.3);}
      line(c,[[-12,0],[-6,-6],[1,-8],[8,-4],[12,0],[5,6],[-2,7],[-9,3],[-12,0]],ink,1.3);
      c.beginPath();c.ellipse(Math.sin(time)*1.3,0,3,4,0,0,Math.PI*2);c.fillStyle=ink;c.fill();c.restore();
     }else if(j===1){ // A badly minted divine orb, bald brow and all.
-     c.save();c.rotate(reduced.matches?0:Math.sin(time*2)*.06);
+     c.save();c.rotate(reduced.matches?0:Math.sin(time*2)*.1);
      line(c,[[-14,9],[-20,-3],[-17,-21],[-9,-29],[5,-30],[17,-23],[20,-9],[13,9],[4,15],[-6,14],[-14,9]],'#987a35',1.8);
      line(c,[[-16,-16],[-8,-20],[-1,-15],[5,-19],[15,-15]],'#a2884f',1.3);
      line(c,[[-13,-10],[-6,-12],[-4,-8],[-11,-7],[-13,-10]],ink,1.6);line(c,[[5,-10],[12,-12],[14,-8],[6,-7],[5,-10]],ink,1.6);
      line(c,[[1,-10],[-2,-1],[3,1],[5,-2]],'#987a35',1.3);line(c,[[-8,6],[-2,4],[6,5],[10,7]],ink,1.3);line(c,[[-6,10],[3,11],[7,9]],'#987a35',1);
      line(c,[[-13,-22],[-6,-25],[7,-25],[14,-20]],'#b49959',.8);c.restore();
     }else if(j===2){ // Dota's cut diagonal and two ragged windows.
-     c.save();c.rotate(reduced.matches?-.05:Math.sin(time*1.8)*.065-.05);
+     c.save();c.rotate(reduced.matches?-.05:Math.sin(time*1.8)*.095-.05);
      const red='#b74936';c.beginPath();c.moveTo(-20,-28);c.lineTo(19,-26);c.lineTo(21,10);c.lineTo(-18,13);c.closePath();c.fillStyle=red;c.fill();line(c,[[-20,-28],[19,-26],[21,10],[-18,13],[-20,-28]],red,1.6);
      c.fillStyle=paper;for(const cut of [[[-14,-23],[17,4],[10,9],[-18,-18]],[[5,-23],[15,-22],[16,-10]],[[-15,-6],[-4,7],[-14,8]]]){c.beginPath();cut.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.closePath();c.fill();}c.restore();
-    }else if(j===3){ // A little fan of cards keeps reshuffling, with the label anchored below.
-     for(let k=0;k<3;k++){c.save();c.rotate((k-1)*.2+(selected&&!reduced.matches?Math.sin(time*7+k)*.12:0));line(c,[[-11,-23],[10,-25],[12,6],[-10,8],[-11,-23]],k===1?'#ec302b':ink,1.2);text(c,k===1?'A':'7',0,-5,14);c.restore();}
-    }else{ // Indomie sandwich. The steam is the motion, the text stays put.
-     line(c,[[-24,-10],[-19,-19],[15,-19],[24,-10],[-24,-10],[-19,7],[18,7],[24,-10]],'#946313',1.4);line(c,[[-20,-3],[-11,-7],[-3,-1],[6,-6],[14,-1],[21,-5]],olive,1.5);
-     for(let k=0;k<3;k++){const sway=reduced.matches?0:Math.sin(time*3+k)*4;line(c,[[-12+k*12,-24],[-15+k*12+sway,-30],[-10+k*12,-36]],ink,.9);}
+    }else if(j===3){
+     // Split, riffle twelve alternating cards, bridge, then square the deck.
+     const q=reduced.matches?4:time%4.8,cycle=Math.floor(time/4.8),ease=v=>{v=Math.max(0,Math.min(1,v));return v*v*(3-2*v);};
+     const split=q<.65?ease(q/.65):q<2.2?1:1-ease((q-2.2)/.65);
+     const bridge=q>=2.85&&q<3.65?Math.sin((q-2.85)/.8*Math.PI)*9:0;
+     for(let k=0;k<12;k++){
+      const side=k%2?1:-1,rank=Math.floor(k/2),dealt=ease((q-.8-k*.095)/.34),separate=split*(1-dealt);
+      const px=side*19*separate,py=-7+rank*.7-Math.sin(dealt*Math.PI)*9;
+      c.save();c.translate(px,py);c.rotate(side*separate*.24);
+      c.beginPath();c.moveTo(-14,7);c.quadraticCurveTo(0,7-bridge,14,7);c.lineTo(13,-24);c.quadraticCurveTo(0,-25-bridge,-14,-24);c.closePath();c.fillStyle=paper;c.fill();c.strokeStyle=k===11?'#96785b':ink;c.lineWidth=.75;c.stroke();
+      if(k===11){line(c,[[-10,-20],[9,-20],[9,3],[-10,3],[-10,-20]],'#a78b6d',.7);for(let z=0;z<4;z++)line(c,[[-9,-17+z*5],[8,-12+z*5]],'#b3a189',.65);}
+      c.restore();
+     }
+     if(q>3.65&&q<4.1&&!reduced.matches){const puff=(q-3.65)/.45;for(const side of [-1,1])line(c,[[side*(18+puff*8),2],[side*(23+puff*10),-2]],olive,(1-puff)*1.1);}
+     if(q>.8&&q<2.2)sfx.beat('poker-riffle',cycle+':'+Math.floor((q-.8)*5),'paper',{level:.12});
+     if(q>3.65)sfx.beat('poker-square',cycle,'click',{level:.10});
+     state.shuffle={phase:q,split,bridge,cards:12};
+    }else{
+     // Heat rises in separate drifting curls, with a few noodles refusing to stay put.
+     for(let k=0;k<5;k++){
+      const age=reduced.matches?.45:(time*.43+k*.21)%1,x=-15+k*7+Math.sin(time*1.4+k)*3,y=-22-age*32;
+      c.save();c.globalAlpha*=Math.sin(age*Math.PI)*.65;c.beginPath();c.moveTo(x,y+9);c.bezierCurveTo(x-8,y+3,x+8,y-4,x+Math.sin(time*2+k)*5,y-12);c.strokeStyle=k%2?'#a18b63':ink;c.lineWidth=.8+k%2*.25;c.stroke();c.restore();
+     }
+     line(c,[[-24,-10],[-19,-19],[15,-19],[24,-10],[-24,-10],[-19,7],[18,7],[24,-10]],'#946313',1.4);
+     for(let k=0;k<3;k++){const wiggle=reduced.matches?0:Math.sin(time*3+k*1.7)*2;c.beginPath();c.moveTo(-20,-6+k*3);c.bezierCurveTo(-10,-13+wiggle,0,3-k*2,8,-5+k);c.bezierCurveTo(13,-10+wiggle,21,0,25,-3+k*2);c.strokeStyle=k===1?olive:'#b59350';c.lineWidth=1.15;c.stroke();}
+     for(let k=0;k<4;k++)line(c,[[-12+k*7,-15],[-10+k*7,-14]],'#ba9b60',.7);
+     state.steamWisps=5;
     }
     },{rescue:true});
     c.restore();atoms[j].words.forEach((word,i)=>{if(j>=3||i===0)text(c,word,x,y+i*20,18);});
