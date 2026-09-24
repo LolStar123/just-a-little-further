@@ -127,7 +127,7 @@ export const projects={
     "title": "smoothtato",
     "short": "Smoothtato",
     "category": "PATH OF EXILE / PERFORMANCE",
-    "caption": "Removes unwanted graphics and adds cosmetic effects in Path of Exile, with presets that carefully replace game files.",
+    "caption": "changes graphics to boost performance and customise visuals in path of exile.",
     "description": "Choose which graphics to remove, match cosmetic effects to your skills, and save the combined setup as a reusable preset. Restore the original files when you want to switch back.",
     "scene": "smoothtato",
     "note": "",
