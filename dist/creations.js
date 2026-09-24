@@ -23,7 +23,7 @@ export const projects={
     "title": "quant research & backtesting",
     "short": "quant research",
     "category": "FINANCE / RESEARCH",
-    "caption": "Collects research papers, then tests market ideas through a Python pipeline on unseen data, after costs.",
+    "caption": "automates academic research scraping and forward-testing market ideas in python.",
     "description": "Collect papers with their sources, remove duplicates and turn research ideas into Python market tests. Lag signals, deduct trading costs and use walk-forward windows to check performance on unseen periods.",
     "scene": "scraper",
     "note": "",
