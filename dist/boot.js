@@ -1,9 +1,7 @@
 import {drawMeowl} from './little-creatures.js';
 import {sharedMix} from './soundscape.js';
 import './button-feel.js';
-const overlay=document.createElement('div');overlay.id='little-boot';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label','Give meowl three pushes to enter');
-overlay.innerHTML='<div class="boot-art"><span>just a little further</span><canvas width="340" height="145" aria-hidden="true"></canvas><button id="boot-push"><span class="push-word">PUSH.</span><svg class="push-ink" viewBox="0 0 290 76" aria-hidden="true"><path d="M19 21 L10 16 M24 13 L21 6 M13 39 L5 40 M272 49 L282 55 M267 62 L270 70 M279 31 L287 29"/></svg></button><p class="push-hint" aria-live="polite">help meowl by clicking 3 times</p><p class="boot-progress" role="status"></p></div>';
-document.body.append(overlay);
+const overlay=document.querySelector('#little-boot');
 const button=overlay.querySelector('button'),status=overlay.querySelector('.boot-progress'),hint=overlay.querySelector('.push-hint'),c=overlay.querySelector('canvas').getContext('2d');
 let pushes=0,loaded=false,done=false,failed=false,shown=0,time=0,last=0,raf=0,keyboardEntry=false;
 function stampPush(stage){
@@ -30,7 +28,7 @@ function drawEntrance(){
  pieces.forEach((el,i)=>{const delay=reduced?0:Math.min(1700,350+i*65);el.animate([{opacity:0,filter:reduced?'none':'blur(2px)'},{opacity:1,filter:'blur(0px)'}],{duration:reduced?180:850,delay,fill:'backwards',easing:'ease-out'});});
  window.__entrance={started:performance.now(),duration};setTimeout(()=>{window.__entrance.finished=true;},duration);
 }
-function finish(){if(!loaded||pushes<3||done)return;done=true;drawEntrance();inert(false);overlay.classList.add('finished');cancelAnimationFrame(raf);setTimeout(()=>{overlay.remove();if(keyboardEntry)document.querySelector('#help')?.focus({preventScroll:true});dispatchEvent(new Event('meowl-enter'));},250);}
+function finish(){if(!loaded||pushes<3||done)return;done=true;drawEntrance();document.documentElement.classList.remove('booting');inert(false);overlay.classList.add('finished');cancelAnimationFrame(raf);setTimeout(()=>{overlay.remove();if(keyboardEntry)document.querySelector('#help')?.focus({preventScroll:true});dispatchEvent(new Event('meowl-enter'));},250);}
 button.addEventListener('click',e=>{keyboardEntry=e.detail===0;sharedMix().enable(true);pushes=Math.min(3,pushes+1);const left=3-pushes;hint.textContent=left?'help meowl by clicking '+left+(left===1?' time':' times'):'you helped. little guy appreciates it.';status.textContent=pushes===3&&!loaded?'preparing the hill...':'';stampPush(pushes);finish();});
 function draw(now){
  const dt=Math.min(.04,(now-(last||now))/1000);last=now;time+=dt;shown+=(pushes/3-shown)*(1-Math.exp(-dt*8));c.clearRect(0,0,340,145);
@@ -43,5 +41,5 @@ function draw(now){
  drawMeowl(c,x-27,ground(x-27),52,{id:'boot',time,mode:pushes===3?'happy':'push',effort:.85,stroke:time%1,ground});if(!done)raf=requestAnimationFrame(draw);
 }
 raf=requestAnimationFrame(draw);
-Promise.all([import('./hill-physics.js'),import('./loose.js')]).then(()=>{loaded=true;status.textContent='';finish();}).catch(error=>{failed=true;console.error(error);status.textContent='the hill could not load.';const retry=document.createElement('a');retry.href='';retry.textContent='reload';status.append(' ',retry);inert(false);});
+Promise.all([import('./hill-physics.js'),import('./loose.js'),document.fonts.ready]).then(()=>{loaded=true;status.textContent='';finish();}).catch(error=>{failed=true;console.error(error);status.textContent='the hill could not load.';const retry=document.createElement('a');retry.href='';retry.textContent='reload';status.append(' ',retry);inert(false);});
 window.__boot=()=>({completed:loaded?3:0,total:3,pushes,visible:!done,done,failed});
