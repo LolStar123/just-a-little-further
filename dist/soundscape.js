@@ -90,13 +90,16 @@ export class Soundscape {
         let i=Math.floor(Math.random()*(n-1));if(i>=last&&last>=0)i++;i%=n;
         this.choices.set(key,i);return i;
     }
-    sample(bus,buffer,offset,duration,level,rate=1){
+    sample(bus,buffer,offset,duration,level,rate=1,softVoice=false){
         const a=this.context,t=a.currentTime,source=a.createBufferSource(),gain=a.createGain(),length=duration/rate;
         source.buffer=buffer;source.playbackRate.value=rate;
         gain.gain.setValueAtTime(0,t);gain.gain.linearRampToValueAtTime(level,t+Math.min(.012,length*.1));
         gain.gain.setValueAtTime(level,t+length*.82);gain.gain.linearRampToValueAtTime(0,t+length);
-        source.connect(gain);gain.connect(bus.node);this.nodes.add(source);
-        source.onended=()=>{source.disconnect();gain.disconnect();this.nodes.delete(source);};
+        // A gentle treble shelf takes the edge off every voice without lowering its gain.
+        const tone=softVoice?a.createBiquadFilter():null;
+        if(tone){tone.type='highshelf';tone.frequency.value=2800;tone.gain.value=-2.5;source.connect(tone);tone.connect(gain);}else source.connect(gain);
+        gain.connect(bus.node);this.nodes.add(source);
+        source.onended=()=>{source.disconnect();tone?.disconnect();gain.disconnect();this.nodes.delete(source);};
         source.start(t,offset,duration);source.stop(t+length+.015);return length;
     }
     mouth(bus,id){
@@ -123,7 +126,7 @@ export class Soundscape {
         }else{
             cut=cuts[variant];
             const gains={step:.115,paper:.08,train:.165,meow:.14,yap:.15,squish:.20,place:.12,swish:.09,aura:.13,stone:.18,chip:.12,friction:.065,slurp:.15,click:.16,spring:.14,roll:.11,trip:.15,data:.095,impact:.25,blast:.23};
-            const rate=kind==='impact'?.88+Math.random()*.06:.98+Math.random()*.04,length=this.sample(bus,this.recorded,cut.offset,cut.duration,gains[kind]*level,rate);
+            const rate=kind==='impact'?.88+Math.random()*.06:.98+Math.random()*.04,length=this.sample(bus,this.recorded,cut.offset,cut.duration,gains[kind]*level,rate,kind==='meow'||kind==='yap');
             if(kind==='meow'||kind==='yap')this.voices.set(bus.key+':'+(options.id||'main'),{start:now,end:now+length,variant,envelope:this.envelopes.get(cut.cut)||[0,1,0]});
         }
         this.history.push({scene:bus.id,kind,id:options.id||null,variant,recording:cut?.cut||('plinko-'+variant),mood:options.mood||null,good:!!options.good,at:now,weight:bus.weight});
