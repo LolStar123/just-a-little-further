@@ -168,7 +168,7 @@ export function miniScene(scene,canvas,wake,sfx){
    const thread=JSON.stringify(points.map(([x,y])=>[+(x*s+(a.w-480*s)/2).toFixed(2),+(y*s+(a.h-artHeight*s)/2).toFixed(2)]));
    if(a.el.dataset.threadPoints!==thread){a.el.dataset.threadPoints=thread;if(woven)parent.dispatchEvent(new Event('ink-anchors'));}
    state.priceDistribution={...d,points,domain:priceDomain,values:prices.slice(0,count).map(r=>r.value),windowUpdates:priceUpdates};
-   note.textContent='50k variants. proxy logs. risk sheets.';
+   note.textContent='';note.hidden=true;
   }else if(scene==='scraper'){
    label(c,'collect papers',117,34,20);label(c,'test the idea',359,34,20);
    for(let i=0;i<3;i++)page(c,24+i*9,104-i*5,35,43);
