@@ -1,8 +1,13 @@
+// Independent smooth random targets, with no shared repeating sway cycle.
+function noise(seed,t){
+ const hash=n=>{const x=Math.sin(n*127.1+seed*311.7)*43758.5453;return (x-Math.floor(x))*2-1;};
+ const i=Math.floor(t),f=t-i,u=f*f*(3-2*f);return hash(i)*(1-u)+hash(i+1)*u;
+}
 export function thoughtPose(index,time){
- // Requested persistent idle movement, including reduced-motion desktops.
- return {lift:Math.sin(time*(1.65+index*.13)+index*.9)*(index<3?3.2:2),
-  sway:Math.sin(time*(1.85+index*.21)+index*1.1)*(index<3?6:4),
-  angle:Math.sin(time*(1.4+index*.17)+index*1.3)*(index<3?.13:.075)};
+ const seed=17+index*83,t=time+index*13.71;
+ return {lift:noise(seed,t*(.46+index*.037))*(index<3?3.2:2),
+ sway:(noise(seed+3,t*(.61+index*.023))*.8+noise(seed+11,t*1.13)*.2)*(index<3?6:4),
+ angle:noise(seed+27,t*(.73+index*.041))*(index<3?.13:.075)};
 }
 export function deadlockBlink(time){
  const phase=time%3;

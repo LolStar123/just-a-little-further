@@ -2,7 +2,7 @@ import {drawMeowl} from './little-creatures.js';
 import {toyProp} from './toy-interactions.js';
 import {inkPath} from './ink-path.js';
 import {POKER_PACK,SHUFFLE_SECONDS,pickPokerCard,drawPokerFace} from './poker-deck.js';
-import {drawBubble,confineBubble} from './bubble-boundary.js';
+import {drawBubble} from './bubble-boundary.js';
 import {thoughtPose,deadlockBlink,eyeGaze} from './thought-motion.js';
 export const normalise=text=>text.toLowerCase().replace(/\s+/g,' ').replace(/[1i|]/g,'l').trim();
 export function inverse2([a,b,c,d]){const det=a*d-b*c;if(Math.abs(det)<1e-8)return null;return[d/det,-b/det,-c/det,a/det];}
@@ -12,8 +12,7 @@ export function personalScene(scene,canvas,wake,sfx){
  document.querySelector('#scene').innerHTML='<canvas id="personal-art" class="toy mini-toy" aria-label="'+(interests?'A thought bubble of competitive games, poker and indomie':'OCR text normalisation example')+'"></canvas><p class="toy-note" id="personal-note"></p>';
  const a=canvas('personal-art'),state={clock:0,scene},note=document.querySelector('#personal-note');
  let shuffleCycle=0,frontCard=interests?pickPokerCard():null;
- const seats=[[90,74],[244,74],[392,74],[143,179],[335,179]],radii=[24,29,30,49,31];
- const floaters=seats.map(([x,y])=>({x,y:y-38,vx:0,vy:-8,knocks:0}));
+ const seats=[[90,74],[244,74],[392,74],[143,179],[335,179]];
  const eyePointer={x:0,y:0,active:false};
  if(interests){
   const follow=e=>{
@@ -59,11 +58,11 @@ export function personalScene(scene,canvas,wake,sfx){
    const thread=[[35,42],[68,23],[137,30],[201,14],[278,29],[339,13],[445,34],[453,113],[377,128],[313,120],[249,143],[182,120],[87,134],[47,215],[85,236],[194,246]];
    line(c,thread,'#b2aa98',.75);
    for(let j=0;j<5;j++){
-    const [x,y]=seats[j],selected=j===active,pose=thoughtPose(j,time),body=floaters[j],lift=y-38-body.y,sway=body.x-x,angle=pose.angle+Math.max(-.06,Math.min(.06,body.vx*.003));
+    const [x,y]=seats[j],selected=j===active,{lift,angle,sway}=thoughtPose(j,time);
     c.save();c.translate(x+sway,y-30-lift);c.rotate(angle);c.strokeStyle=selected?olive:ink;c.lineWidth=1.5;
     toyProp(c,['deadlock-emblem','divine-orb','dota-emblem','poker-hand','indomie-sandwich'][j],0,16,j===3?82:52,60,c=>{
     if(j===0){ // Deadlock's eight-part wheel and little watching eye.
-     c.save();c.translate(0,-8);c.rotate(reduced.matches?0:Math.sin(time*1.7)*.11);
+     c.save();c.translate(0,-8);c.rotate(angle*.35);
      for(let k=0;k<8;k++){const angle=k*Math.PI/4+.04;const pts=[];for(let q=0;q<=5;q++){const t=angle+q*.11,r=20+(q%2?.7:-.5);pts.push([Math.cos(t)*r,Math.sin(t)*r]);}line(c,pts,ink,2);line(c,[[Math.cos(angle)*12,Math.sin(angle)*12],[Math.cos(angle)*21,Math.sin(angle)*21]],ink,1.3);}
      const bounds=a.el.getBoundingClientRect(),px=(eyePointer.x-bounds.left)*a.w/bounds.width,py=(eyePointer.y-bounds.top)*a.h/bounds.height;
      const targetX=(px-ox)/s-x-sway,targetY=(py-oy)/s-(y-38-lift);
@@ -73,14 +72,14 @@ export function personalScene(scene,canvas,wake,sfx){
      c.beginPath();c.ellipse(gaze.x,gaze.y,3,4,0,0,Math.PI*2);c.fillStyle=ink;c.fill();c.restore();c.restore();
      state.deadlockEye={...gaze,blink,following:eyePointer.active};
     }else if(j===1){ // A badly minted divine orb, bald brow and all.
-     c.save();c.rotate(reduced.matches?0:Math.sin(time*2)*.1);
+     c.save();c.rotate(angle*.3);
      line(c,[[-14,9],[-20,-3],[-17,-21],[-9,-29],[5,-30],[17,-23],[20,-9],[13,9],[4,15],[-6,14],[-14,9]],'#987a35',1.8);
      line(c,[[-16,-16],[-8,-20],[-1,-15],[5,-19],[15,-15]],'#a2884f',1.3);
      line(c,[[-13,-10],[-6,-12],[-4,-8],[-11,-7],[-13,-10]],ink,1.6);line(c,[[5,-10],[12,-12],[14,-8],[6,-7],[5,-10]],ink,1.6);
      line(c,[[1,-10],[-2,-1],[3,1],[5,-2]],'#987a35',1.3);line(c,[[-8,6],[-2,4],[6,5],[10,7]],ink,1.3);line(c,[[-6,10],[3,11],[7,9]],'#987a35',1);
      line(c,[[-13,-22],[-6,-25],[7,-25],[14,-20]],'#b49959',.8);c.restore();
     }else if(j===2){ // Dota's cut diagonal and two ragged windows.
-     c.save();c.rotate(reduced.matches?-.05:Math.sin(time*1.8)*.095-.05);
+     c.save();c.rotate(angle*.25-.05);
      const red='#b74936';c.beginPath();c.moveTo(-20,-28);c.lineTo(19,-26);c.lineTo(21,10);c.lineTo(-18,13);c.closePath();c.fillStyle=red;c.fill();line(c,[[-20,-28],[19,-26],[21,10],[-18,13],[-20,-28]],red,1.6);
      c.fillStyle=paper;for(const cut of [[[-14,-23],[17,4],[10,9],[-18,-18]],[[5,-23],[15,-22],[16,-10]],[[-15,-6],[-4,7],[-14,8]]]){c.beginPath();cut.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.closePath();c.fill();}c.restore();
     }else if(j===3){
@@ -111,12 +110,7 @@ export function personalScene(scene,canvas,wake,sfx){
      for(let k=0;k<4;k++)line(c,[[-12+k*7,-15],[-10+k*7,-14]],'#ba9b60',.7);
      state.steamWisps=5;
     }
-    },{rescue:true,constrain:(p)=>{
-     const rect=a.el.getBoundingClientRect(),frame=window.frameElement?.getBoundingClientRect(),host=parent!==window?parent:window,unit=s*rect.width/a.w;
-     const left=(frame?.left||0)+rect.left+ox*rect.width/a.w,top=(frame?.top||0)+rect.top+host.scrollY+oy*rect.height/a.h;
-     const local={x:(p.x-left)/unit,y:(p.y-top)/unit,vx:p.vx/unit,vy:p.vy/unit},hit=confineBubble(local,radii[j]);
-     return {x:left+local.x*unit,y:top+local.y*unit,vx:local.vx*unit,vy:local.vy*unit,hit:hit.hit};
-    }});
+    },{rescue:true});
     c.restore();atoms[j].words.forEach((word,i)=>{if(j>=3||i===0)text(c,word,x,y+i*20,18);});
     if(gameLinks[j]){const link=gameLinks[j];link.style.left=(a.el.offsetLeft+ox+x*s)+'px';link.style.top=(a.el.offsetTop+oy+(y+20)*s)+'px';link.style.fontSize=Math.max(18*1.06*s,15)+'px';link.style.opacity=String(growth);link.style.visibility=growth>.98?'visible':'hidden';}
     if(selected){const spread=20+Math.sin(phase*Math.PI)*23;line(c,[[x-spread,y+26],[x-7,y+28],[x+spread,y+25]],olive,1.1);}
@@ -160,12 +154,6 @@ export function personalScene(scene,canvas,wake,sfx){
  }
  return {state,draw,advance(dt){
   state.clock+=dt;
-  if(interests){for(let left=Math.min(dt,.1);left>0;left-=1/120){const step=Math.min(left,1/120);for(let j=0;j<5;j++){
-   const b=floaters[j],pose=thoughtPose(j,state.clock),[x,y]=seats[j];
-   b.vx+=((x+pose.sway-b.x)*22-b.vx*4)*step;b.vy+=((y-38-pose.lift-b.y)*22-b.vy*4)*step;
-   b.x+=b.vx*step;b.y+=b.vy*step;const contact=confineBubble(b,radii[j]);if(contact.hit)b.knocks++;
-  }}state.bubbleBodies=floaters.map((b,j)=>({...b,radius:radii[j]}));}
-
   const cycle=Math.floor(state.clock/SHUFFLE_SECONDS);
   if(interests&&cycle!==shuffleCycle){shuffleCycle=cycle;frontCard=pickPokerCard();}
  }};

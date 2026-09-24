@@ -79,7 +79,6 @@ export function pageToyWorld(){
      if((!item.needsRescue||item.carried)&&Math.hypot(body.position.x-item.pageHome.x,body.position.y-item.pageHome.y)<2&&Math.hypot(body.velocity.x,body.velocity.y)<1){restore(item);continue;}
     }
    }
-   if(item.constrain){const bounded=item.constrain({x:body.position.x,y:body.position.y,vx:body.velocity.x,vy:body.velocity.y});if(bounded.hit){Body.setPosition(body,{x:bounded.x,y:bounded.y});Body.setVelocity(body,{x:bounded.vx,y:bounded.vy});}}
    const inPanel=!!item.hostFrame?.closest('#project-panel'),shown=!host.document.body.classList.contains('panel-open')||inPanel;
    if(item.handle)item.handle.hidden=!shown;
    const x=body.position.x,y=body.position.y-host.scrollY;if(item.handle){item.handle.style.width=item.pageSize.w+'px';item.handle.style.height=item.pageSize.h+'px';item.handle.style.transform=`translate(${x-item.pageSize.w/2}px,${y-item.pageSize.h/2}px) rotate(${body.angle}rad)`;}if(!shown||y<-200||y>host.innerHeight+200)continue;
