@@ -108,7 +108,7 @@ export class Soundscape {
         const moodBank={crying:'crying',sad:'sad',upset:'sad',desperate:'crying',strain:'effort',determined:'effort',angry:'angry',panic:'panic',relieved:'relief',worried:'worried',dazed:'dazed'}[options.mood];
         const bank=kind==='impact'?'spring':kind==='meow'&&moodBank?'voice-'+moodBank:kind,cuts=recordings[bank],pluck=kind==='plink'||kind==='blink';
         if(pluck?!this.buffers.length:!cuts||!this.recorded)return false;
-        const variant=this.select(bus.key+':'+key+':'+bank,pluck?10:cuts.length),level=clamp(options.level??1,0,1.5);
+        const variant=this.select(bus.key+':'+key+':'+bank,pluck?10:cuts.length),level=clamp(options.level??1,0,1.5)*(kind==='meow'||kind==='yap'||kind==='train'||bus.id==='deadlock'&&kind==='plink'?.6:kind==='step'?.7:1);
         let cut=null;
         if(pluck){
             const blink=kind==='blink',buffer=this.buffers[variant],rate=(blink?1.55:options.good?1.19:1)*(blink?.98+Math.random()*.04:.97+Math.random()*.06);
