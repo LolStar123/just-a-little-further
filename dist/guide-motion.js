@@ -98,7 +98,7 @@ export class GuideMotion{
    const foot=this.landingPoint||near;this.vx+=(foot.x-this.x)*65*dt-this.vx*16*dt;this.vy+=(foot.y-this.y)*80*dt-this.vy*16*dt;
    if(this.age>.18){
     if(this.attentionBounce&&!reduced&&this.idleTime>1){this.attentionBounce=0;this.reboundJump=true;this.jump(route.perchAt(this.x-this.facing*28,foot.y),'starhop');}
-    else if(this.triplet>0&&this.triplet<3){this.triplet++;this.jump({x:this.x+this.facing*(38+this.triplet*17),y:near.y},'triple');this.vy-=this.triplet*35;}
+    else if(this.triplet>0&&this.triplet<3){this.triplet++;this.jump(route.perchAt(this.x+this.facing*(38+this.triplet*17),near.y),'triple');this.vy-=this.triplet*35;}
     else{this.triplet=0;this.state('run');}
    }
   }else{
@@ -154,7 +154,7 @@ export class GuideMotion{
      else if(sceneKey==='liquidation'){kind='kong';this.text='i know a way up the pile.';}
      else if(sceneKey==='smoothtato'&&this.moveCount%2===0){kind='starhop';goal=shortcut||ahead;}
      else if(this.kind==='climb'){kind='kong';goal=ahead;this.text='one wing. other wing. up.';}
-     else if(this.moveCount%3===0){kind='triple';this.triplet=1;goal={x:this.x+this.facing*45,y:near.y};this.text='one... two...';}
+     else if(this.moveCount%3===0){kind='triple';this.triplet=1;goal=route.perchAt(this.x+this.facing*45,near.y);this.text='one... two...';}
      else if(this.moveCount%3===1)kind='kong';
      this.planned={kind,target:goal};this.state('crouch');this.nextMove=this.time+2.5+Math.random()*2;
     }

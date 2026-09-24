@@ -5,7 +5,7 @@ export function musicPlayer(mix){
     const controls=document.createElement('div');controls.className='sound-settings';
     controls.setAttribute('role','group');controls.setAttribute('aria-label','Sound settings');
     controls.innerHTML=`<label>music <input id="music-volume" type="range" min="0" max="100" step="0.01" value="8.82" aria-label="Music volume"></label><label>sfx <input id="sfx-volume" type="range" min="0" max="100" value="48" aria-label="Sound effects volume"></label><span id="audio-status" role="status"></span>`;
-    document.querySelector('#world header').after(controls);
+    document.querySelector('#world').prepend(controls);
     const status=controls.querySelector('#audio-status');
     let volume=.0882,part=0,slot=0,blocked=false,error=null,switching=false,fadeEnd=0,fromSlot=0,prepared=-1;
     const media=[new Audio(),new Audio()],gains=[];

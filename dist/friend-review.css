@@ -199,3 +199,19 @@ body.tugging-thread,body.tugging-thread *{user-select:none!important;cursor:grab
 @media(max-width:760px){#world .introduction{top:126px}#world .presenter{font-size:13px;margin-bottom:8px}#world .presenter .name{font-size:23px}#world .introduction h1{font-size:clamp(35px,9.6vw,48px)}}
 
 #world .title-prefix{letter-spacing:-.01em;word-spacing:.06em}
+
+#world .introduction{top:105px}
+.presenter-profiles{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 0 10px;pointer-events:auto}
+.presenter-profiles a{display:grid;place-items:center;width:28px;height:28px;color:#66675b}
+.presenter-profiles a:first-child{transform:rotate(-14deg) translateY(2px)}
+.presenter-profiles a:last-child{transform:rotate(11deg) translateY(-2px)}
+.presenter-profiles svg{width:15px;height:15px}
+.presenter-profiles a:focus-visible{outline:1px dashed currentColor;outline-offset:3px}
+#world .title-prefix{font-size:1em;transform:none;word-spacing:0}
+#world .title-just{display:inline-block;font-size:.46em;transform:translateY(-.2em) rotate(-8deg)}
+#world .title-a{display:inline-block;font-size:.32em;transform:translateY(.16em) rotate(11deg);margin:0 .04em}
+#world .title-little{display:inline-block;font-size:.59em;transform:translateY(-.02em) rotate(4deg)}
+#world .introduction h1 em{font-size:1.28em;transform:rotate(-1deg);margin-left:.03em}
+@media(max-width:760px){#world .introduction{top:101px}.presenter-profiles{margin-bottom:6px}#world .introduction h1{font-size:clamp(28px,8vw,40px)}}
+
+#world .sound-settings{top:30px}@media(max-width:760px){#world .sound-settings{top:25px}}

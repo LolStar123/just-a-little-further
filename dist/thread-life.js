@@ -32,7 +32,7 @@ export function threadLife(svg,path){
     const thinkingDots=document.querySelector('.thinking-dots');let dotCount=-1;
     const reduced=matchMedia('(prefers-reduced-motion: reduce)');
     function wake(){if(!raf&&!document.hidden)raf=requestAnimationFrame(tick);}
-    function pointAt(distance){let lo=0,hi=lengths.length-1;while(lo<hi){const mid=(lo+hi)>>1;if(lengths[mid]<distance)lo=mid+1;else hi=mid;}const i=Math.max(1,lo),a=shape[i-1]||base[0],b=shape[i]||a,f=(distance-lengths[i-1])/(lengths[i]-lengths[i-1]||1);return{x:a[0]+(b[0]-a[0])*f,y:a[1]+(b[1]-a[1])*f,angle:Math.atan2(b[1]-a[1],b[0]-a[0]),i};}
+    function pointAt(distance){let lo=0,hi=lengths.length-1;while(lo<hi){const mid=(lo+hi)>>1;if(lengths[mid]<distance)lo=mid+1;else hi=mid;}const i=Math.max(1,lo),a=shape[i-1]||base[0],b=shape[i]||a,f=(distance-lengths[i-1])/(lengths[i]-lengths[i-1]||1);return{x:a[0]+(b[0]-a[0])*f,y:a[1]+(b[1]-a[1])*f,angle:Math.atan2(b[1]-a[1],b[0]-a[0]),i,arc:distance};}
     function render(){
         // Long C2 falloff follows arclength across nearby text and illustration floors.
         // It does not pin abruptly at an iframe rectangle or paragraph boundary.
@@ -75,8 +75,9 @@ export function threadLife(svg,path){
         const viewLeft=visualViewport?.offsetLeft||0,viewWidth=visualViewport?.width||innerWidth;const viewTop=scrollY+(visualViewport?.offsetTop||0),viewHeight=visualViewport?.height||innerHeight,viewBottom=viewTop+viewHeight;
         if(now>targetAt||!routeCache){
             const landing=scrollY<90;if(landing)tubeEntryDone=false;const wantedY=viewTop+viewHeight*.91;
-            let best=Infinity;
-            for(let i=0;i<base.length;i+=2){const p=shape[i],outside=p[0]<viewLeft+45||p[0]>viewLeft+viewWidth-45||p[1]<viewTop+90||p[1]>viewBottom-22;const score=Math.abs(p[1]-wantedY)+Math.abs(p[0]-(landing?viewLeft+viewWidth-100:viewLeft+viewWidth*.78))*(landing?.35:.14)+(outside?10000:0);if(score<best){targetIndex=i;best=score;}}
+            let best=Infinity;const oldTarget=targetIndex;let oldScore=Infinity;
+            for(let i=0;i<base.length;i+=2){const p=shape[i],outside=p[0]<viewLeft+45||p[0]>viewLeft+viewWidth-45||p[1]<viewTop+90||p[1]>viewBottom-22;const score=Math.abs(p[1]-wantedY)+Math.abs(p[0]-(landing?viewLeft+viewWidth-100:viewLeft+viewWidth*.78))*(landing?.35:.14)+(outside?10000:0);if(Math.abs(i-oldTarget)<2)oldScore=Math.min(oldScore,score);if(score<best){targetIndex=i;best=score;}}
+            if(routeCache&&oldScore<best+55)targetIndex=oldTarget;
             // The large arrival loop is decoration, not a place to pace forever.
             // Once the reader scrolls, commit to the first scene's entrance below it.
             const tubeEntry=guideEntries.tfl;
@@ -91,22 +92,33 @@ export function threadLife(svg,path){
             if(goodbye){targetIndex=signatureEnd;crossingTubeLoop=false;}
             // Nearby branches of a loop are not interchangeable footholds.
             // Stay on the current stretch unless flight has deliberately crossed it.
-            let j=nearest(actor.x,actor.y);
-            if(routeCache&&!['air','land','fly','flutter','thrown','held','cheer'].includes(actor.mode)){
-                let bestLocal=Infinity,local=j;
-                for(let i=tugStart;i<base.length;i++){const arc=Math.abs(lengths[i]-travel);if(arc>130)continue;if(routeCache.direction&&routeCache.direction*(lengths[i]-travel)<-20)continue;const score=Math.hypot(shape[i][0]-actor.x,shape[i][1]-actor.y)+arc*.12;if(score<bestLocal){bestLocal=score;local=i;}}
-                if(bestLocal<260)j=local;
+            // A jump keeps its intended strand, even at an exact self-intersection.
+            // Only a deliberate throw or free flight reacquires a global strand.
+            const free=['thrown','held','fly','flutter','cheer'].includes(actor.mode);
+            let j=nearest(actor.x,actor.y),proposed=lengths[j];
+            if(routeCache&&!free){
+                const landing=actor.mode==='land'&&Number.isFinite(actor.landingPoint?.arc);
+                const anchor=landing?actor.landingPoint.arc:travel;
+                let bestLocal=Infinity;
+                for(let i=Math.max(1,tugStart);i<base.length;i++){
+                    if(lengths[i]<anchor-160||lengths[i-1]>anchor+160)continue;
+                    const a=shape[i-1],b=shape[i],dx=b[0]-a[0],dy=b[1]-a[1],u=Math.max(0,Math.min(1,((actor.x-a[0])*dx+(actor.y-a[1])*dy)/(dx*dx+dy*dy||1)));
+                    const arc=lengths[i-1]+u*(lengths[i]-lengths[i-1]);
+                    const score=Math.hypot(a[0]+u*dx-actor.x,a[1]+u*dy-actor.y)+Math.abs(arc-anchor)*.08;
+                    if(score<bestLocal){bestLocal=score;proposed=arc;}
+                }
+                if(actor.mode==='air'||actor.mode==='crouch')proposed=travel;
+                if(landing){proposed=actor.landingPoint.arc;actor.landingPoint.arc=undefined;}
             }
-            const proposed=lengths[j];
             const sameDirection=routeCache&&Math.sign(lengths[targetIndex]-travel)===routeCache.direction;
-            travel=sameDirection&&actor.mode==='run'? (routeCache.direction>0?Math.max(travel,proposed):Math.min(travel,proposed)):proposed;
+            travel=sameDirection&&actor.mode==='run'?(routeCache.direction>0?Math.max(travel,proposed):Math.min(travel,proposed)):proposed;
             const destination=lengths[targetIndex],direction=destination>=travel?1:-1;
             const ahead=pointAt(Math.max(0,Math.min(total,travel+direction*Math.min(24,Math.abs(destination-travel))))),near=pointAt(travel),target=pointAt(Math.max(0,Math.min(total,destination)));
             // Loops offer real shortcuts: select a reachable future foothold, then leap through space.
             let shortcut=null;
-            for(let distance=170;distance<=480;distance+=50){const candidate=pointAt(Math.max(0,Math.min(total,travel+direction*distance))),gap=Math.hypot(candidate.x-actor.x,candidate.y-actor.y);if(gap>65&&gap<230&&candidate.y>actor.y-80&&candidate.y<actor.y+155){shortcut=candidate;}}
+            for(let distance=100;distance<=Math.min(650,Math.abs(destination-travel));distance+=35){const candidate=pointAt(Math.max(0,Math.min(total,travel+direction*distance))),gap=Math.hypot(candidate.x-actor.x,candidate.y-actor.y);if(gap>55&&gap<270&&candidate.y>actor.y-80&&candidate.y<actor.y+155){shortcut=candidate;}}
             // The viewport chooses a real perch. Never move the perch off its wire.
-            const perchAt=(x,y)=>{let best=Infinity,pick=target;for(const p of shape){if(p[0]<viewLeft+45||p[0]>viewLeft+viewWidth-45||p[1]<viewTop+70||p[1]>viewBottom-22)continue;const score=Math.hypot(p[0]-x,p[1]-y);if(score<best){best=score;pick={x:p[0],y:p[1]};}}return {...pick};};
+            const perchAt=(x,y)=>{let best=Infinity,pick=near;for(let i=tugStart;i<shape.length;i++){const p=shape[i],arc=lengths[i],offset=Math.abs(arc-travel);if(offset>450||p[0]<viewLeft+45||p[0]>viewLeft+viewWidth-45||p[1]<viewTop+70||p[1]>viewBottom-22)continue;const score=Math.hypot(p[0]-x,p[1]-y)+offset*.12;if(score<best){best=score;pick={x:p[0],y:p[1],arc};}}return {...pick};};
             routeCache={near,ahead,target,shortcut,perchAt,goodbye,direction,cornerExit:pointAt(Math.max(0,Math.min(total,travel+direction*Math.min(96,Math.abs(destination-travel))))),remaining:Math.abs(destination-travel),committedExit:crossingTubeLoop?target:null};
             sceneCache=sceneRects.find(r=>actor.y>=r.top-100&&actor.y<r.bottom+130)||null;
             targetAt=now+(['run','land','crouch'].includes(actor.mode)?16:90);
@@ -146,16 +158,26 @@ export function threadLife(svg,path){
         wake();
     }
     function update(points,startIndex=0,entries={}){
+        const oldTotal=total,oldLengths=lengths,oldEntries={start:tugStart,...guideEntries,end:Math.max(0,base.length-1)};
+        const mapArc=value=>{
+            if(!oldTotal||!Number.isFinite(value))return value;
+            const anchors=Object.keys(oldEntries).filter(k=>k==='start'||k==='end'||Number.isInteger(entries[k])).map(k=>({old:oldLengths[oldEntries[k]]||0,next:k==='start'?startIndex:k==='end'?points.length-1:entries[k]})).sort((a,b)=>a.old-b.old);
+            let a=anchors[0],b=anchors.at(-1);for(let i=1;i<anchors.length;i++)if(anchors[i].old>=value){a=anchors[i-1];b=anchors[i];break;}
+            const f=Math.max(0,Math.min(1,(value-a.old)/(b.old-a.old||1)));return lengths[a.next]+f*(lengths[b.next]-lengths[a.next]);
+        };
         guideEntries=entries;
         tugStart=startIndex;
         worldHeight=document.querySelector('#world').offsetHeight;
-        base=points.map(p=>p.slice());lengths=[0];for(let i=1;i<base.length;i++)lengths[i]=lengths[i-1]+Math.hypot(base[i][0]-base[i-1][0],base[i][1]-base[i-1][1]);total=lengths.at(-1);anchor=Math.min(anchor,base.length-1);render();
+        base=points.map(p=>p.slice());lengths=[0];for(let i=1;i<base.length;i++)lengths[i]=lengths[i-1]+Math.hypot(base[i][0]-base[i-1][0],base[i][1]-base[i-1][1]);total=lengths.at(-1);travel=mapArc(travel);
+        for(const p of [actor?.airTarget,actor?.landingPoint,actor?.planned?.target])if(p&&Number.isFinite(p.arc))p.arc=mapArc(p.arc);
+        targetAt=0;
+        anchor=Math.min(anchor,base.length-1);render();targetIndex=pointAt(mapArc(oldLengths[targetIndex]??travel)).i;
         sceneRects=[...document.querySelectorAll('.sketch-chapter')].map(el=>{const frame=el.querySelector('.sketch-demo'),r=(frame||el).getBoundingClientRect(),inside=frame?.dataset.scene==='botato'?frame.contentDocument?.querySelector('.toy')?.getBoundingClientRect():null;return{key:frame?.dataset.scene,left:r.left+(inside?.left||0),right:inside?r.left+inside.right:r.right,top:r.top+(inside?.top||0)+scrollY,bottom:r.top+(inside?.bottom||r.height)+scrollY};});
         if(!handles.length){for(let i=0;i<sceneRects.length;i++){const b=document.createElement('button');b.className='thread-grab';b.setAttribute('aria-label','Tug the thread after project '+(i+1));b.title='tug the thread';b.addEventListener('pointerdown',e=>start(e,Number(b.dataset.point)));b.addEventListener('pointermove',move);b.addEventListener('pointerup',release);b.addEventListener('pointercancel',release);b.addEventListener('lostpointercapture',release);b.addEventListener('keydown',e=>{if(e.code==='Space'||e.key==='Enter'){e.preventDefault();anchor=Number(b.dataset.point);dy=45;vy=-90;wake();}});document.body.append(b);handles.push(b);}}
         handles.forEach((b,i)=>{const r=sceneRects[i],j=nearest(innerWidth*.5,r.bottom+60),p=base[j];b.dataset.point=j;b.style.left=p[0]-19+'px';b.style.top=p[1]-19+'px';});wake();
     }
     visualViewport?.addEventListener('resize',()=>{targetAt=0;wake();});visualViewport?.addEventListener('scroll',()=>{targetAt=0;wake();});
     addEventListener('scroll',wake,{passive:true});document.addEventListener('visibilitychange',()=>{last=0;if(document.hidden){cancelAnimationFrame(raf);raf=0;sound.active(false);}else wake();});
-    window.__threadLife=()=>({points:base.length,tugStart,tubeEntryDone,goodbye:routeCache?.goodbye,guideEntries,committedExit:routeCache?.committedExit,total,travel,dragging:!!drag,offset:[dx,dy],guideVisible:!guide.hidden,handles:handles.length,actor:actor?{x:actor.x,y:actor.y,vx:actor.vx,vy:actor.vy,mode:actor.mode,kind:actor.kind,text:actor.text,history:actor.history}:null});
+    window.__threadLife=()=>({points:base.length,tugStart,tubeEntryDone,goodbye:routeCache?.goodbye,guideEntries,committedExit:routeCache?.committedExit,total,travel,targetArc:routeCache?.target?.arc,remaining:routeCache?.remaining,direction:routeCache?.direction,dragging:!!drag,offset:[dx,dy],guideVisible:!guide.hidden,handles:handles.length,actor:actor?{x:actor.x,y:actor.y,vx:actor.vx,vy:actor.vy,mode:actor.mode,kind:actor.kind,text:actor.text,history:actor.history}:null});
     return {update};
 }
