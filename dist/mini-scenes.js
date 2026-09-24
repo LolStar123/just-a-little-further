@@ -256,7 +256,7 @@ export function miniScene(scene,canvas,wake,sfx){
    if(reduced){cx=home;moving=false;}
    const stampTimes=tie?[2.2,4.45]:[winning===0?2.2:99,winning===1?2.2:99];
    const stamped=stampTimes.map(at=>q>=at+.18),stamping=stampTimes.some(at=>q>=at-.15&&q<at+.38);
-   label(c,days+' days this week',240,248,18);
+   label(c,days+(days===1?' day':' days')+' this week',240,248,18);
    function ticket(ctx,x,y,index){
     const tilt=(index?1:-1)*.035;ctx.save();ctx.translate(x,y);ctx.rotate(tilt);
     ctx.beginPath();ctx.moveTo(-53,-31);ctx.lineTo(53,-29);ctx.lineTo(51,-10);ctx.quadraticCurveTo(41,-6,51,-1);ctx.lineTo(53,43);ctx.lineTo(-52,41);ctx.lineTo(-50,5);ctx.quadraticCurveTo(-41,0,-51,-5);ctx.closePath();ctx.fillStyle=paper;ctx.fill();ctx.strokeStyle=ink;ctx.lineWidth=1.2;ctx.stroke();
