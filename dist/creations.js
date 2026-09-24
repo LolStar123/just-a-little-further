@@ -72,7 +72,7 @@ export const projects={
     "demoScope": "August 2026 asking-price archive. Three-mod values are modelled; probability assumptions and missing coverage stay visible."
   },
   "tfl": {
-    "title": "tube reliability",
+    "title": "tube reliability leaderboard",
     "short": "Tube ratings",
     "category": "DATA / LONDON",
     "caption": "Ranks all eleven Tube lines from sampled arrival evidence, with a live rating history.",
@@ -98,7 +98,7 @@ export const projects={
     "demoScope": "Sampled TfL arrival predictions with durable history; Elo stays between 100 and 3500. Not official punctuality statistics."
   },
   "commute": {
-    "title": "commute calculator",
+    "title": "commute cost optimiser",
     "short": "commute fares",
     "category": "DATA / LONDON",
     "caption": "Compares pay-as-you-go, fare caps and Travelcards for the week you actually travel.",

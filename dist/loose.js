@@ -293,7 +293,7 @@ new ResizeObserver(resize).observe(surface);
 ready.then(wake).catch(()=>{status('the creature artwork could not load. reload to try again.');});
 window.__hill=()=>({depth:{extra:extraDepth,paintTop,paintHeight},time,paused,aura:{count:auraField.particles.length,deflections:auraField.deflections,bounces:auraField.bounces},sound:mix.enabled,audio:mix.diagnostics(),pointerGrab:grab?.type||null,lastRelease,reducedMotion:reduce.matches,toyMotionRequested,assets:art.ready,hero:{...hero},physics:physics?.diagnostics(),particles:particles.length,scuffs:scuffs.length,panel:project,panelOpen,petCount,meanFrameMs:intervals.length?intervals.reduce((a,b)=>a+b,0)/intervals.length:0});
 
-const chapterObserver=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting){entry.target.classList.add('seen');const demo=entry.target.querySelector('iframe[data-scene]');if(demo&&!demo.hasAttribute('src')){demo.loading='eager';demo.src='demo.html?scene='+demo.dataset.scene;}}}},{rootMargin:'550px 0px',threshold:0});
+const chapterObserver=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting){entry.target.classList.add('seen');for(const demo of entry.target.querySelectorAll('iframe[data-scene]')){if(!demo.hasAttribute('src')){demo.loading='eager';demo.src='demo.html?scene='+demo.dataset.scene;}}}}},{rootMargin:'550px 0px',threshold:0});
 document.querySelectorAll('.sketch-chapter').forEach(el=>chapterObserver.observe(el));
 
 new IntersectionObserver(entries=>{worldVisible=entries[0].isIntersecting;hillSound.active(worldVisible&&!paused&&!panelOpen);if(!worldVisible){cancelAnimationFrame(frame);frame=0;last=0;cancelGrab();}else wake();},{threshold:0}).observe($('#world'));

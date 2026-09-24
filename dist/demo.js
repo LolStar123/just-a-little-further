@@ -91,7 +91,7 @@ if(scene==='halo'){
         robot={x:40,y:220,cameraX:240,cameraY:320,target:[885,560],route:[],blocked:[],rocks:rocks.map(r=>r.points),routeMs:0};
         const silhouettes=rocks.map(rockPath);let terrain=null,terrainWidth=0,terrainHeight=0,draggedLoot=null,lastLootRoute=-1;
         function map(){
-            const scale=Math.max(a.w/WIDTH,a.h/HEIGHT),vw=a.w/scale,vh=a.h/scale;
+            const scale=Math.min(a.w/WIDTH,a.h/HEIGHT),vw=a.w/scale,vh=a.h/scale;
             const cx=Math.max(vw/2,Math.min(WIDTH-vw/2,robot.cameraX)),cy=Math.max(vh/2,Math.min(HEIGHT-vh/2,robot.cameraY));
             return{scale,ox:a.w/2-cx*scale,oy:a.h/2-cy*scale};
         }

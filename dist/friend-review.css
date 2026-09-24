@@ -161,3 +161,18 @@ body.tugging-thread,body.tugging-thread *{user-select:none!important;cursor:grab
 #world{height:calc(var(--stage-height) + 30px + var(--dig-depth,0px))}
 #interaction-surface{height:calc(var(--stage-height) + var(--dig-depth,0px))}
 @media(max-width:760px){#world{height:calc(615px + var(--dig-depth,0px))}}
+
+/* Two independent London tools share one stop on the line. */
+.sketch-chapter.london-pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px 48px;align-items:start;min-height:0}
+.london-label{grid-column:1/-1;font-style:italic;color:#6b795d}
+.london-project{min-width:0;display:flex;flex-direction:column}
+.london-pair .chapter-copy{order:0!important;min-height:205px}
+.london-pair h3{font-family:Pen,Georgia,serif;font-size:34px;font-weight:400;line-height:1.12;margin:6px 0 14px}
+.london-pair .chapter-copy p{max-width:34ch;margin:0 0 12px}
+.london-pair .sketch-demo{height:335px;min-height:335px}
+@media(max-width:760px){.sketch-chapter.london-pair{display:flex;gap:18px}.london-pair .chapter-copy{min-height:0}.london-pair h3{font-size:32px}.london-project{width:100%}.london-pair .sketch-demo{height:335px;min-height:335px}.london-project+.london-project{margin-top:35px}}
+
+.sketch-chapter.chapter-botato,.sketch-chapter.chapter-botato:nth-of-type(even){display:grid;grid-template-columns:minmax(250px,.8fr) minmax(0,1.35fr);gap:44px;align-items:center;min-height:0}
+.chapter-botato .chapter-copy{display:block;order:0!important;margin:0}
+.chapter-botato .sketch-demo[data-scene=botato]{width:100%;margin:0;height:480px;min-height:480px}
+@media(max-width:760px){.sketch-chapter.chapter-botato,.sketch-chapter.chapter-botato:nth-of-type(even){display:flex;gap:14px}.chapter-botato .sketch-demo[data-scene=botato]{height:355px;min-height:355px}.chapter-botato .chapter-copy{margin:0}}
