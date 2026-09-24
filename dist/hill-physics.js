@@ -22,7 +22,7 @@ export class HillPhysics {
             const body=Bodies.rectangle((x1+x2)/2,(y1+y2)/2+82,Math.hypot(x2-x1,y2-y1)+3,164,{isStatic:true,friction:.62,restitution:0,label:'soil'});
             this.segments.push(body);Composite.add(this.engine.world,body);
         }
-        this.boundaryDepth=h;this.walls=[Bodies.rectangle(-60,h/2,120,h*4,{isStatic:true,restitution:.2}),Bodies.rectangle(w+60,h/2,120,h*4,{isStatic:true,restitution:.2})];this.bottom=Bodies.rectangle(w/2,h+100,w+240,160,{isStatic:true});Composite.add(this.engine.world,[...this.walls,this.bottom]);
+        this.boundaryDepth=h;this.downhillReserve=0;this.walls=[Bodies.rectangle(-60,h/2,120,h*4,{isStatic:true,restitution:.2}),Bodies.rectangle(w+60,h/2,120,h*4,{isStatic:true,restitution:.2})];this.bottom=Bodies.rectangle(w/2,h+100,w+240,160,{isStatic:true});Composite.add(this.engine.world,[...this.walls,this.bottom]);
         // Physical contact follows the clipboard stone's traced silhouette.
         const scale=this.radius/rockSource.unit;
         const hull=Vertices.clockwiseSort(Vertices.hull(rockContour.map(p=>({x:p.x*scale,y:p.y*scale}))));
@@ -270,6 +270,10 @@ export class HillPhysics {
     }
     addMeowl(size){
         this.actorSize=size;this.actorHeight=size*.79;this.actorWidth=size*.38;
+        // Phone hills previously let the stone settle flush against the left wall,
+        // leaving less room than a complete meowl needs to get behind it. Reserve
+        // one real foothold at the bottom so the catch-and-push loop can continue.
+        this.downhillReserve=this.w<760?Math.max(this.actorWidth/2+3,this.actorSize*.58)+this.actorWidth/2+5:0;
         const x=this.rock.position.x-this.radius-size*.32;
         this.actor=Bodies.rectangle(x,this.ground(x)-this.actorHeight/2,this.actorWidth,this.actorHeight,{chamfer:{radius:size*.14},friction:.72,frictionStatic:.9,frictionAir:.009,restitution:0,inertia:Infinity,label:'meowl'});
         Body.setMass(this.actor,size*size*.0022);this.strength=this.actor.mass*(this.w<760?.0108*1.224:.0096*1.05);this.baseStrength=this.strength;Body.setInertia(this.actor,Infinity);Composite.add(this.engine.world,this.actor);
@@ -346,7 +350,9 @@ export class HillPhysics {
             this.mode='scurry';this.facing=-1;this.lane+=(1-this.lane)*(1-Math.exp(-dt*20));
             desired=clamp((target-a.position.x)*.16,-6.8,0);
             const clear=a.bounds.max.x<b.bounds.min.x-Math.min(this.actorSize*.4,Math.max(5,b.bounds.min.x-this.actorWidth*1.9));
-            if(clear){this.plantIntercept();return;}
+            const downhillFooting=Math.max(this.actorWidth/2+3,this.actorSize*.58);
+            const plantedAtEdge=a.position.x<=downhillFooting+1&&a.bounds.max.x<b.bounds.min.x-3;
+            if(clear||plantedAtEdge){this.plantIntercept();return;}
             // At the edge, wait in the foreground instead of chattering into a wall.
             if(a.position.x<this.actorWidth*.8+4&&target<=this.actorWidth*.65+4&&!clear){r.phase='edgebrace';r.age=0;}
         }else if(r.phase==='edgebrace'){
@@ -583,7 +589,7 @@ export class HillPhysics {
     }
     containRock(){
         const b=this.rock,left=b.position.x-b.bounds.min.x,right=b.bounds.max.x-b.position.x;
-        const x=clamp(b.position.x,left+3,this.w*.963-right-3),ceiling=this.rockSurfaceLimit(x);
+        const x=clamp(b.position.x,left+3+this.downhillReserve,this.w*.963-right-3),ceiling=this.rockSurfaceLimit(x);
         const y=Math.min(b.position.y,ceiling+1);
         if(x===b.position.x&&y===b.position.y)return;
         const vx=b.velocity.x,vy=b.velocity.y,hitSide=x!==b.position.x,hitGround=y<b.position.y;
@@ -659,5 +665,5 @@ export class HillPhysics {
         this.stepUntil=0;this.nextStep=0;
     }
     dispose(){this.release(false);Events.off(this.engine);Composite.clear(this.engine.world,false);Engine.clear(this.engine);}
-    diagnostics(){return{actorFlight:this.actorFlight?{...this.actorFlight}:null,actorMask:this.actor?.collisionFilter.mask,rockMask:this.rock.collisionFilter.mask,slabs:this.slabs.length,terrainBreaks:this.terrainBreaks,terrainFaults:this.faults.length,terrainVersion:this.terrainVersion,erosion:this.nodes.map(n=>n.eroded),structuralDamage:this.nodes.map(n=>n.damage),intercept:this.intercept?{...this.intercept}:null,catchBeat:this.catchBeat,catchArmed:this.catchArmed,catchImpactAge:this.time-this.catchImpactAt,catchSpeed:this.catchSpeed,catchGap:this.catchGap,assisting:!!this.assist,powerLeft:this.assist?Math.max(0,this.assist.until-this.time):0,tripCount:this.tripCount,emotion:this.emotion,emotionAge:this.time-this.emotionSince,panicHops:this.panicHops,setbackAge:this.time-this.setbackAt,splatAge:this.splat?.age||0,flattened:!!this.splat,position:{...this.rock.position},velocity:{...this.rock.velocity},angle:this.rock.angle,radius:this.radius,outline:this.outline(),area:this.rock.area,originalArea:this.originalArea,chipCount:this.chipCount,chips:this.chips.length,lastChipArea:this.lastChipArea||0,ground:this.ground(this.rock.position.x),dragging:!!this.drag,impacts:this.impactCount,maxIndent:this.maxIndent,indent:this.nodes.map(n=>n.y),steps:this.steps,catchCount:this.catchCount,maxSlide:this.maxSlide,contact:this.contact,gripGrace:this.gripGrace,mode:this.mode,catchAge:this.catchAge,stroke:this.stroke,workAge:this.workAge,pushForce:this.pushForce,strength:this.strength,mass:this.rock.mass,actorMass:this.actor?.mass,facing:this.facing,lane:this.lane,reposition:this.reposition?{...this.reposition}:null,repositionCount:this.repositionCount,actor:this.actor?{position:{...this.actor.position},velocity:{...this.actor.velocity}}:null};}
+    diagnostics(){return{actorFlight:this.actorFlight?{...this.actorFlight}:null,actorMask:this.actor?.collisionFilter.mask,rockMask:this.rock.collisionFilter.mask,downhillReserve:this.downhillReserve,slabs:this.slabs.length,terrainBreaks:this.terrainBreaks,terrainFaults:this.faults.length,terrainVersion:this.terrainVersion,erosion:this.nodes.map(n=>n.eroded),structuralDamage:this.nodes.map(n=>n.damage),intercept:this.intercept?{...this.intercept}:null,catchBeat:this.catchBeat,catchArmed:this.catchArmed,catchImpactAge:this.time-this.catchImpactAt,catchSpeed:this.catchSpeed,catchGap:this.catchGap,assisting:!!this.assist,powerLeft:this.assist?Math.max(0,this.assist.until-this.time):0,tripCount:this.tripCount,emotion:this.emotion,emotionAge:this.time-this.emotionSince,panicHops:this.panicHops,setbackAge:this.time-this.setbackAt,splatAge:this.splat?.age||0,flattened:!!this.splat,position:{...this.rock.position},velocity:{...this.rock.velocity},angle:this.rock.angle,radius:this.radius,outline:this.outline(),area:this.rock.area,originalArea:this.originalArea,chipCount:this.chipCount,chips:this.chips.length,lastChipArea:this.lastChipArea||0,ground:this.ground(this.rock.position.x),dragging:!!this.drag,impacts:this.impactCount,maxIndent:this.maxIndent,indent:this.nodes.map(n=>n.y),steps:this.steps,catchCount:this.catchCount,maxSlide:this.maxSlide,contact:this.contact,gripGrace:this.gripGrace,mode:this.mode,catchAge:this.catchAge,stroke:this.stroke,workAge:this.workAge,pushForce:this.pushForce,strength:this.strength,mass:this.rock.mass,actorMass:this.actor?.mass,facing:this.facing,lane:this.lane,reposition:this.reposition?{...this.reposition}:null,repositionCount:this.repositionCount,actor:this.actor?{position:{...this.actor.position},velocity:{...this.actor.velocity}}:null};}
 }

@@ -330,8 +330,20 @@ target.hip=[-12,-9];target.chest=[-4,-40];target.head=[2,-66];target.feet=[-26,1
             foot.age=Math.min(1,foot.age+dt/Math.max(.07,duration));
             const u=foot.age,ease=u*u*(3-2*u);foot.x=mix(foot.from,foot.to,ease);fy=ground(foot.x)-Math.sin(u*Math.PI)*size*(loaded?.025:.045);
         }
+        const guideScamper=o.id==='guide'&&mode==='scurry'&&Math.abs(o.speed||0)>35;
+        const guideAir=o.id==='guide'&&air&&!['pole','hang'].includes(o.parkour?.kind);
         if(o.parkour?.kind==='grind')feet.push([p.feet[i],0]);
+        else if(guideAir){
+            const stride=t*15+i*Math.PI,kind=o.parkour?.kind;
+            if(['walljump','wallkick'].includes(kind))feet.push([p.hip[0]+(i?-5:20),p.hip[1]+(i?12:23)]);
+            else if(['leap','triple','kong'].includes(kind))feet.push([p.hip[0]+(i?20:-20),p.hip[1]+(i?23:10)]);
+            else feet.push([p.hip[0]+(i?6:-6)+Math.sin(stride)*10,p.hip[1]+17-Math.max(0,Math.cos(stride))*7]);
+        }
         else if(air)feet.push([p.feet[i]+Math.sin(t*7+i*2)*3,Math.sin(t*7+i*2)*3+1]);
+        else if(guideScamper){
+            const stride=state.gait*1.18+i*Math.PI;
+            feet.push([p.hip[0]+(i?5:-5)+Math.sin(stride)*18,p.hip[1]+23-Math.max(0,Math.cos(stride))*12]);
+        }
         else if(!o.ground&&!loaded&&Math.abs(o.speed||0)>5){const stride=state.gait+i*Math.PI;feet.push([p.feet[i]+Math.sin(stride)*4,-Math.max(0,Math.cos(stride))*4]);}
         else feet.push(local(foot.x,fy));
     }
@@ -360,13 +372,26 @@ target.hip=[-12,-9];target.chest=[-4,-40];target.head=[2,-66];target.feet=[-26,1
     }
     for(let i=0;i<2;i++){const shoulder=[p.chest[0]+(i?16:-17),p.chest[1]+(i?8:5)],dx=hands[i][0]-shoulder[0],dy=hands[i][1]-shoulder[1],d=Math.hypot(dx,dy),reach=o.overhead||air?79:loaded?39:48;if(d>reach){hands[i]=[shoulder[0]+dx/d*reach,shoulder[1]+dy/d*reach];}}
     c.save();c.translate(x,y);c.scale(scale*face,scale);c.lineCap='round';c.lineJoin='round';
+    const guideScamper=o.id==='guide'&&mode==='scurry'&&Math.abs(o.speed||0)>35;
+    const guideAir=o.id==='guide'&&air&&!['pole','hang'].includes(o.parkour?.kind);
     feet.forEach((foot,i)=>{
         // A crooked pen flourish gives each short bird foot three toes.
-        const [fx,fy]=foot;c.beginPath();c.moveTo(fx-1,fy-9);
-        c.bezierCurveTo(fx-4,fy-1,fx-2,fy,fx+7,fy);
-        c.lineTo(fx,fy);c.lineTo(fx+5,fy+3);c.lineTo(fx-1,fy+1);c.lineTo(fx-5,fy+2);
-        c.strokeStyle=ink;c.lineWidth=1.2;c.stroke();
+        const [fx,fy]=foot;
+        if(guideScamper||guideAir){
+            const hipX=p.hip[0]+(i?6:-6),hipY=p.hip[1]+4,kneeX=mix(hipX,fx,.55)+(i?3:-3),kneeY=mix(hipY,fy-8,.52)-2;
+            curve(c,[hipX,hipY],[kneeX,kneeY],[fx-1,fy-8],1.7);
+        }
+        c.beginPath();c.moveTo(fx-1,fy-9);
+        c.bezierCurveTo(fx-4,fy-1,fx-2,fy,fx+(guideScamper||guideAir?14:7),fy);
+        c.lineTo(fx,fy);c.lineTo(fx+(guideScamper||guideAir?11:5),fy+3);c.lineTo(fx-1,fy+1);c.lineTo(fx-(guideScamper||guideAir?9:5),fy+2);
+        c.strokeStyle=ink;c.lineWidth=guideScamper||guideAir?1.65:1.2;c.stroke();
     });
+    if(guideScamper){
+        const flutter=Math.sin(state.gait)*1.5;
+        for(let i=0;i<3;i++)curve(c,[p.hip[0]-18-i*6,p.hip[1]+12+i*3+flutter],[p.hip[0]-24-i*7,p.hip[1]+10+i*3],[p.hip[0]-30-i*8,p.hip[1]+12+i*3],1.15-i*.08,faint);
+    }else if(guideAir&&['walljump','wallkick','leap','triple','kong'].includes(o.parkour?.kind)){
+        for(let i=0;i<2;i++)curve(c,[p.hip[0]-19-i*7,p.hip[1]+12+i*5],[p.hip[0]-27-i*8,p.hip[1]+8+i*5],[p.hip[0]-35-i*9,p.hip[1]+11+i*5],.85,faint);
+    }
     const shoulders=[[p.chest[0]-17,p.chest[1]+5],[p.chest[0]+16,p.chest[1]+8]];
     wing(c,shoulders[0],hands[0],1,false);
     silhouette(c,p,t,effort);

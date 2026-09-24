@@ -7,8 +7,24 @@ if(!window.__buttonFeel){
     const reduced=matchMedia('(prefers-reduced-motion: reduce)');
     const animations=new WeakMap();
     const css=document.createElement('style');
-    css.textContent='button{touch-action:manipulation}button:focus-visible{outline:2px solid #8b7248;outline-offset:5px}.cheer-bit{position:fixed;pointer-events:none;z-index:1001;color:#847348;font:22px Pen,cursive}';
+    css.textContent='button{touch-action:manipulation}button:focus-visible{outline:2px solid #8b7248;outline-offset:5px}.cheer-bit{position:fixed;pointer-events:none;z-index:1001;color:#847348;font:22px Pen,cursive}.inline-project-link{color:inherit;text-decoration-line:underline;text-decoration-thickness:1px;text-decoration-style:wavy;text-underline-offset:3px}';
     document.head.append(css);
+    const gameTargets='.chapter-copy h2,.chapter-copy p,.chapter-copy small,.legal p,.scene-intro p,.project-note p,.halo-cue .cue-detail,#panel-content h2,#panel-content>p';
+    const gameDestinations={deadlock:'https://store.steampowered.com/app/1422450/Deadlock/','path of exile':'https://www.pathofexile.com/'};
+    function linkGameNames(root=document){
+        const targets=root.matches?.(gameTargets)?[root]:root.querySelectorAll?.(gameTargets)||[];
+        for(const target of targets){
+            const walker=document.createTreeWalker(target,NodeFilter.SHOW_TEXT,{acceptNode:node=>node.parentElement?.closest('a,button,script,style')||!/(path of exile|deadlock)/i.test(node.data)?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});
+            const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
+            for(const node of nodes){
+                const fragment=document.createDocumentFragment();let at=0;
+                node.data.replace(/path of exile|deadlock/gi,(word,index)=>{fragment.append(node.data.slice(at,index));const link=document.createElement('a');link.className='inline-project-link';link.href=gameDestinations[word.toLowerCase()];link.target='_blank';link.rel='noopener noreferrer';link.textContent=word;fragment.append(link);at=index+word.length;return word;});
+                fragment.append(node.data.slice(at));node.replaceWith(fragment);
+            }
+        }
+    }
+    linkGameNames();
+    const projectPanel=document.querySelector('#project-panel');if(projectPanel)new MutationObserver(records=>{for(const record of records)for(const node of record.addedNodes)if(node.nodeType===Node.ELEMENT_NODE)linkGameNames(node);}).observe(projectPanel,{childList:true,subtree:true});
     function bounce(button,press){
         if(reduced.matches)return;
         const current=getComputedStyle(button).scale;

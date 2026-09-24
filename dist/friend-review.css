@@ -224,8 +224,8 @@ body.tugging-thread,body.tugging-thread *{user-select:none!important;cursor:grab
 .sketch-foot nav{align-items:center}.sketch-foot .footer-profile{display:inline-flex;align-items:center;justify-content:center;min-width:32px;min-height:36px;text-decoration:none}.footer-profile svg{width:19px;height:19px}.footer-profile:first-child{rotate:-9deg}.footer-profile:nth-child(2){rotate:7deg}
 
 /* One link row; the mascot sits underneath the two community links. */
-.project-links.poetato-links{display:grid;grid-template-columns:repeat(4,max-content);align-items:center;justify-content:start;gap:5px 18px;max-width:100%;font:16.96px/1.4 Reader,Georgia,serif}
-.poetato-links .squish-yoshi{grid-column:3 / 5;justify-self:center;display:block;width:68px;height:72px;padding:0;border:0;background:none;cursor:pointer}
+.project-links.poetato-links{display:grid;grid-template-columns:repeat(3,max-content);align-items:center;justify-content:start;gap:5px 18px;max-width:100%;font:16.96px/1.4 Reader,Georgia,serif}
+.poetato-links .squish-yoshi{grid-column:3;justify-self:center;display:block;width:68px;height:72px;padding:0;border:0;background:none;cursor:pointer}
 .poetato-links .squish-yoshi img{display:block;width:68px;height:72px;object-fit:contain;transform:rotate(-12deg);transform-origin:50% 92%;will-change:scale}
 @media(max-width:380px){.project-links.poetato-links{column-gap:13px}}
 
