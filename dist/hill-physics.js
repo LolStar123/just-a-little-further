@@ -15,7 +15,7 @@ export class HillPhysics {
         this.w=w;this.h=h;this.onImpact=onImpact;this.accumulator=0;this.steps=0;this.time=0;
         this.engine=Engine.create({positionIterations:12,velocityIterations:10,constraintIterations:6});
         this.engine.gravity.y=1;this.engine.gravity.scale=.001;
-        this.radius=clamp(w*.058,35,80);this.startX=Math.max(w*.16,this.radius*3);this.segmentCount=52;
+        this.radius=w<760?clamp(w*.075,24,40):clamp(w*.058,35,80);this.startX=Math.max(w*.16,this.radius*3);this.segmentCount=52;
         this.nodes=Array.from({length:53},(_,i)=>({x:i*w/52,y:0,v:0,eroded:0,damage:0}));this.segments=[];this.faults=[];this.slabs=[];this.terrainBreaks=0;this.terrainVersion=0;this.terrainChanging=false;
         for(let i=0;i<52;i++){
             const [x1,y1]=this.point(i),[x2,y2]=this.point(i+1);
@@ -72,7 +72,8 @@ export class HillPhysics {
     }
     base(x){
         const k=clamp(x/this.w*52,0,52),i=Math.min(51,Math.floor(k)),f=k-i;
-        const rise=Math.min(this.h*.40,this.w*.48),baseline=this.w<760?(this.h<700?.70:.74):.84;
+        const phone=this.w<760;
+        const rise=phone?Math.min(this.h*.20,this.w*.26):Math.min(this.h*.40,this.w*.48),baseline=phone?.77:.84;
         // The last quarter grows steadily steeper; retain the same crag offsets.
         const lo=clamp((i/52-.78)/.22,0,1),hi=clamp(((i+1)/52-.78)/.22,0,1);
         const summit=.60*(lo*lo+(hi*hi-lo*lo)*f);

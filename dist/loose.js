@@ -64,7 +64,7 @@ function resize(){
     surface.dataset.baseHeight=H;paintHeight=0;canvas.width=Math.round(W*dpr);canvas.height=Math.round(Math.min(H,innerHeight+256)*dpr);c.setTransform(dpr,0,0,dpr,0,0);
     cancelGrab();auraField.clear();physics?.dispose();physics=new HillPhysics(W,H,impact);physics.restoreTerrain(terrain);terrainSeen=-1;catchSeen=0;
     if(old&&oldW){const b=physics.rock;Matter.Body.setPosition(b,{x:clamp(old.position.x/oldW*W,physics.radius,W-physics.radius),y:Math.min(old.position.y/oldH*H,physics.ground(old.position.x/oldW*W)-physics.radius)});Matter.Body.setAngle(b,old.angle);}
-    hero.size=W<760?84:128;physics.addMeowl(hero.size);hero.held=false;updateCharacters(0);
+    hero.size=W<760?clamp(W*.17,56,76):128;physics.addMeowl(hero.size);hero.held=false;updateCharacters(0);
     prepareLinework();setHillContour(physics.contour(),Math.min(0,physics.base(W*.47)-H*.72-22));layoutProjects();last=0;wake();
 }
 function layoutProjects(){
