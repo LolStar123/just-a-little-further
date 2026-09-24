@@ -43,14 +43,14 @@ export function miniScene(scene,canvas,wake,sfx){
   note.textContent=({poe:["Watcher's Eye",'Timeless jewels','Sublime Vision'][n%3]+' / prices to risk sheets.',scraper:paperTitles[n]+' / collecting paper '+(state.cycles+1)+'.',pipeline:'clean market data. test on the next unseen period.',smoothtato:presets[n]+': '+['all effects visible.','particles and bloom off.','decorative props and skill FX off.','shadows, reflections and fog off.'][n],mtxtato:auraStyles[n%3].name,tfl:['Central','Victoria','Northern'][n%3]+' is delayed. each checkpoint updates the ratings.',commute:(n%5+1)+' days: '+((n%5+1)*6===24?'both cost the same in this example.':((n%5+1)*6<24?'single journeys':'the weekly ticket')+' cost less in this example.'),deadlock:'',baxter:['baxter sorts the request','the product manager scopes it','the developer builds it','the verifier checks it'][Math.min(3,Math.floor(state.elapsed/2.4))]})[scene];
  }
  function change(manual=false){
-  if(scene!=='scraper'){previous=document.createElement('canvas');previous.width=a.el.width;previous.height=a.el.height;previous.getContext('2d').drawImage(a.el,0,0);}
+  if(!['scraper','tfl'].includes(scene)){previous=document.createElement('canvas');previous.width=a.el.width;previous.height=a.el.height;previous.getContext('2d').drawImage(a.el,0,0);}
   const choices=Array.from({length:counts[scene]||3},(_,i)=>i).filter(i=>i!==state.choice);
   if(scene==='scraper'){
    if(!paperBag.length){paperBag=choices;for(let i=paperBag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[paperBag[i],paperBag[j]]=[paperBag[j],paperBag[i]];}}
    state.choice=paperBag.pop();
   }else state.choice=choices[Math.floor(Math.random()*choices.length)];
   state.cycles++;if(manual)state.actions++;
-  if(scene!=='scraper'||!manual)state.elapsed=0;state.transition=scene==='scraper'?1:0;caption();draw();wake();
+  if(scene!=='scraper'||!manual)state.elapsed=0;state.transition=['scraper','tfl'].includes(scene)?1:0;caption();draw();wake();
  }
  caption();
  if(scene==='poe'||scene==='deadlock'){
@@ -244,15 +244,44 @@ export function miniScene(scene,canvas,wake,sfx){
     toyProp(c,'train-'+i,x,y-2,25,16,(c)=>path(c,[[x-10,y-12],[x+10,y-11],[x+11,y-2],[x-9,y-2],[x-10,y-12]],ink,1.3));
     label(c,names[i],64,y+4,16);label(c,String(Math.round(state.ratings[i])),408,y+5,20);
    }
-   const days=Math.floor(state.clock/4.5)%5+1,pay=days*6,weekly=24,save=Math.abs(pay-weekly);
-   label(c,days+' commute days',128,259,19);
-   label(c,'payg £'+pay+' / week £'+weekly,150,289,18);
-   label(c,pay===weekly?'same cost':(pay<weekly?'payg':'week ticket')+' saves £'+save,150,320,18);
-   const cx=343+Math.sin(state.routeTime*.9)*24;
-   owl(c,cx,354,'conductor',53,{mode:'carry',speed:32,costume:'verifier',cargo:(ctx,g)=>{page(ctx,g.x-18,g.y-29,36,29);}});
-   path(c,[[132,51],[123,153],[128,218],[258,231],[280,304],[296,354]],soft,.65);
+   const q=state.routeTime%8,round=Math.floor(state.routeTime/8),days=[1,5,2,4,3][round%5],pay=days*6,weekly=24;
+   const tie=pay===weekly,winning=pay<=weekly?0:1,reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+   const smooth=v=>{v=Math.max(0,Math.min(1,v));return v*v*(3-2*v);};
+   const leftX=113,rightX=372,home=242,near=[204,281];
+   let cx=home,moving=false,side=winning;
+   if(q<2.1){cx=home+(near[winning]-home)*smooth((q-.65)/1.45);moving=q>.65;}
+   else if(tie&&q>3.05&&q<4.35){side=1;cx=near[0]+(near[1]-near[0])*smooth((q-3.05)/1.3);moving=true;}
+   else if(q<5.35){side=tie&&q>=4.35?1:winning;cx=near[side];}
+   else {side=tie?1:winning;cx=near[side]+(home-near[side])*smooth((q-5.35)/2);moving=q<7.35;}
+   if(reduced){cx=home;moving=false;}
+   const stampTimes=tie?[2.2,4.45]:[winning===0?2.2:99,winning===1?2.2:99];
+   const stamped=stampTimes.map(at=>q>=at+.18),stamping=stampTimes.some(at=>q>=at-.15&&q<at+.38);
+   label(c,days+' days this week',240,248,18);
+   function ticket(ctx,x,y,index){
+    const tilt=(index?1:-1)*.035;ctx.save();ctx.translate(x,y);ctx.rotate(tilt);
+    ctx.beginPath();ctx.moveTo(-53,-31);ctx.lineTo(53,-29);ctx.lineTo(51,-10);ctx.quadraticCurveTo(41,-6,51,-1);ctx.lineTo(53,43);ctx.lineTo(-52,41);ctx.lineTo(-50,5);ctx.quadraticCurveTo(-41,0,-51,-5);ctx.closePath();ctx.fillStyle=paper;ctx.fill();ctx.strokeStyle=ink;ctx.lineWidth=1.2;ctx.stroke();
+    ctx.fillStyle=ink;ctx.textAlign='center';ctx.font='17px Reader,Georgia,serif';ctx.fillText(index?'week pass':'pay as you go',0,-9);ctx.font='23px Reader,Georgia,serif';ctx.fillText('£'+(index?weekly:pay),0,15);
+    for(let j=0;j<7;j++)path(ctx,[[33+j*2.1,21],[33+j*2.1,27]],soft,j%2?.65:1);
+    if(stamped[index]){const age=q-stampTimes[index]-.18,pop=reduced?1:1+Math.exp(-age*9)*Math.sin(age*21)*.14;ctx.save();ctx.translate(0,29);ctx.rotate(-.12);ctx.scale(pop,pop);ctx.strokeStyle='#687a58';ctx.lineWidth=1.5;ctx.strokeRect(-35,-8,70,20);ctx.fillStyle='#687a58';ctx.font='bold 15px Reader,Georgia,serif';ctx.fillText(tie?'either!':'this one',0,7);ctx.restore();}
+    ctx.restore();
+   }
+   for(let i=0;i<2;i++){
+    const tx=i?rightX:leftX,arrival=reduced?0:Math.exp(-q*6)*Math.sin(q*14)*5;
+    toyProp(c,'fare-ticket-'+i,tx,345,110,78,ctx=>ticket(ctx,tx,301+arrival,i));
+   }
+   owl(c,cx,354,'conductor',65,{mode:stamping?'push':moving?'walk':stamped[side]?'happy':'watch',speed:moving?52:0,facing:side===0?-1:1,effort:stamping?.8:.15,costume:'verifier',emotion:stamped[side]?'happy':'curious',cargo:stamping?(ctx,g)=>{path(ctx,[[g.x-7,g.y-12],[g.x+7,g.y-12],[g.x+7,g.y-5],[g.x+2,g.y-5],[g.x+2,g.y+3],[g.x+12,g.y+3],[g.x+12,g.y+9],[g.x-12,g.y+9],[g.x-12,g.y+3],[g.x-2,g.y+3],[g.x-2,g.y-5],[g.x-7,g.y-5],[g.x-7,g.y-12]],ink,1.2);}:null});
+   for(let i=0;i<2;i++){
+    const age=q-stampTimes[i],tx=i?rightX:leftX;
+    if(!reduced&&age>=0&&age<.45){const hit=Math.sin(Math.min(1,age/.18)*Math.PI/2),lift=age>.18?(age-.18)*90:0;ctxStamp(c,tx,280+hit*18-lift,1-age/.45);}
+    if(!reduced&&age>.18&&age<.75)for(let j=0;j<5;j++){const a=-Math.PI+j*Math.PI/4,r=14+(age-.18)*32,px=tx+Math.cos(a)*r,py=317+Math.sin(a)*r;path(c,[[px,py],[px+Math.cos(a)*4,py+Math.sin(a)*4]],gold,.9);}
+    if(age>=.18)sfx.beat('fare-stamp-'+i,round,'place',{level:.23});
+   }
+   function ctxStamp(ctx,x,y,alpha){ctx.save();ctx.globalAlpha*=Math.max(0,alpha);path(ctx,[[x-9,y-27],[x+9,y-27],[x+7,y-16],[x+3,y-15],[x+3,y-6],[x+22,y-6],[x+22,y],[x-22,y],[x-22,y-6],[x-3,y-6],[x-3,y-15],[x-7,y-16],[x-9,y-27]],ink,1.8);ctx.restore();}
+   if(stamped[winning])label(c,tie?'same fare. take either.':'£'+Math.abs(pay-weekly)+' stays in your pocket',240,377,16);
+   path(c,[[132,51],[123,153],[128,218],[51,243],[52,335],[65,354]],soft,.65);
    sfx.chirp('tflconductor',state.clock,[14,22]);
-   state.commute={days,pay,weekly,cheapest:Math.min(pay,weekly)};
+   if(moving)sfx.beat('fare-waddle',Math.floor(state.routeTime*3),'step',{level:.25});
+   state.commute={days,pay,weekly,cheapest:Math.min(pay,weekly),phase:q,stamped,conductorX:cx,tie};
    note.textContent='';
   }else if(scene==='commute'){
    const days=n%5+1,pay=days*6,weekly=24,max=32;
