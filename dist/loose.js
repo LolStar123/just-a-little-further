@@ -43,12 +43,18 @@ function positionThought(dt){
         copy.getAnimations().forEach(a=>a.cancel());copy.animate([{opacity:.2,transform:'translateY(4px) scale(.96)'},{opacity:1,transform:'translateY(-3px) scale(1.025)'},{transform:'translateY(1px) scale(.995)'},{transform:'none'}],{duration:420,easing:'ease-out'});
     }
     const width=el.offsetWidth,height=el.offsetHeight,origin=surface.getBoundingClientRect();
-    const obstacles=[$('.introduction'),$('.bottom-edge'),...document.querySelectorAll('.knot-name')].map(el=>{const r=el.getBoundingClientRect();return {left:r.left-origin.left,right:r.right-origin.left,top:r.top-origin.top,bottom:r.bottom-origin.top};});
+    const obstacles=[$('.introduction'),$('.bottom-edge'),...document.querySelectorAll('.knot')].map(el=>{const r=el.getBoundingClientRect();return {left:r.left-origin.left-9,right:r.right-origin.left+9,top:r.top-origin.top-9,bottom:r.bottom-origin.top+9};});
     const rock=physics.rock.bounds;obstacles.push({left:rock.min.x-10,right:rock.max.x+10,top:rock.min.y-10,bottom:rock.max.y+10},{left:hero.x-hero.size*.6,right:hero.x+hero.size*.6,top:hero.y-hero.size*1.1,bottom:hero.y+15});
     const candidates=[...(W<760?[[W*.07,340]]:[]),[hero.x-hero.size*.7-width-14,hero.y-hero.size*.9],[hero.x+hero.size*.7+14,hero.y-hero.size*.9],[hero.x-width*.5,hero.y+50]];
+    for(const lift of [1.3,1.7,2.1])for(const side of [-1,0,1])candidates.push([hero.x-width*.5+side*(width+20),hero.y-hero.size*lift-height]);
     const choices=candidates.map(([x,y])=>{x=clamp(x,12,W-width-12);y=clamp(y,95,H+extraDepth-height-8);const area=obstacles.reduce((sum,r)=>sum+Math.max(0,Math.min(x+width,r.right)-Math.max(x,r.left))*Math.max(0,Math.min(y+height,r.bottom)-Math.max(y,r.top)),0);return{x,y,area};});
     const chosen=choices.find(p=>p.area===0)||choices.sort((a,b)=>a.area-b.area)[0],{x,y}=chosen,ease=1-Math.exp(-Math.max(dt,.016)*9);
     thoughtX=thoughtX===null?x:thoughtX+(x-thoughtX)*ease;thoughtY=thoughtY===null?y:thoughtY+(y-thoughtY)*ease;
+    // The interpolated path must avoid the cards too, not only its destination.
+    for(let pass=0;pass<obstacles.length;pass++){
+        const hit=obstacles.find(r=>thoughtX<r.right&&thoughtX+width>r.left&&thoughtY<r.bottom&&thoughtY+height+3>r.top);
+        if(!hit)break;thoughtY=hit.top-height-4;
+    }
     el.style.transform=`translate(${thoughtX}px,${thoughtY+Math.sin(time*2)*1.2}px)`;
 }
 

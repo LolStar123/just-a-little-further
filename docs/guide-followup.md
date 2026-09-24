@@ -195,3 +195,9 @@ Music references: https://viva.pressbooks.pub/openmusictheory/chapter/altered-an
 - [x] Physical bottom and side boundaries follow the deeper region; drag range extends with it.
 - [x] Desktop and mobile render checks at 0, 900, 6000 and 14000px excavation; cards remain inside the region, fracture drawing visible, canvas stays at most viewport + 256px tall.
 - [x] Repeated-impact crack renewal test still passes at 180 impacts.
+
+## Laptop feedback, 24 September
+- [x] Constrain boulder drag targets against the rotated polygon's support surface.
+- [x] After every physics substep, correct tunnelling and keep the complete rock inside the visible hill's edges; remove only inward velocity.
+- [x] Speech avoids full card bounds with padding and checks its interpolated movement too.
+- [x] Stress drag/rotation, both edges, forced below-ground recovery at phone/laptop widths; speech at 1024x768, 1280x720, 1366x768. Grounded chase regression passed.
