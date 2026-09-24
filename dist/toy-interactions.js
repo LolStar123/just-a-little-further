@@ -94,7 +94,7 @@ export function toyProp(c,id,x,y,w,h,paint,options={}){
     const result=itemFor(c,id,x,y,w,h,false);
     if(result){
         const {item,matrix}=result;
-        item.needsRescue=!!options.rescue;
+        item.needsRescue=!!options.rescue;item.constrain=options.constrain||null;
         if(!item.pageActive&&(!item.sprite||performance.now()-(item.spriteAt||0)>180)){
             item.spriteAt=performance.now();const pad=4,sprite=item.sprite||document.createElement('canvas'),sw=Math.ceil(item.box.w+pad*2),sh=Math.ceil(item.box.h+pad*2);sprite.width=sw;sprite.height=sh;
             const ctx=sprite.getContext('2d');ctx.setTransform(matrix.a,matrix.b,matrix.c,matrix.d,matrix.e-item.home.x+item.box.w/2+pad,matrix.f-item.home.y+item.box.h+pad);ctx.strokeStyle=c.strokeStyle;ctx.fillStyle=c.fillStyle;ctx.font=c.font;ctx.lineWidth=c.lineWidth;paint(ctx);item.sprite=sprite;

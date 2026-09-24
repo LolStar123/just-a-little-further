@@ -15,7 +15,7 @@ export class HillPhysics {
         this.w=w;this.h=h;this.onImpact=onImpact;this.accumulator=0;this.steps=0;this.time=0;
         this.engine=Engine.create({positionIterations:12,velocityIterations:10,constraintIterations:6});
         this.engine.gravity.y=1;this.engine.gravity.scale=.001;
-        this.radius=clamp(w*.058,35,80);this.segmentCount=52;
+        this.radius=clamp(w*.058,35,80);this.startX=Math.max(w*.16,this.radius*3);this.segmentCount=52;
         this.nodes=Array.from({length:53},(_,i)=>({x:i*w/52,y:0,v:0,eroded:0,damage:0}));this.segments=[];this.faults=[];this.slabs=[];this.terrainBreaks=0;this.terrainVersion=0;this.terrainChanging=false;
         for(let i=0;i<52;i++){
             const [x1,y1]=this.point(i),[x2,y2]=this.point(i+1);
@@ -28,7 +28,7 @@ export class HillPhysics {
         const hull=Vertices.clockwiseSort(Vertices.hull(rockContour.map(p=>({x:p.x*scale,y:p.y*scale}))));
         const centre=Vertices.centre(hull);this.referenceOrigin={x:-centre.x,y:-centre.y};
         this.initialReferenceOrigin={...this.referenceOrigin};
-        this.rock=Bodies.fromVertices(w*.59,this.ground(w*.59)-this.radius-4,[hull],{density:.0138,friction:.82,frictionStatic:1.15,frictionAir:.0018,restitution:.22,label:'boulder'});
+        this.rock=Bodies.fromVertices(this.startX,this.ground(this.startX)-this.radius-4,[hull],{density:.0138,friction:.82,frictionStatic:1.15,frictionAir:.0018,restitution:.22,label:'boulder'});
         this.originalArea=this.rock.area;this.chips=[];this.chipCount=0;this.fractures=[];this.lastChip=-100;
         this.initialOutline=this.rock.vertices.map(v=>({x:v.x-this.rock.position.x,y:v.y-this.rock.position.y}));
         Composite.add(this.engine.world,this.rock);
@@ -37,7 +37,7 @@ export class HillPhysics {
         this.catchGap=0;this.lastGripAt=-100;this.lastGroundAt=-100;this.gripGrace=false;this.catchArmed=false;this.catchBeat=0;this.catchImpactAt=-100;this.catchSpeed=0;
         this.stepUntil=0;this.nextStep=0;
         this.drag=null;this.dragSamples=[];this.impactCount=0;this.maxIndent=0;this.catchCount=0;this.maxSlide=0;
-        this.emotion='calm';this.emotionSince=0;this.setbackAt=-100;this.earnedX=w*.59;this.nextPanicHop=0;this.panicHops=0;
+        this.emotion='calm';this.emotionSince=0;this.setbackAt=-100;this.earnedX=this.startX;this.nextPanicHop=0;this.panicHops=0;
         this.trip=null;this.tripCount=0;this.nextTrip=0;this.assist=null;this.actorFlight=null;
         this.splat=null;this.springUntil=0;this.actor=null;this.control={pet:0};this.mode='walk';this.effort=0;this.catchAge=0;this.catchActive=false;this.contact=false;this.grounded=false;this.landed=0;this.celebrate=0;this.restUntil=0;this.workAge=0;this.stroke=0;this.pushForce=0;this.slipUntil=0;this.recoverUntil=0;
         Events.on(this.engine,'beforeUpdate',()=>{this.rock.plugin.preV={...this.rock.velocity};if(this.actor)this.actor.plugin.preV={...this.actor.velocity};});
@@ -635,7 +635,7 @@ export class HillPhysics {
         this.release(false);this.actorFlight=null;this.unsplat(false);this.springUntil=0;for(const n of this.nodes){n.y=0;n.v=0;n.eroded=0;n.damage=0;}this.faults=[];this.terrainBreaks=0;this.terrainVersion++;this.updateGround();this.seedTerrain();
         for(const chip of this.chips)Composite.remove(this.engine.world,chip.body);this.chips=[];this.fractures=[];this.referenceOrigin={...this.initialReferenceOrigin};
         Body.setAngle(this.rock,0);Body.setVertices(this.rock,this.initialOutline.map(p=>({...p})));this.chipCount=0;this.lastChip=-100;this.lastChipArea=0;
-        Body.setPosition(this.rock,{x:this.w*.59,y:this.ground(this.w*.59)-this.radius-5});Body.setVelocity(this.rock,{x:0,y:0});Body.setAngularVelocity(this.rock,0);Body.setAngle(this.rock,0);
+        Body.setPosition(this.rock,{x:this.startX,y:this.ground(this.startX)-this.radius-5});Body.setVelocity(this.rock,{x:0,y:0});Body.setAngularVelocity(this.rock,0);Body.setAngle(this.rock,0);
         if(this.actor){const x=this.rock.position.x-this.radius-this.actorSize*.32;Body.setPosition(this.actor,{x,y:this.ground(x)-this.actorHeight/2});Body.setVelocity(this.actor,{x:0,y:0});}
         this.catchActive=false;this.catchArmed=false;this.lastGripAt=-100;this.lastGroundAt=-100;this.gripGrace=false;this.catchAge=0;this.celebrate=0;this.effort=0;this.restUntil=0;this.workAge=0;this.stroke=0;this.pushForce=0;this.recoverUntil=0;this.mode='walk';
         this.reposition=null;this.intercept=null;this.catchGap=0;this.catchImpactAt=-100;this.lane=0;this.facing=1;if(this.actor)this.actor.collisionFilter.mask=0xFFFFFFFF;

@@ -2,6 +2,7 @@ import {drawMeowl} from './little-creatures.js';
 import {toyProp} from './toy-interactions.js';
 import {inkPath} from './ink-path.js';
 import {POKER_PACK,SHUFFLE_SECONDS,pickPokerCard,drawPokerFace} from './poker-deck.js';
+import {drawBubble,confineBubble} from './bubble-boundary.js';
 import {thoughtPose,deadlockBlink,eyeGaze} from './thought-motion.js';
 export const normalise=text=>text.toLowerCase().replace(/\s+/g,' ').replace(/[1i|]/g,'l').trim();
 export function inverse2([a,b,c,d]){const det=a*d-b*c;if(Math.abs(det)<1e-8)return null;return[d/det,-b/det,-c/det,a/det];}
@@ -11,6 +12,8 @@ export function personalScene(scene,canvas,wake,sfx){
  document.querySelector('#scene').innerHTML='<canvas id="personal-art" class="toy mini-toy" aria-label="'+(interests?'A thought bubble of competitive games, poker and indomie':'OCR text normalisation example')+'"></canvas><p class="toy-note" id="personal-note"></p>';
  const a=canvas('personal-art'),state={clock:0,scene},note=document.querySelector('#personal-note');
  let shuffleCycle=0,frontCard=interests?pickPokerCard():null;
+ const seats=[[90,74],[244,74],[392,74],[143,179],[335,179]],radii=[24,29,30,49,31];
+ const floaters=seats.map(([x,y])=>({x,y:y-38,vx:0,vy:-8,knocks:0}));
  const eyePointer={x:0,y:0,active:false};
  if(interests){
   const follow=e=>{
@@ -49,14 +52,14 @@ export function personalScene(scene,canvas,wake,sfx){
   if(interests){
    const expansion=reduced.matches?1:Math.min(1,time/1.5),growth=1-Math.pow(1-expansion,3);
    c.save();c.translate(240,244);c.scale(.12+.88*growth,.12+.88*growth);c.translate(-240,-244);
-   c.beginPath();c.moveTo(46,242);c.bezierCurveTo(10,240,8,197,22,172);c.bezierCurveTo(-1,137,9,59,35,42);c.bezierCurveTo(44,7,131,7,164,20);c.bezierCurveTo(225,-2,297,13,325,20);c.bezierCurveTo(395,-2,467,20,463,60);c.bezierCurveTo(485,118,469,171,464,181);c.bezierCurveTo(478,233,425,244,386,239);c.bezierCurveTo(292,261,124,247,46,242);c.strokeStyle=ink;c.lineWidth=1.1;c.stroke();
-   const seats=[[90,74],[244,74],[392,74],[143,179],[335,179]],active=Math.floor(time/2.6)%5,phase=(time%2.6)/2.6;
+   c.strokeStyle=ink;c.lineWidth=1.1;drawBubble(c);
+   const active=Math.floor(time/2.6)%5,phase=(time%2.6)/2.6;
    state.activeThought=active;state.thoughtMotion=seats.map((_,i)=>thoughtPose(i,time));
    // The words never move. The doodles do the daydreaming above each label.
    const thread=[[35,42],[68,23],[137,30],[201,14],[278,29],[339,13],[445,34],[453,113],[377,128],[313,120],[249,143],[182,120],[87,134],[47,215],[85,236],[194,246]];
    line(c,thread,'#b2aa98',.75);
    for(let j=0;j<5;j++){
-    const [x,y]=seats[j],selected=j===active,{lift,angle,sway}=thoughtPose(j,time);
+    const [x,y]=seats[j],selected=j===active,pose=thoughtPose(j,time),body=floaters[j],lift=y-38-body.y,sway=body.x-x,angle=pose.angle+Math.max(-.06,Math.min(.06,body.vx*.003));
     c.save();c.translate(x+sway,y-30-lift);c.rotate(angle);c.strokeStyle=selected?olive:ink;c.lineWidth=1.5;
     toyProp(c,['deadlock-emblem','divine-orb','dota-emblem','poker-hand','indomie-sandwich'][j],0,16,j===3?82:52,60,c=>{
     if(j===0){ // Deadlock's eight-part wheel and little watching eye.
@@ -89,7 +92,7 @@ export function personalScene(scene,canvas,wake,sfx){
       const side=k%2?1:-1,rank=Math.floor(k/2),dealt=ease((q-.8-k*.095)/.34),separate=split*(1-dealt);
       const px=side*19*separate,py=-7+rank*.7-Math.sin(dealt*Math.PI)*9;
       c.save();c.translate(px,py);c.rotate(side*separate*.24);
-      c.beginPath();c.moveTo(-16,13);c.quadraticCurveTo(0,13-bridge,16,13);c.quadraticCurveTo(18,-9,15,-33);c.quadraticCurveTo(0,-35-bridge,-17,-32);c.closePath();c.fillStyle=paper;c.fill();c.strokeStyle=ink;c.lineWidth=1.05;c.stroke();
+      c.beginPath();c.moveTo(-16,13);c.quadraticCurveTo(0,13-bridge,16,13);c.quadraticCurveTo(18,-9,15,-33);c.quadraticCurveTo(0,-35-bridge,-17,-32);c.closePath();c.fillStyle=paper;c.fill();c.strokeStyle=ink;c.lineWidth=1.5;c.stroke();
       c.save();c.translate(0,-bridge*.45);drawPokerFace(c,k===11?frontCard:POKER_PACK[(POKER_PACK.indexOf(frontCard)+k+1)%54]);c.restore();
       c.restore();
      }
@@ -108,7 +111,12 @@ export function personalScene(scene,canvas,wake,sfx){
      for(let k=0;k<4;k++)line(c,[[-12+k*7,-15],[-10+k*7,-14]],'#ba9b60',.7);
      state.steamWisps=5;
     }
-    },{rescue:true});
+    },{rescue:true,constrain:(p)=>{
+     const rect=a.el.getBoundingClientRect(),frame=window.frameElement?.getBoundingClientRect(),host=parent!==window?parent:window,unit=s*rect.width/a.w;
+     const left=(frame?.left||0)+rect.left+ox*rect.width/a.w,top=(frame?.top||0)+rect.top+host.scrollY+oy*rect.height/a.h;
+     const local={x:(p.x-left)/unit,y:(p.y-top)/unit,vx:p.vx/unit,vy:p.vy/unit},hit=confineBubble(local,radii[j]);
+     return {x:left+local.x*unit,y:top+local.y*unit,vx:local.vx*unit,vy:local.vy*unit,hit:hit.hit};
+    }});
     c.restore();atoms[j].words.forEach((word,i)=>{if(j>=3||i===0)text(c,word,x,y+i*20,18);});
     if(gameLinks[j]){const link=gameLinks[j];link.style.left=(a.el.offsetLeft+ox+x*s)+'px';link.style.top=(a.el.offsetTop+oy+(y+20)*s)+'px';link.style.fontSize=Math.max(18*1.06*s,15)+'px';link.style.opacity=String(growth);link.style.visibility=growth>.98?'visible':'hidden';}
     if(selected){const spread=20+Math.sin(phase*Math.PI)*23;line(c,[[x-spread,y+26],[x-7,y+28],[x+spread,y+25]],olive,1.1);}
@@ -152,6 +160,12 @@ export function personalScene(scene,canvas,wake,sfx){
  }
  return {state,draw,advance(dt){
   state.clock+=dt;
+  if(interests){for(let left=Math.min(dt,.1);left>0;left-=1/120){const step=Math.min(left,1/120);for(let j=0;j<5;j++){
+   const b=floaters[j],pose=thoughtPose(j,state.clock),[x,y]=seats[j];
+   b.vx+=((x+pose.sway-b.x)*22-b.vx*4)*step;b.vy+=((y-38-pose.lift-b.y)*22-b.vy*4)*step;
+   b.x+=b.vx*step;b.y+=b.vy*step;const contact=confineBubble(b,radii[j]);if(contact.hit)b.knocks++;
+  }}state.bubbleBodies=floaters.map((b,j)=>({...b,radius:radii[j]}));}
+
   const cycle=Math.floor(state.clock/SHUFFLE_SECONDS);
   if(interests&&cycle!==shuffleCycle){shuffleCycle=cycle;frontCard=pickPokerCard();}
  }};

@@ -1,8 +1,8 @@
 export function thoughtPose(index,time){
  // Requested persistent idle movement, including reduced-motion desktops.
- return {lift:Math.sin(time*(1.65+index*.13)+index*.9)*(index<3?4:2.5),
-  sway:Math.sin(time*(1.85+index*.21)+index*1.1)*(index<3?8:5),
-  angle:Math.sin(time*(1.4+index*.17)+index*1.3)*(index<3?.19:.10)};
+ return {lift:Math.sin(time*(1.65+index*.13)+index*.9)*(index<3?3.2:2),
+  sway:Math.sin(time*(1.85+index*.21)+index*1.1)*(index<3?6:4),
+  angle:Math.sin(time*(1.4+index*.17)+index*1.3)*(index<3?.13:.075)};
 }
 export function deadlockBlink(time){
  const phase=time%3;
