@@ -153,7 +153,7 @@ export const projects={
     "title": "deadlock statistical analysis",
     "short": "Deadlock analysis",
     "category": "GAMES / STATISTICS",
-    "caption": "top 100 deadlock player. optimised my gameplay using conditional probability analyses to maximise impact and winrate.",
+    "caption": "top 100 deadlock player. optimised my gameplay using conditional probability analyses to maximise winrate.",
     "description": "Collect match data, take comparable checkpoints and split matches by a condition. Compare win rates for economy, damage, objectives and other stats, with sample sizes and uncertainty beside each result.",
     "scene": "deadlock",
     "note": "",
