@@ -4,10 +4,11 @@ const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
 export class Soundscape {
     constructor({autoStart=true}={}){
         this.enabled=true;this.sfxVolume=.48;this.context=null;this.buses=new Map();this.buffers=[];this.recorded=null;this.envelopes=new Map();this.loading=null;
+        this.focusLevel=document.hidden||!document.hasFocus()?.4:1;
         this.history=[];this.choices=new Map();this.voices=new Map();this.nodes=new Set();this.sampleError=false;
-        document.addEventListener('visibilitychange',()=>{
-            if(!document.hidden&&this.enabled)this.enable(true);
-        });
+        const updateFocus=()=>this.updateFocus();
+        document.addEventListener('visibilitychange',()=>{updateFocus();if(!document.hidden&&this.enabled)this.enable(true);});
+        addEventListener('focus',updateFocus);addEventListener('blur',()=>setTimeout(updateFocus,0));
         const refresh=()=>this.refresh();
         addEventListener('scroll',refresh,{passive:true});addEventListener('resize',refresh);
         if(autoStart)queueMicrotask(()=>this.enable(this.enabled));
@@ -18,10 +19,16 @@ export class Soundscape {
             this.master=a.createGain();this.master.gain.value=0;
             this.limiter=a.createDynamicsCompressor();this.limiter.threshold.value=-15;this.limiter.knee.value=12;this.limiter.ratio.value=6;
             this.limiter.attack.value=.004;this.limiter.release.value=.2;
-            this.master.connect(this.limiter);this.limiter.connect(a.destination);
+            this.focusGain=a.createGain();this.focusGain.gain.value=this.focusLevel;
+            this.master.connect(this.limiter);this.limiter.connect(this.focusGain);this.focusGain.connect(a.destination);
             for(const bus of this.buses.values())this.connect(bus);
         }
         return this.context;
+    }
+    updateFocus(){
+        // Top document.hasFocus() stays true when focus moves into a demo iframe.
+        this.focusLevel=document.hidden||!document.hasFocus()?.4:1;
+        if(this.focusGain)this.focusGain.gain.setTargetAtTime(this.focusLevel,this.context.currentTime,.16);
     }
     enable(value=!this.enabled){
         this.enabled=value;
@@ -61,7 +68,7 @@ export class Soundscape {
         this.buses.set(key,bus);if(this.context)this.connect(bus);return bus;
     }
     proximity(bus){
-        if(!bus.active||document.hidden||bus.owner.document.hidden)return 0;
+        if(!bus.active)return 0;
         const element=bus.owner===window?bus.element:bus.owner.frameElement;
         if(!element)return bus.owner===window?1:0;
         if(document.body.classList.contains('panel-open')&&!element.closest('#project-panel'))return 0;
@@ -122,7 +129,7 @@ export class Soundscape {
         this.history.push({scene:bus.id,kind,id:options.id||null,variant,recording:cut?.cut||('plinko-'+variant),mood:options.mood||null,good:!!options.good,at:now,weight:bus.weight});
         if(this.history.length>300)this.history.shift();return true;
     }
-    diagnostics(){return{enabled:this.enabled,sfxVolume:this.sfxVolume,state:this.context?.state||'locked',samples:this.buffers.length,recorded:!!this.recorded,recordedCuts:Object.values(recordings).reduce((n,c)=>n+c.length,0),sampleError:this.sampleError,nodes:this.nodes.size,buses:[...this.buses.values()].map(b=>({id:b.id,active:b.active,weight:b.weight})),events:this.history.slice(),voices:[...this.voices.entries()]};}
+    diagnostics(){return{focusLevel:this.focusLevel,focusGain:this.focusGain?.gain.value,enabled:this.enabled,sfxVolume:this.sfxVolume,state:this.context?.state||'locked',samples:this.buffers.length,recorded:!!this.recorded,recordedCuts:Object.values(recordings).reduce((n,c)=>n+c.length,0),sampleError:this.sampleError,nodes:this.nodes.size,buses:[...this.buses.values()].map(b=>({id:b.id,active:b.active,weight:b.weight})),events:this.history.slice(),voices:[...this.voices.entries()]};}
 }
 export function sharedMix(){
     try{if(parent!==window&&parent.__meowlSound)return parent.__meowlSound;}catch{}
