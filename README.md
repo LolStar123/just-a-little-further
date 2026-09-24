@@ -1,8 +1,8 @@
-# my corner of the internet
+# just a little further
 
 A little meowl pushing a boulder, and twelve things I have been tinkering with, plus the other constants in my brain.
 
-**[Visit the website](https://lolstar123.github.io/meowl-corner/)** · [All project repositories and demos](https://github.com/LolStar123)
+**[Visit the website](https://lolstar123.github.io/just-a-little-further/)** · [All project repositories and demos](https://github.com/LolStar123)
 
 ![The meowl hillside and project trail](docs/preview.png)
 

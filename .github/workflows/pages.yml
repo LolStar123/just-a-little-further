@@ -1,4 +1,4 @@
-name: Publish meowl corner
+name: Publish just a little further
 on:
   push:
     branches: [main]
