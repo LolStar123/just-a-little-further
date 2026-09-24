@@ -31,7 +31,7 @@ export function miniScene(scene,canvas,wake,sfx){
  const artHeight=['deadlock','poe'].includes(scene)?430:scene==='tfl'?380:330;
  const a=canvas('mini-art'),state={scene,choice:0,actions:0,cycles:0,elapsed:0,clock:0,routeTime:0,transition:1},note=$('#toy-note');
  let previous=null,paperBag=[];const counts={scraper:paperTitles.length,pipeline:5,smoothtato:4,mtxtato:3,tfl:6,commute:5,deadlock:6,baxter:4,poe:3};
- const duration={scraper:2.5,pipeline:4.2,smoothtato:5,mtxtato:5,tfl:7,commute:4.5,deadlock:6,baxter:10,poe:6}[scene]||5;
+ const duration={scraper:2.5,pipeline:4.2,smoothtato:5/1.5,mtxtato:5,tfl:7,commute:4.5,deadlock:6,baxter:10,poe:6}[scene]||5;
  const auraImages=['smoothtato','mtxtato'].includes(scene)?auraStyles.map(style=>{const image=new Image();image.onload=()=>{draw();wake();};image.src='assets/mtx/'+style.file;return image;}):[];
  const presets=['Original','Performance','League Start','Barebones'];
  const deadlockStats=metrics.map(m=>m.name);
@@ -198,6 +198,7 @@ export function miniScene(scene,canvas,wake,sfx){
    raw.forEach((v,i)=>{const target=rank.findIndex(q=>q.i===i),x=330+(i+(target-i)*ease)*19;toyProp(c,'datum-'+i,x,220,17,v*11,(c)=>path(c,[[x,220],[x,220-v*11]],sorting>0&&sorting<1?gold:ink,4));});
    label(c,'market data',68,265);label(c,'python',230,265);label(c,'walk-forward',378,265);
   }else if(scene==='smoothtato'){
+   const t=state.clock; // Continuous motion stays at its original speed while options cycle faster.
    const particles=n===0,props=n<2,fog=n<3;
    label(c,'remove graphics',122,40,19);label(c,'add cosmetics',354,40,19);
    if(fog){c.globalAlpha=state.transition*.22;for(let i=0;i<4;i++){const x=65+i*37+Math.sin(t+i)*7;path(c,[[x-30,107+i%2*26],[x-12,99+i%2*26],[x+18,109+i%2*26],[x+34,104+i%2*26]],soft,6);}c.globalAlpha=state.transition;}
@@ -205,7 +206,7 @@ export function miniScene(scene,canvas,wake,sfx){
    c.beginPath();c.ellipse(123,234,79,20,0,0,Math.PI*2);c.strokeStyle='#aa775d';c.lineWidth=1.3;c.stroke();
    owl(c,123,234,'effect-clear',95,{hat:'goldrim',mode:'rest'});
    if(particles)for(let i=0;i<30;i++){const angle=i*.61+t*.9,r=31+i%7*9,x=123+Math.cos(angle)*r,y=177+Math.sin(angle)*r*.65;path(c,[[x-3,y+3],[x,y-5],[x+4,y]],i%2?gold:soft,1.2);}
-   const effect=Math.floor(state.clock/6.3)%3,style=auraStyles[effect],image=auraImages[effect],cy=225;
+   const effect=Math.floor(state.clock/(6.3/1.5))%3,style=auraStyles[effect],image=auraImages[effect],cy=225;
    if(image?.complete&&image.naturalWidth)toyProp(c,'aura-gem',424,112,44,44,c=>{c.drawImage(image,402,68,44,44);});
    for(let layer=0;layer<3;layer++){
     const pts=[],radius=68+layer*8;
