@@ -257,7 +257,7 @@ export const projects={
     "title": "the hardware hunt",
     "short": "hardware hunt",
     "category": "LIQUIDATION / HARDWARE",
-    "caption": "Turns auction lots into fee-adjusted buying limits, using condition and resale evidence.",
+    "caption": "weighs up fees, taxes and margin to optimise auction flipping.",
     "description": "Track the lot, identify the hardware and estimate recoverable resale value. Include faults, buyer fees, VAT, transport and selling costs before setting a maximum hammer bid.",
     "scene": "liquidation",
     "note": "",
