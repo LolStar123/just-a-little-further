@@ -92,6 +92,10 @@ export const projects={
       {
         "label": "github",
         "url": "https://github.com/LolStar123/tfl-reliability"
+      },
+      {
+        "label": "devpost",
+        "url": "https://devpost.com/software/tfl-elo-tracker"
       }
     ],
     "demoDescription": "Follow all 11 Tube ratings on a live history chart, compare the leaderboard and inspect the original QuantiHack archive.",
