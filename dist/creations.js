@@ -75,7 +75,7 @@ export const projects={
     "title": "tube reliability leaderboard",
     "short": "Tube ratings",
     "category": "DATA / LONDON",
-    "caption": "ranks tube lines using live rating history, like chess elo",
+    "caption": "ranks tube lines using live rating history, like chess elo. made for quantihack competition.",
     "description": "Built with Benjamin Toze at QuantiHack 2026. Collect timestamped TfL arrival predictions, identify sampled stop outcomes and update bounded line ratings. Compare the live history with the original hackathon archive.",
     "scene": "tfl",
     "note": "",
