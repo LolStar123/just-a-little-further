@@ -1,6 +1,8 @@
 import {drawMeowl} from './little-creatures.js';
 import {toyProp} from './toy-interactions.js';
 import {inkPath} from './ink-path.js';
+import {POKER_PACK,SHUFFLE_SECONDS,pickPokerCard,drawPokerFace} from './poker-deck.js';
+import {thoughtPose,deadlockBlink,eyeGaze} from './thought-motion.js';
 export const normalise=text=>text.toLowerCase().replace(/\s+/g,' ').replace(/[1i|]/g,'l').trim();
 export function inverse2([a,b,c,d]){const det=a*d-b*c;if(Math.abs(det)<1e-8)return null;return[d/det,-b/det,-c/det,a/det];}
 export function personalScene(scene,canvas,wake,sfx){
@@ -8,6 +10,20 @@ export function personalScene(scene,canvas,wake,sfx){
  document.querySelector('.caption').textContent=interests?'a few constants in my brain':'pixels, text, a stopping rule';
  document.querySelector('#scene').innerHTML='<canvas id="personal-art" class="toy mini-toy" aria-label="'+(interests?'A thought bubble of competitive games, poker and indomie':'OCR text normalisation example')+'"></canvas><p class="toy-note" id="personal-note"></p>';
  const a=canvas('personal-art'),state={clock:0,scene},note=document.querySelector('#personal-note');
+ let shuffleCycle=0,frontCard=interests?pickPokerCard():null;
+ const eyePointer={x:0,y:0,active:false};
+ if(interests){
+  const follow=e=>{
+   if(e.pointerType==='touch')return;
+   const frame=window.frameElement?.getBoundingClientRect();
+   const outside=e.currentTarget!==window;
+   eyePointer.x=e.clientX-(outside&&frame?frame.left:0);
+   eyePointer.y=e.clientY-(outside&&frame?frame.top:0);eyePointer.active=true;
+  };
+  addEventListener('pointermove',follow,{passive:true});
+  try{if(parent!==window)parent.addEventListener('pointermove',follow,{passive:true});}catch{}
+  addEventListener('pagehide',()=>{try{if(parent!==window)parent.removeEventListener('pointermove',follow);}catch{}},{once:true});
+ }
  const labels=[['top 100','deadlock'],['wealthiest','path of exile player'],['top 5000','dota 2'],['bath poker','tourney winner'],['indomie','sandwich']];
  const gameLinks=interests?['https://store.steampowered.com/app/1422450/Deadlock/','https://www.pathofexile.com/','https://www.dota2.com/'].map((href,i)=>{
   const link=document.createElement('a');link.href=href;link.target='_blank';link.rel='noopener noreferrer';link.textContent=labels[i][1];link.className='interest-game-link';
@@ -35,19 +51,24 @@ export function personalScene(scene,canvas,wake,sfx){
    c.save();c.translate(240,244);c.scale(.12+.88*growth,.12+.88*growth);c.translate(-240,-244);
    c.beginPath();c.moveTo(46,242);c.bezierCurveTo(10,240,8,197,22,172);c.bezierCurveTo(-1,137,9,59,35,42);c.bezierCurveTo(44,7,131,7,164,20);c.bezierCurveTo(225,-2,297,13,325,20);c.bezierCurveTo(395,-2,467,20,463,60);c.bezierCurveTo(485,118,469,171,464,181);c.bezierCurveTo(478,233,425,244,386,239);c.bezierCurveTo(292,261,124,247,46,242);c.strokeStyle=ink;c.lineWidth=1.1;c.stroke();
    const seats=[[90,74],[244,74],[392,74],[143,179],[335,179]],active=Math.floor(time/2.6)%5,phase=(time%2.6)/2.6;
-   state.activeThought=active;
+   state.activeThought=active;state.thoughtMotion=seats.map((_,i)=>thoughtPose(i,time));
    // The words never move. The doodles do the daydreaming above each label.
    const thread=[[35,42],[68,23],[137,30],[201,14],[278,29],[339,13],[445,34],[453,113],[377,128],[313,120],[249,143],[182,120],[87,134],[47,215],[85,236],[194,246]];
    line(c,thread,'#b2aa98',.75);
    for(let j=0;j<5;j++){
-    const [x,y]=seats[j],selected=j===active,lift=reduced.matches?0:selected?Math.sin(phase*Math.PI)*10:Math.sin(time*(1.7+j*.11)+j)*4;
-    c.save();c.translate(x,y-30-lift);c.rotate(reduced.matches?0:Math.sin(time*(1.6+j*.17)+j*1.3)*[.09,.12,.1,.025,.035][j]);c.strokeStyle=selected?olive:ink;c.lineWidth=1.5;
+    const [x,y]=seats[j],selected=j===active,{lift,angle,sway}=thoughtPose(j,time);
+    c.save();c.translate(x+sway,y-30-lift);c.rotate(angle);c.strokeStyle=selected?olive:ink;c.lineWidth=1.5;
     toyProp(c,['deadlock-emblem','divine-orb','dota-emblem','poker-hand','indomie-sandwich'][j],0,16,j===3?82:52,60,c=>{
     if(j===0){ // Deadlock's eight-part wheel and little watching eye.
      c.save();c.translate(0,-8);c.rotate(reduced.matches?0:Math.sin(time*1.7)*.11);
      for(let k=0;k<8;k++){const angle=k*Math.PI/4+.04;const pts=[];for(let q=0;q<=5;q++){const t=angle+q*.11,r=20+(q%2?.7:-.5);pts.push([Math.cos(t)*r,Math.sin(t)*r]);}line(c,pts,ink,2);line(c,[[Math.cos(angle)*12,Math.sin(angle)*12],[Math.cos(angle)*21,Math.sin(angle)*21]],ink,1.3);}
+     const bounds=a.el.getBoundingClientRect(),px=(eyePointer.x-bounds.left)*a.w/bounds.width,py=(eyePointer.y-bounds.top)*a.h/bounds.height;
+     const targetX=(px-ox)/s-x-sway,targetY=(py-oy)/s-(y-38-lift);
+     const gaze=eyePointer.active?eyeGaze(targetX,targetY):{x:0,y:0},blink=deadlockBlink(time);
+     c.save();c.scale(1,blink);
      line(c,[[-12,0],[-6,-6],[1,-8],[8,-4],[12,0],[5,6],[-2,7],[-9,3],[-12,0]],ink,1.3);
-     c.beginPath();c.ellipse(Math.sin(time)*1.3,0,3,4,0,0,Math.PI*2);c.fillStyle=ink;c.fill();c.restore();
+     c.beginPath();c.ellipse(gaze.x,gaze.y,3,4,0,0,Math.PI*2);c.fillStyle=ink;c.fill();c.restore();c.restore();
+     state.deadlockEye={...gaze,blink,following:eyePointer.active};
     }else if(j===1){ // A badly minted divine orb, bald brow and all.
      c.save();c.rotate(reduced.matches?0:Math.sin(time*2)*.1);
      line(c,[[-14,9],[-20,-3],[-17,-21],[-9,-29],[5,-30],[17,-23],[20,-9],[13,9],[4,15],[-6,14],[-14,9]],'#987a35',1.8);
@@ -60,22 +81,22 @@ export function personalScene(scene,canvas,wake,sfx){
      const red='#b74936';c.beginPath();c.moveTo(-20,-28);c.lineTo(19,-26);c.lineTo(21,10);c.lineTo(-18,13);c.closePath();c.fillStyle=red;c.fill();line(c,[[-20,-28],[19,-26],[21,10],[-18,13],[-20,-28]],red,1.6);
      c.fillStyle=paper;for(const cut of [[[-14,-23],[17,4],[10,9],[-18,-18]],[[5,-23],[15,-22],[16,-10]],[[-15,-6],[-4,7],[-14,8]]]){c.beginPath();cut.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.closePath();c.fill();}c.restore();
     }else if(j===3){
-     // Split, riffle twelve alternating cards, bridge, then square the deck.
-     const q=reduced.matches?4:time%4.8,cycle=Math.floor(time/4.8),ease=v=>{v=Math.max(0,Math.min(1,v));return v*v*(3-2*v);};
+     // A repeating face-up riffle; twelve visible edges suggest the full pack.
+     const q=time%SHUFFLE_SECONDS,cycle=shuffleCycle,ease=v=>{v=Math.max(0,Math.min(1,v));return v*v*(3-2*v);};
      const split=q<.65?ease(q/.65):q<2.2?1:1-ease((q-2.2)/.65);
      const bridge=q>=2.85&&q<3.65?Math.sin((q-2.85)/.8*Math.PI)*9:0;
      for(let k=0;k<12;k++){
       const side=k%2?1:-1,rank=Math.floor(k/2),dealt=ease((q-.8-k*.095)/.34),separate=split*(1-dealt);
       const px=side*19*separate,py=-7+rank*.7-Math.sin(dealt*Math.PI)*9;
       c.save();c.translate(px,py);c.rotate(side*separate*.24);
-      c.beginPath();c.moveTo(-14,7);c.quadraticCurveTo(0,7-bridge,14,7);c.lineTo(13,-24);c.quadraticCurveTo(0,-25-bridge,-14,-24);c.closePath();c.fillStyle=paper;c.fill();c.strokeStyle=k===11?'#96785b':ink;c.lineWidth=.75;c.stroke();
-      if(k===11){line(c,[[-10,-20],[9,-20],[9,3],[-10,3],[-10,-20]],'#a78b6d',.7);for(let z=0;z<4;z++)line(c,[[-9,-17+z*5],[8,-12+z*5]],'#b3a189',.65);}
+      c.beginPath();c.moveTo(-16,13);c.quadraticCurveTo(0,13-bridge,16,13);c.lineTo(16,-33);c.quadraticCurveTo(0,-34-bridge,-16,-33);c.closePath();c.fillStyle=paper;c.fill();c.strokeStyle=ink;c.lineWidth=.75;c.stroke();
+      c.save();c.translate(0,-bridge*.45);drawPokerFace(c,k===11?frontCard:POKER_PACK[(POKER_PACK.indexOf(frontCard)+k+1)%54]);c.restore();
       c.restore();
      }
      if(q>3.65&&q<4.1&&!reduced.matches){const puff=(q-3.65)/.45;for(const side of [-1,1])line(c,[[side*(18+puff*8),2],[side*(23+puff*10),-2]],olive,(1-puff)*1.1);}
      if(q>.8&&q<2.2)sfx.beat('poker-riffle',cycle+':'+Math.floor((q-.8)*5),'paper',{level:.12});
      if(q>3.65)sfx.beat('poker-square',cycle,'click',{level:.10});
-     state.shuffle={phase:q,split,bridge,cards:12};
+     state.shuffle={phase:q,split,bridge,cards:54,visibleLayers:12,cycle,frontCard:frontCard.id,faceUp:true};
     }else{
      // Heat rises in separate drifting curls, with a few noodles refusing to stay put.
      for(let k=0;k<5;k++){
@@ -129,5 +150,9 @@ export function personalScene(scene,canvas,wake,sfx){
   }
   c.restore();
  }
- return {state,draw,advance(dt){state.clock+=dt;}};
+ return {state,draw,advance(dt){
+  state.clock+=dt;
+  const cycle=Math.floor(state.clock/SHUFFLE_SECONDS);
+  if(interests&&cycle!==shuffleCycle){shuffleCycle=cycle;frontCard=pickPokerCard();}
+ }};
 }

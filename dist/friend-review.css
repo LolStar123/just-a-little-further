@@ -215,3 +215,8 @@ body.tugging-thread,body.tugging-thread *{user-select:none!important;cursor:grab
 @media(max-width:760px){#world .introduction{top:101px}.presenter-profiles{margin-bottom:6px}#world .introduction h1{font-size:clamp(28px,8vw,40px)}}
 
 #world .sound-settings{top:30px}@media(max-width:760px){#world .sound-settings{top:25px}}
+
+/* Clearer controls, keeping the coloured ink and hand-drawn underlines. */
+#world .toys :is(#help,#ruin,#encourage){font-family:Reader,Georgia,serif;font-size:22px;font-weight:500;line-height:1.2;letter-spacing:.005em}
+#world .toys #reset{font-family:Reader,Georgia,serif;font-size:14px}
+@media(max-width:760px){#world .toys :is(#help,#ruin,#encourage){font-size:19px}#world .toys #reset{font-size:14px}}
