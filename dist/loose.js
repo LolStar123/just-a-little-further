@@ -104,7 +104,7 @@ function hillAudio(){
     const feetDown=physics.ground(hero.x)-(physics.actor.position.y+physics.actorHeight/2)<hero.size*.12;
     if(Math.abs(hero.vx)>6&&feetDown&&!hero.held&&!physics.splat)hillSound.beat('feet',Math.floor(hero.phase/3),'step',{level:.6});
     if(physics.chipCount>heardChips)hillSound.play('chip');heardChips=physics.chipCount;
-    if(hero.mode!==heardMode){if(hero.mode==='spring')hillSound.play('spring');if(hero.mode==='trip')hillSound.play('trip');if(hero.mode==='flattened')hillSound.play('squish');heardMode=hero.mode;}
+    if(hero.mode!==heardMode){if(hero.mode==='spring')hillSound.play('spring',{level:.5});if(hero.mode==='trip')hillSound.play('trip');if(hero.mode==='flattened')hillSound.play('squish');heardMode=hero.mode;}
 }
 
 function updateCharacters(dt){
