@@ -5,6 +5,10 @@ import {SceneSound} from './soundscape.js';
 export function threadLife(svg,path){
     const ns='http://www.w3.org/2000/svg',hit=document.createElementNS(ns,'path');
     hit.style.cssText='stroke:transparent;stroke-width:26px;fill:none;pointer-events:stroke;cursor:grab;touch-action:pan-y pinch-zoom';svg.append(hit);
+    path.classList.add('thread-segment');
+    const inkSegments=[path],hitSegments=[hit];
+    function bindWire(target){target.addEventListener('pointerdown',e=>start(e));target.addEventListener('pointermove',move);target.addEventListener('pointerup',release);target.addEventListener('pointercancel',release);target.addEventListener('lostpointercapture',release);}
+    function setPath(el,d){if(el.getAttribute('d')!==d)el.setAttribute('d',d);}
     // The opaque hill canvas sits above the page wire. Show the SAME deformed
     // exit points over that canvas, clipped exactly to its bounds.
     const hillWire=document.createElementNS(ns,'svg'),hillInk=document.createElementNS(ns,'path');
@@ -28,6 +32,9 @@ export function threadLife(svg,path){
     const speechSizer=document.createElement('span'),speechInk=document.createElement('span');
     speechSizer.className='speech-size';speechInk.className='speech-ink';speechSizer.setAttribute('aria-hidden','true');speechInk.setAttribute('aria-hidden','true');words.setAttribute('role','note');words.append(speechSizer,speechInk);
     let speechText='',speechLetters=[],speechCount=0,typeAt=0,lastKick=0;
+    let speechWidth=235,speechHeight=78,invitationBounds=null;
+    words.style.bottom='auto';words.style.left='0';words.style.top='0';
+    new ResizeObserver(()=>{speechWidth=words.offsetWidth;speechHeight=words.offsetHeight;}).observe(words);
     let guideEntries={},tubeEntryDone=false,tugStart=0,base=[],lengths=[],total=0,travel=0,time=0,last=0,raf=0,drag=null,anchor=0,dx=0,dy=0,vx=0,vy=0,pullX=0,pullY=0,shape=[],handles=[],sceneRects=[];
     const thinkingDots=document.querySelector('.thinking-dots');let dotCount=-1;
     const reduced=matchMedia('(prefers-reduced-motion: reduce)');
@@ -46,7 +53,15 @@ export function threadLife(svg,path){
         });
         window.__inkPhysicsPoints=shape;
         const exitEnd=shape.findIndex((p,i)=>i>tugStart&&p[1]>hillWire.clientHeight+64);const exit=shape.slice(tugStart,exitEnd<0?undefined:exitEnd+1);hillInk.setAttribute('d',exit.map(([x,y],i)=>`${i?'L':'M'}${x.toFixed(2)},${y.toFixed(2)}`).join(' '));
-        const d=shape.map(([x,y],i)=>`${i?'L':'M'}${x.toFixed(2)},${y.toFixed(2)}`).join(' ');path.setAttribute('d',d);hit.setAttribute('d',d);
+        // Identical shared endpoints preserve one continuous stroke. A moving stats
+        // curve should invalidate one small path, not a page-tall SVG shape.
+        let count=0;
+        for(let start=0;start<shape.length-1;start+=256){
+            if(!inkSegments[count]){const ink=path.cloneNode(false),target=hit.cloneNode(false);ink.removeAttribute('id');target.removeAttribute('id');ink.removeAttribute('d');target.removeAttribute('d');svg.insertBefore(ink,hit);svg.append(target);inkSegments.push(ink);hitSegments.push(target);bindWire(target);}
+            const d=shape.slice(start,start+257).map(([x,y],i)=>`${i?'L':'M'}${x.toFixed(2)},${y.toFixed(2)}`).join(' ');
+            setPath(inkSegments[count],d);setPath(hitSegments[count],d);count++;
+        }
+        for(let i=count;i<inkSegments.length;i++){setPath(inkSegments[i],'');setPath(hitSegments[i],'');}
     }
     function nearest(x,y){let result=0,best=Infinity;for(let i=0;i<base.length;i++){const d=(base[i][0]-x)**2+(base[i][1]-y)**2;if(d<best){best=d;result=i;}}return result;}
     function start(e,index){
@@ -61,14 +76,15 @@ export function threadLife(svg,path){
     function move(e){if(!drag)return;pullX=120*Math.tanh((e.clientX-drag.startX)/120);pullY=110*Math.tanh((e.clientY+scrollY-drag.startY)/110);wake();}
     function release(){document.body.classList.remove('tugging-thread');if(!drag)return;const d=drag;drag=null;pullX=pullY=0;if(d.target.hasPointerCapture(d.id))d.target.releasePointerCapture(d.id);sound.active(true);sound.play('spring',{level:.3});wake();}
     addEventListener('blur',release);
-    for(const target of [hit]){target.addEventListener('pointerdown',e=>start(e));target.addEventListener('pointermove',move);target.addEventListener('pointerup',release);target.addEventListener('pointercancel',release);target.addEventListener('lostpointercapture',release);}
+    bindWire(hit);
     document.addEventListener('pointerdown',e=>{
         if(e.pointerType==='touch'||drag||e.target.closest?.('button,a,input,.line-guide')||(e.target.tagName==='CANVAS'&&e.target.id!=='playground')||!base.length)return;
         const j=nearest(e.clientX,e.clientY+scrollY),p=shape[j]||base[j];
         if(j>tugStart&&Math.hypot(e.clientX-p[0],e.clientY+scrollY-p[1])<14){e.stopPropagation();start({...{clientX:e.clientX,clientY:e.clientY,pointerId:e.pointerId,currentTarget:hit},preventDefault:()=>e.preventDefault()},j);}
     },true);
+    let paintDue=0;
     function tick(now){
-        raf=0;const dt=Math.min(.035,(now-(last||now))/1000);last=now;time+=dt;if(!base.length)return;
+        raf=0;if(last&&now<paintDue){wake();return;}paintDue=now+1000/60-1;const dt=Math.min(.035,(now-(last||now))/1000);last=now;time+=dt;if(!base.length)return;
         const nextDots=[0,1,2,3,2,1][Math.floor(time/.55)%6];if(thinkingDots&&nextDots!==dotCount){dotCount=nextDots;thinkingDots.textContent='.'.repeat(dotCount);thinkingDots.style.opacity=String(.45+dotCount*.18);}
         if(drag||Math.abs(dx)+Math.abs(dy)+Math.abs(vx)+Math.abs(vy)>.05){let left=dt;while(left>0){const h=Math.min(left,1/120),stiffness=drag?240:95,damping=drag?30:17;vx+=((pullX-dx)*stiffness-vx*damping)*h;vy+=((pullY-dy)*stiffness-vy*damping)*h;dx+=vx*h;dy+=vy*h;left-=h;}render();}
         if(!actor){const index=nearest(innerWidth-100,innerHeight-55);actor=new GuideMotion({x:base[index][0],y:base[index][1]});}
@@ -146,18 +162,20 @@ export function threadLife(svg,path){
             if(now>=typeAt&&speechCount<speechLetters.length){const letter=speechLetters[speechCount++];speechInk.textContent=speechLetters.slice(0,speechCount).join('');if(speechCount%2===0&&letter.trim())sound.play('click',{id:'typing',level:.055});typeAt=now+(/[.!?]/.test(letter)?115:letter===','?100:48);}
             words.classList.toggle('typing',speechCount<speechLetters.length);
             // The caption shares the actor transform on every frame, including flips and jumps.
-            const w=words.offsetWidth,h=words.offsetHeight,guideLeft=actor.x-72,guideTop=actor.y-112;
+            const w=speechWidth,h=speechHeight,guideLeft=actor.x-72,guideTop=actor.y-112;
             const captionX=Math.max(8,Math.min(innerWidth-w-8,actor.x-w/2));
             let captionY=Math.max(scrollY+8,actor.y-152);
-            const invitation=document.querySelector('.projects-invitation');
-            if(invitation){const r=invitation.getBoundingClientRect(),top=r.top+scrollY;if(captionX+w>r.left&&captionX<r.right&&captionY+h>top-10&&captionY<top+r.height+10)captionY=Math.max(scrollY+8,top-h-14);}
-            words.style.bottom='auto';words.style.left=captionX-guideLeft+'px';words.style.top=captionY-guideTop+'px';
+            if(invitationBounds){const r=invitationBounds,top=r.top;if(captionX+w>r.left&&captionX<r.right&&captionY+h>top-10&&captionY<top+r.height+10)captionY=Math.max(scrollY+8,top-h-14);}
+            words.style.transform=`translate(${captionX-guideLeft}px,${captionY-guideTop}px)`;
             if(!sound.nextMeows.has('guide'))sound.nextMeows.set('guide',time+1.5);sound.chirp('guide',time,[10,17],true,{level:.55});
             if(actor.mode==='run'&&actor.kind!=='pole')sound.beat('feet',Math.floor(time*3.4),'step',{level:.35});
         }
         wake();
     }
     function update(points,startIndex=0,entries={}){
+        const invitation=document.querySelector('.projects-invitation')?.getBoundingClientRect();
+        invitationBounds=invitation?{left:invitation.left,right:invitation.right,top:invitation.top+scrollY,height:invitation.height}:null;
+        if(base.length===points.length&&tugStart===startIndex&&points.every((p,i)=>p[0]===base[i][0]&&p[1]===base[i][1]))return;
         const oldTotal=total,oldLengths=lengths,oldEntries={start:tugStart,...guideEntries,end:Math.max(0,base.length-1)};
         const mapArc=value=>{
             if(!oldTotal||!Number.isFinite(value))return value;

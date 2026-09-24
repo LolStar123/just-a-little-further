@@ -20,10 +20,10 @@ function onScreen(){
     try{const r=window.frameElement?.getBoundingClientRect();if(r)return r.bottom>0&&r.top<parent.innerHeight;}catch{}
     return visible;
 }
-function wake(){visible=onScreen();if(!frame&&visible&&!paused&&!document.hidden)frame=requestAnimationFrame(tick);}
+function wake(){if(!frame&&visible&&!paused&&!document.hidden)frame=requestAnimationFrame(tick);}
 function tick(now){
-    frame=0;const dt=last?Math.min((now-last)/1000,.1):0;last=now;time+=dt;sfx.active(true);advance(dt);sceneAudio();
-    // Small hand-drawn characters animate at 30 fps. UI timing remains display-rate.
+    frame=0;if(last&&now-paintAt<32){wake();return;}const dt=last?Math.min((now-last)/1000,.1):0;last=now;time+=dt;sfx.active(true);advance(dt);sceneAudio();
+    // Run scene work at 30 fps; elapsed time preserves animation and countdown speed.
     if(now-paintAt>=32){const start=performance.now();draw(dt);stats.paintMs=performance.now()-start;stats.frames++;paintAt=now;}
     wake();
 }
@@ -209,5 +209,5 @@ new ResizeObserver(reportLayout).observe(document.querySelector('#demo'));
 parent.postMessage({type:'demo-ready'},location.origin);document.fonts.ready.then(reportLayout);reportLayout();wake();
 
 // Parent IntersectionObserver can miss a notification during a mobile frame load.
-const visibilityPoll=setInterval(()=>{const next=onScreen();if(next&&!frame)wake();else if(!next&&frame)stop();},500);
+const visibilityPoll=setInterval(()=>{const next=onScreen();visible=next;if(next&&!frame)wake();else if(!next&&frame)stop();},500);
 addEventListener('pagehide',()=>clearInterval(visibilityPoll));

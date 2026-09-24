@@ -13,7 +13,7 @@ const surface=$('#interaction-surface');let worldVisible=true;
 const TAU=Math.PI*2,reduce=matchMedia('(prefers-reduced-motion: reduce)');
 let toyMotionRequested=false;
 const quietToy=()=>reduce.matches&&!toyMotionRequested;
-let W=0,H=0,dpr=1,physics,time=0,last=0,frame=0,paused=false,dirty=true;
+let W=0,H=0,dpr=1,physics,time=0,last=0,frame=0,paused=false,dirty=true,paintDue=0;
 let terrainSeen=-1,terrainInkAt=0,extraDepth=0,paintTop=0,paintHeight=0;
 let landscape,lastRelease=null,grab=null,pointer={x:-1000,y:-1000,active:false};
 let petCount=0,catchSeen=0,shake=0,stoneKick=0;
@@ -218,7 +218,7 @@ function render(dt){
 const intervals=[];
 function tick(now){
     if(!physics){frame=requestAnimationFrame(tick);return;}
-    frame=0;const dt=paused?0:Math.min(.04,(now-(last||now))/1000);if(last&&dt) {intervals.push(now-last);if(intervals.length>120)intervals.shift();}last=now;
+    frame=0;if(last&&now<paintDue){wake();return;}paintDue=now+1000/60-1;const dt=paused?0:Math.min(.04,(now-(last||now))/1000);if(last&&dt) {intervals.push(now-last);if(intervals.length>120)intervals.shift();}last=now;
     if(dt){const worldDt=dt;time+=worldDt;physics.step(worldDt,{pet:hero.pet,cheer:hero.cheer});updateCharacters(worldDt);auraField.step(worldDt,hero,physics,quietToy());hillAudio();}
     if(dirty||!paused)render(dt);dirty=false;if(!paused&&!document.hidden&&worldVisible&&!panelOpen)frame=requestAnimationFrame(tick);
 }

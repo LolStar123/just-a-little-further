@@ -19,8 +19,15 @@ inert(true);button.focus({preventScroll:true});
 function drawEntrance(){
  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
  const duration=reduced?180:2850;
- const path=document.querySelector('.pen-thread path');
- if(path&&!reduced){const pts=window.__inkPhysicsPoints||[];let visible=0;for(let i=1;i<pts.length;i++){if(pts[i][1]>innerHeight)break;visible+=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);}const firstPage=Math.min(.8,visible/(path.getTotalLength()||1));path.setAttribute('pathLength','1000');const ink=path.animate([{strokeDasharray:'1000 1000',strokeDashoffset:1000},{strokeDasharray:'1000 1000',strokeDashoffset:1000*(1-firstPage),offset:.7},{strokeDasharray:'1000 1000',strokeDashoffset:0}],{duration:2550,easing:'cubic-bezier(.25,.05,.35,1)'});ink.finished.finally(()=>path.removeAttribute('pathLength'));}
+ const paths=[...document.querySelectorAll('.pen-thread .thread-segment')];
+ if(paths.length&&!reduced){
+  const lengths=paths.map(path=>path.getTotalLength()),total=lengths.reduce((a,b)=>a+b,0)||1;
+  const pts=window.__inkPhysicsPoints||[];let visible=0;
+  for(let i=1;i<pts.length;i++){if(pts[i][1]>innerHeight)break;visible+=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);}
+  const firstPage=Math.max(.001,Math.min(.8,visible/total));
+  const at=f=>f<=firstPage?1785*f/firstPage:1785+765*(f-firstPage)/(1-firstPage);let distance=0;
+  paths.forEach((path,i)=>{const delay=at(distance/total);distance+=lengths[i];path.setAttribute('pathLength','1000');const ink=path.animate([{strokeDasharray:'1000 1000',strokeDashoffset:1000},{strokeDasharray:'1000 1000',strokeDashoffset:0}],{delay,duration:Math.max(1,at(distance/total)-delay),fill:'backwards',easing:'linear'});ink.finished.finally(()=>path.removeAttribute('pathLength'));});
+ }
  const hillInk=document.querySelector('.hill-thread path');if(hillInk)hillInk.animate([{opacity:0},{opacity:.7}],{duration:reduced?180:550,delay:reduced?0:1500,fill:'backwards'});
  const canvas=document.querySelector('#playground');
  if(canvas)canvas.animate(reduced?[{opacity:0},{opacity:1}]:[{opacity:0,clipPath:'polygon(0 0,0 0,0 100%,0 100%)'},{opacity:.7,clipPath:'polygon(0 0,36% 0,42% 12%,35% 25%,43% 38%,36% 52%,44% 66%,38% 80%,45% 100%,0 100%)',offset:.42},{opacity:1,clipPath:'polygon(0 0,100% 0,100% 12%,100% 25%,100% 38%,100% 52%,100% 66%,100% 80%,100% 100%,0 100%)'}],{duration:reduced?180:2100,easing:'ease-out'});

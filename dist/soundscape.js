@@ -76,14 +76,15 @@ export class Soundscape {
         if(overlap<=0||r.width===0)return 0;
         return Math.pow(clamp(overlap/Math.min(r.height,innerHeight)),1.25);
     }
-    refresh(){for(const bus of this.buses.values()){
+    refresh(){this.refreshedAt=Date.now();for(const bus of this.buses.values()){
         if(bus.owner!==window&&!bus.owner.frameElement?.isConnected){
             bus.node?.disconnect();this.buses.delete(bus.key);
             for(const key of this.voices.keys())if(key.startsWith(bus.key+':'))this.voices.delete(key);
             continue;
         }
-        bus.weight=this.proximity(bus);
-        if(bus.node)bus.node.gain.setTargetAtTime(bus.weight,this.context.currentTime,bus.weight?.12:.025);
+        const weight=this.proximity(bus);
+        if(bus.node&&(bus.appliedWeight===undefined||Math.abs(weight-bus.appliedWeight)>.001)){bus.node.gain.setTargetAtTime(weight,this.context.currentTime,weight?.12:.025);bus.appliedWeight=weight;}
+        bus.weight=weight;
     }}
     select(key,n){
         const last=this.choices.get(key)??-1;
@@ -152,7 +153,7 @@ export class SceneSound {
             document.addEventListener('keydown',unlock,{capture:true});
         }
     }
-    active(value){this.bus.active=value;this.mix.refresh();}
+    active(value){const changed=this.bus.active!==value;this.bus.active=value;if(changed||Date.now()-(this.mix.refreshedAt||0)>100)this.mix.refresh();}
     play(kind,options){return this.mix.play(this.bus,kind,options);}
     mouth(id){return this.mix.mouth(this.bus,id);}
     beat(key,value,kind,options){if(this.marks.get(key)===value)return;this.marks.set(key,value);this.play(kind,options);}
