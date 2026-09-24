@@ -101,7 +101,7 @@ export const projects={
     "title": "commute cost optimiser",
     "short": "commute fares",
     "category": "DATA / LONDON",
-    "caption": "finds the cheapest ticket for your week.",
+    "caption": "i commute a lot. this tool finds us the cheapest train combos.",
     "description": "Enter your journey and working pattern, then compare ticket costs with daily and weekly caps. The full calculator also handles zones, peak times, Railcards, annual leave and break-even points.",
     "scene": "commute",
     "note": "",
