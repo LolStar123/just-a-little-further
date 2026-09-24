@@ -179,7 +179,7 @@ export const projects={
     "title": "baxter",
     "short": "Baxter",
     "category": "AI / PERSONAL ASSISTANT",
-    "caption": "turned a discord server into an LLM harness. the bots scope, schedule, execute and verify.",
+    "caption": "i love discord so i turned it into an llm harness. the bots scope, schedule, execute and verify.",
     "description": "I wired Claude into a Discord bot so I can hand off work where I already spend my time. Baxter scopes the request, schedules tasks and reserves the files they need. Work with conflicting edits waits its turn. A separate verification step checks the result before Baxter marks it done.",
     "scene": "baxter",
     "note": "",
