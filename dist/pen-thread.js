@@ -154,7 +154,7 @@ function layout(){
         const phone=w<760,room=Math.max(36,floor-ceiling),mid=ceiling+room*.49;
         const span=phone?w*.60:Math.min(w*.34,460),cx=w*(index%2?.40:.60);
         const rx=Math.min(span/2,cx-22,w-cx-22),ry=Math.min(phone?57:82,room*.41);
-        if(kind==='interests'){
+        if(kind==='liquidation'){
             const destination=nextLane,centre=(edge+destination)/2;
             // Four broad bends carry the vertical tangent into a single open curl.
             curve(edge,ceiling+room*.24,centre+rx*.6,ceiling+room*.12,centre,mid-ry*.35);
@@ -163,7 +163,7 @@ function layout(){
             curve(centre-rx*.4,mid-ry*.4,destination,floor-45,destination,floor);
             return;
         }
-        if(kind==='liquidation'){
+        if(kind==='interests'){
             // Invented lettering, never a trace of a personal signature. One pen
             // moves through every letter and the final underlining flourish.
             const width=Math.min(w*.80,790),sx=width/670,sy=Math.min(sx*1.1,room/180);

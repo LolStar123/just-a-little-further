@@ -220,3 +220,5 @@ body.tugging-thread,body.tugging-thread *{user-select:none!important;cursor:grab
 #world .toys :is(#help,#ruin,#encourage){font-family:Reader,Georgia,serif;font-size:22px;font-weight:500;line-height:1.2;letter-spacing:.005em}
 #world .toys #reset{font-family:Reader,Georgia,serif;font-size:14px}
 @media(max-width:760px){#world .toys :is(#help,#ruin,#encourage){font-size:19px}#world .toys #reset{font-size:14px}}
+
+.sketch-foot nav{align-items:center}.sketch-foot .footer-profile{display:inline-flex;align-items:center;justify-content:center;min-width:32px;min-height:36px;text-decoration:none}.footer-profile svg{width:19px;height:19px}.footer-profile:first-child{rotate:-9deg}.footer-profile:nth-child(2){rotate:7deg}
