@@ -4,7 +4,7 @@ const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
 export class Soundscape {
     constructor({autoStart=true}={}){
         this.enabled=true;this.sfxVolume=.48;this.context=null;this.buses=new Map();this.buffers=[];this.recorded=null;this.envelopes=new Map();this.loading=null;
-        this.focusLevel=document.hidden||!document.hasFocus()?.4:1;
+        this.focusLevel=document.hidden||!document.hasFocus()?.2:1;
         this.history=[];this.choices=new Map();this.voices=new Map();this.nodes=new Set();this.sampleError=false;
         const updateFocus=()=>this.updateFocus();
         document.addEventListener('visibilitychange',()=>{updateFocus();if(!document.hidden&&this.enabled)this.enable(true);});
@@ -27,7 +27,7 @@ export class Soundscape {
     }
     updateFocus(){
         // Top document.hasFocus() stays true when focus moves into a demo iframe.
-        this.focusLevel=document.hidden||!document.hasFocus()?.4:1;
+        this.focusLevel=document.hidden||!document.hasFocus()?.2:1;
         if(this.focusGain)this.focusGain.gain.setTargetAtTime(this.focusLevel,this.context.currentTime,.16);
     }
     enable(value=!this.enabled){
@@ -115,7 +115,7 @@ export class Soundscape {
         const moodBank={crying:'crying',sad:'sad',upset:'sad',desperate:'crying',strain:'effort',determined:'effort',angry:'angry',panic:'panic',relieved:'relief',worried:'worried',dazed:'dazed'}[options.mood];
         const bank=kind==='impact'?'spring':kind==='meow'&&moodBank?'voice-'+moodBank:kind,cuts=recordings[bank],pluck=kind==='plink'||kind==='blink';
         if(pluck?!this.buffers.length:!cuts||!this.recorded)return false;
-        const variant=this.select(bus.key+':'+key+':'+bank,pluck?10:cuts.length),level=clamp(options.level??1,0,1.5)*(kind==='meow'||kind==='yap'||kind==='train'||bus.id==='deadlock'&&kind==='plink'?.6:kind==='step'?.42:1)*(kind==='plink'?.6:1);
+        const variant=this.select(bus.key+':'+key+':'+bank,pluck?10:cuts.length),level=clamp(options.level??1,0,1.5)*(kind==='meow'||kind==='yap'||kind==='train'||bus.id==='deadlock'&&kind==='plink'?.6:kind==='step'?.42:1)*(kind==='plink'?.6:1)*(bus.id==='halo'&&kind==='yap'?.5:1);
         let cut=null;
         if(pluck){
             const blink=kind==='blink',buffer=this.buffers[variant],rate=(blink?1.55:options.good?1.19:1)*(blink?.98+Math.random()*.04:.97+Math.random()*.06);
