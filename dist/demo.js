@@ -140,7 +140,7 @@ if(scene==='halo'){
             if(draggedLoot?.held&&time-lastLootRoute>.25){lastLootRoute=time;route(draggedLoot.x,draggedLoot.y);}
             if(toyBusy(a.el))return;
             if(!robot.route.length){robot.idle=(robot.idle||0)+dt;if(robot.idle>.8){robot.idle=0;nextLoot();}}else robot.idle=0;
-            let remaining=dt*125;
+            let remaining=dt*162.5;
             while(robot.route.length&&remaining>0){const [x,y]=robot.route[0],dx=x-robot.x,dy=y-robot.y,d=Math.hypot(dx,dy);
                 if(d<=remaining){robot.x=x;robot.y=y;robot.route.shift();remaining-=d;if(!robot.route.length)note.textContent='found it. choosing the next drop.';}
                 else{robot.x+=dx/d*remaining;robot.y+=dy/d*remaining;remaining=0;}
@@ -158,7 +158,7 @@ if(scene==='halo'){
             c.drawImage(terrain,0,0,WIDTH,HEIGHT);
             if(robot.route.length){c.setLineDash([2,6]);line(c,[[robot.x,robot.y],...robot.route],'#89846e',1);c.setLineDash([]);}
             const [tx,ty]=robot.target;draggedLoot=toyProp(c,'loot',tx,ty+20,36,44,(c)=>divineOrb(c,tx,ty));
-            drawMeowl(c,robot.x,robot.y,74,{voice:sfx.mouth('bot'),id:'bot',chase:false,hat:'goldrim',time,speed:robot.route.length?60:0,facing:robot.route.length&&robot.route[0][0]<robot.x?-1:1});
+            drawMeowl(c,robot.x,robot.y,74,{voice:sfx.mouth('bot'),id:'bot',chase:false,hat:'goldrim',time,speed:robot.route.length?78:0,facing:robot.route.length&&robot.route[0][0]<robot.x?-1:1});
             // Rock faces in front of his feet occlude him as he passes behind.
             rocks.forEach((r,i)=>{if(r.bottom>robot.y&&Math.abs(r.x-robot.x)<r.rx+40&&Math.abs(r.y-robot.y)<r.ry+65)outline(c,r,i);});
             c.restore();

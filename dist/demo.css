@@ -38,3 +38,6 @@ html.embedded,html.embedded body{background:transparent}
 #demo .portrait{height:auto;min-height:120px;gap:0;padding:3px 7px}#demo .portrait canvas{flex:0 0 94px}#demo #thought{position:relative;max-width:225px;width:60%;margin:0;padding:18px 20px 19px 32px;min-height:88px;display:flex;align-items:center;font-style:normal;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20240%20140%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M36%208%20Q127%201%20215%2011%20Q235%2015%20230%2065%20Q236%20124%20207%20127%20L66%20129%20Q32%20126%2029%20106%20L5%20115%2024%2086%20Q15%2016%2036%208Z%22%20fill%3D%22none%22%20stroke%3D%22%23686052%22%20stroke-width%3D%221.4%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E") center/100% 100% no-repeat}
 
 body[data-scene=botato] .toy{height:clamp(220px,65vw,390px);min-height:0}
+
+body[data-scene=tfl] .mini-toy{height:360px}.woven body[data-scene=tfl] .toy-note{display:none}
+@media(max-width:420px){body[data-scene=tfl] .mini-toy{height:320px}}

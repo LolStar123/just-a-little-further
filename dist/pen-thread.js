@@ -228,7 +228,17 @@ function layout(){
             curve(x+vx/speed*reach,y+vy/speed*reach,nextLane,floor-24,nextLane,floor);
             return;
         }
-        const motifs={scraper:'paperclip',pipeline:'infinity',poe:'spiral',tfl:'switchback',commute:'infinity',smoothtato:'spiral',mtxtato:'orbit',deadlock:'infinity',baxter:'coil',botato:'orbit',halo:'coil',liquidation:'spiral'};
+        if(kind==='tfl'){
+            // Two rounded, slightly unequal lobes. Tangents carry the pen through the crossing.
+            curve(edge,ceiling+20,cx+rx*.22,mid-ry*.45,cx,mid);
+            curve(cx-rx*.48,mid+ry,cx-rx*1.05,mid+ry,cx-rx,mid);
+            curve(cx-rx*.95,mid-ry,cx-rx*.45,mid-ry,cx,mid);
+            curve(cx+rx*.45,mid+ry,cx+rx*1.07,mid+ry*.88,cx+rx,mid);
+            curve(cx+rx*.93,mid-ry*.88,cx+rx*.45,mid-ry,cx,mid);
+            curve(cx-rx*.45,mid+ry,nextLane,floor-24,nextLane,floor);
+            return;
+        }
+        const motifs={scraper:'paperclip',pipeline:'infinity',poe:'spiral',tfl:'infinity',commute:'infinity',smoothtato:'spiral',mtxtato:'orbit',deadlock:'infinity',baxter:'coil',botato:'orbit',halo:'coil',liquidation:'spiral'};
         const motif=motifs[kind],flip=index%2?-1:1,pts=[];
         if(motif==='paperclip'){
             // An open, imperfect paperclip becomes the research chapter's exit.
@@ -244,7 +254,7 @@ function layout(){
             else if(motif==='coil'){const angle=a*1.65;px=cx+rx*(t*1.15-.62+.48*Math.sin(angle));py=mid+ry*.72*Math.cos(angle);}
             else if(motif==='orbit'){const angle=-Math.PI/2+a*1.72,r=1-t*.29;px=cx+rx*r*Math.sin(angle);py=mid+ry*(r*Math.sin(angle+.65)+.17*Math.sin(a*3));}
             else if(motif==='switchback'){px=cx+rx*(t*1.65-.84+.33*Math.sin(a*2));py=mid+ry*Math.sin(a*2);}
-            else {const commute=kind==='commute',angle=commute?-Math.PI*.27+a*.77:-Math.PI/2+a*1.08;px=cx+rx*Math.sin(angle);py=mid+ry*Math.sin(angle*2)*(commute?.90+.06*Math.cos(angle):.84+.12*Math.cos(angle));}
+            else {const commute=kind==='commute',angle=kind==='tfl'?-Math.PI+a*.95:commute?-Math.PI*.27+a*.77:-Math.PI/2+a*1.08;px=cx+rx*Math.sin(angle);py=mid+ry*Math.sin(angle*2)*(commute?.90+.06*Math.cos(angle):.84+.12*Math.cos(angle));}
             pts.push([px,mid+(py-mid)*flip]);
         }
         const first=pts[0],second=pts[1],dx=second[0]-first[0],dy=second[1]-first[1],length=Math.hypot(dx,dy)||1;
@@ -265,12 +275,12 @@ function layout(){
     const before=hill.at(-2),end=hill.at(-1),slope=(end[1]-before[1])/(end[0]-before[0]||1);
     const tugStart=points.length-1;
     for(const controls of hillExit(w,end,slope,world.h,margin,extent.h))curve(...controls);
-    let index=0,pairedJoin=false;const guideEntries={};
+    let index=0;const guideEntries={};
     for(const frame of document.querySelectorAll('.sketch-demo')){
         const kind=frame.dataset.scene,boxed=kind==='halo'||kind==='botato';
         const r=sceneRect(frame,kind==='halo'?'.call':'.toy');
         const left=kind==='botato'?r.x:Math.max(8,r.x-18),right=kind==='botato'?r.x+r.w:Math.min(w-8,r.x+r.w+18),top=r.y-(kind==='botato'?0:5),bottom=r.y+r.h+(kind==='botato'?0:5);
-        if(index===0&&frame.closest('.london-pair')){const heading=rect(frame.closest('article')).y;curve(x,y+15,w-margin,Math.min(y+45,heading-32),w-margin,heading-32);curve(w*.72,heading-38,w*.28,heading-38,margin,heading-24);}
+        if(index===0&&frame.closest('.london-pair')){const heading=rect(frame.closest('article')).y;curve(x,y+15,w-margin,Math.min(y+45,heading-32),w-margin,heading-32);}
         const lane=x<w/2?margin:w-margin;
         if(boxed){
             curve(lane,y+40,lane,top-52,right,top-8);
@@ -281,14 +291,12 @@ function layout(){
             curve(right+15,top+70,right+9,bottom-35,right,bottom+24);
         }else{
             // The line becomes the floor of each small drawing, rather than another box.
-            const floor=r.y+(r.threadY||r.h*.86),fromLeft=frame.closest('.london-pair')&&w>=760?true:index%2===1,entry=fromLeft?left:right,exit=fromLeft?right:left;
-            const joiningPair=pairedJoin;
-            if(pairedJoin){curve(x+18,y,entry-18,floor-14,entry,floor-14);pairedJoin=false;}
-            else if(w<760){curve(lane,y+35,lane,top-65,lane,top-42);curve(lane,top-24,entry,top-24,entry,top-12);}
+            const floor=r.y+(r.threadY||r.h*.86),fromLeft=frame.closest('.london-pair')?false:index%2===1,entry=fromLeft?left:right,exit=fromLeft?right:left;
+            if(w<760){curve(lane,y+35,lane,top-65,lane,top-42);curve(lane,top-24,entry,top-24,entry,top-12);}
             else curve(lane,y+35,entry,top-55,entry,top-12);
             const out=fromLeft?-1:1,space=fromLeft?entry-5:w-5-entry,sway=Math.max(2,Math.min(w<760?10:32,space*.75));
-            if(!joiningPair){curve(entry+out*sway,top+30,entry+out*sway,top+(floor-top)*.38,entry,top+(floor-top)*.48);
-            curve(entry-out*sway*.5,top+(floor-top)*.64,entry,floor-42,entry,floor-14);}
+            curve(entry+out*sway,top+30,entry+out*sway,top+(floor-top)*.38,entry,top+(floor-top)*.48);
+            curve(entry-out*sway*.5,top+(floor-top)*.64,entry,floor-42,entry,floor-14);
             guideEntries[kind]=points.length-1;
             if(r.threadPoints?.length){
                 const samples=r.threadPoints.map(([px,py])=>[r.x+px,r.y+py]);if(!fromLeft)samples.reverse();
@@ -303,13 +311,13 @@ function layout(){
         const panel=frame.closest('.london-project')||frame.closest('article');
         const copy=rect(panel.querySelector('.chapter-copy'));
         const article=rect(panel);
-        if(w>=760&&frame.closest('.london-pair')&&frames[index+1]?.closest('.london-pair')===frame.closest('.london-pair')){pairedJoin=true;index++;continue;}
-        const gap=Math.max(rect(frame).y+rect(frame).h,copy.y+copy.h,article.y+article.h)+12;
+        const gap=Math.max(rect(frame).y+rect(frame).h,copy.y+copy.h,article.y+article.h,kind==='tfl'?y+48:0)+12;
         // Pass the caption and controls along the outside edge first.
         // Only cross the page after the whole embedded document has ended.
         const edge=x,away=x>w/2?1:-1,sideRoom=away>0?w-x-6:x-6,bend=Math.min(w<760?8:24,Math.max(1,sideRoom*.65)),half=(y+gap)/2;
-        curve(edge+away*bend,y+22,edge+away*bend,half-18,edge+away*bend*.25,half);
-        curve(edge-away*bend*.5,half+18,edge,gap-20,edge,gap);
+        if(kind==='tfl')curve(edge,y+20,edge,gap-20,edge,gap);
+        else{curve(edge+away*bend,y+22,edge+away*bend,half-18,edge+away*bend*.25,half);
+        curve(edge-away*bend*.5,half+18,edge,gap-20,edge,gap);}
         const next=frames[index+1]?.closest('.london-project')||frames[index+1]?.closest('article'),limit=next?rect(next).y-18:rect(document.querySelector('.sketch-foot')).y-20;
         flourish(kind,x,nextLane,gap,Math.max(gap+36,limit),index);
         index++;
