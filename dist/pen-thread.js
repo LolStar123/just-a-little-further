@@ -169,8 +169,12 @@ function layout(){
             const width=Math.min(w*.80,790),sx=width/670,sy=Math.min(sx*1.1,room/180);
             const ox=(w-width)/2,oy=mid-62*sy;
             const pen=(...v)=>curve(...v.map((n,i)=>i%2?oy+n*sy:ox+n*sx));
-            curve(edge,ceiling+room*.32,ox-42*sx,oy+8*sy,ox-18*sx,oy+53*sy);
-            curve(ox+6*sx,oy+98*sy,ox-18*sx,oy+80*sy,ox,oy+92*sy);
+            // Cross above the ascenders, then enter the first letter from its left.
+            // The incoming wire must not strike through the name.
+            const approachY=oy-28*sy;
+            curve(edge+24*sx,y+32*sy,edge+44*sx,approachY,edge-16*sx,approachY);
+            curve(edge-90*sx,approachY,ox+width*.32,approachY,ox-24*sx,approachY);
+            curve(ox-58*sx,approachY,ox-44*sx,oy+81*sy,ox,oy+92*sy);
             guideEntries.signatureStart=points.length-1;
             // a t u l
             pen(18,106,57,49,42,48);pen(18,46,5,100,35,99);
