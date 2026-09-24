@@ -201,3 +201,11 @@ Music references: https://viva.pressbooks.pub/openmusictheory/chapter/altered-an
 - [x] After every physics substep, correct tunnelling and keep the complete rock inside the visible hill's edges; remove only inward velocity.
 - [x] Speech avoids full card bounds with padding and checks its interpolated movement too.
 - [x] Stress drag/rotation, both edges, forced below-ground recovery at phone/laptop widths; speech at 1024x768, 1280x720, 1366x768. Grounded chase regression passed.
+
+## Clear the mountain and combine smoothtato
+- [x] Removed poker-card navigation, card effects and the card-triggered procedural theme player. Retained main audio, scene SFX and both sliders.
+- [x] Kept the name and introduction unchanged.
+- [x] Combined graphics-removal and cosmetic-effect meowls into one smoothtato scene, with separate actor IDs and effect cycles.
+- [x] Removed the separate cosmetics project section and unified descriptions.
+- [x] Consolidated both working browser editors, data, preview icons, code and tests into LolStar123/smoothtato-preview with graphics/cosmetics tabs. Old repo points to the unified home.
+- [x] Both model suites and browser audits passed; portfolio desktop/mobile and two-actor checks passed.

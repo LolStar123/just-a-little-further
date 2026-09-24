@@ -12,7 +12,7 @@ const specs={
  poe:['prices become probabilities','try another item family','sample prices / no live trade quotes'],
  scraper:['collecting papers','collect another paper','sample reading list'],
  pipeline:['market data to walk-forward tests','shuffle the data','sample market data'],
- smoothtato:['less clutter. same meowl.','change the preset','presets from the app'],
+ smoothtato:['less clutter. more wardrobe.','change the preset','presets from the app'],
  mtxtato:['a little aura goes a long way','change the effect','effects from the app catalogue'],
  tfl:['the Tube gets a leaderboard','delay a different line','sample service history'],
  commute:['a week of getting there','add a commute day','example fares / check current prices before buying'],
@@ -32,7 +32,7 @@ export function miniScene(scene,canvas,wake,sfx){
  const a=canvas('mini-art'),state={scene,choice:0,actions:0,cycles:0,elapsed:0,clock:0,routeTime:0,transition:1},note=$('#toy-note');
  let previous=null,paperBag=[];const counts={scraper:paperTitles.length,pipeline:5,smoothtato:4,mtxtato:3,tfl:3,commute:5,deadlock:6,baxter:4,poe:3};
  const duration={scraper:2.5,pipeline:4.2,smoothtato:5,mtxtato:5,tfl:7,commute:4.5,deadlock:6,baxter:10,poe:6}[scene]||5;
- const auraImages=scene==='mtxtato'?auraStyles.map(style=>{const image=new Image();image.onload=()=>{draw();wake();};image.src='assets/mtx/'+style.file;return image;}):[];
+ const auraImages=['smoothtato','mtxtato'].includes(scene)?auraStyles.map(style=>{const image=new Image();image.onload=()=>{draw();wake();};image.src='assets/mtx/'+style.file;return image;}):[];
  const presets=['Original','Performance','League Start','Barebones'];
  const deadlockStats=metrics.map(m=>m.name);
  let priceKey='',prices=[],priceIncoming=[],priceDomain=[],priceUpdates=0,priceCount=-1,priced=null;
@@ -90,7 +90,7 @@ export function miniScene(scene,canvas,wake,sfx){
  }
  const levels={scraper:253,pipeline:221,poe:400,smoothtato:251,mtxtato:251,tfl:280,commute:308,deadlock:400,baxter:235};
  const floorLevel=levels[scene]||295;
- const floorShapes={poe:[[0,306],[100,306],[150,283],[218,283],[258,306],[480,306]],scraper:[[0,253],[32,253],[156,250],[295,255],[448,251],[480,253]],smoothtato:[[0,251],[80,251],[170,234],[290,234],[422,251],[480,251]],mtxtato:[[0,251],[58,251],[160,225],[320,225],[422,251],[480,251]]};
+ const floorShapes={poe:[[0,306],[100,306],[150,283],[218,283],[258,306],[480,306]],scraper:[[0,253],[32,253],[156,250],[295,255],[448,251],[480,253]],smoothtato:[[0,251],[55,251],[80,234],[175,234],[210,251],[280,251],[310,225],[400,225],[435,251],[480,251]],mtxtato:[[0,251],[58,251],[160,225],[320,225],[422,251],[480,251]]};
  const floorPoints=smoothTrail(floorShapes[scene]||[[0,floorLevel],[120,floorLevel-1],[260,floorLevel+1],[380,floorLevel-1],[480,floorLevel]]);
  function floorAt(x){let i=0;while(i<floorPoints.length-2&&floorPoints[i+1][0]<x)i++;const a=floorPoints[i],b=floorPoints[i+1],t=Math.max(0,Math.min(1,(x-a[0])/(b[0]-a[0])));return a[1]+(b[1]-a[1])*t;}
  function owl(c,x,y,id='mini',size=55,extra={}){
@@ -100,7 +100,8 @@ export function miniScene(scene,canvas,wake,sfx){
 
  function audioEvents(){
   const t=state.elapsed,clock=state.clock,n=state.choice;
-  const voiceId={scraper:'mini',pipeline:'sort',poe:'research',smoothtato:'effect',mtxtato:'effect',commute:'commuter',deadlock:'analyst'}[scene];
+  const voiceId={scraper:'mini',pipeline:'sort',poe:'research',mtxtato:'effect',commute:'commuter',deadlock:'analyst'}[scene];
+  if(scene==='smoothtato'){sfx.chirp('smoothtatoeffect-clear',clock,17);sfx.chirp('smoothtatoeffect-aura',clock+3,19);}
   if(voiceId)sfx.chirp(scene+voiceId,clock,['poe','deadlock'].includes(scene)?18:13);
   if(scene==='scraper'){const lap=Math.floor(state.routeTime/2.5),placing=state.routeTime%2.5>=1.625;sfx.beat('paper-handoff',lap+':'+(placing?'place':'grab'),'paper',{id:'paper-handoff',level:placing?1.12:1});}
   if(scene==='pipeline'&&t<3.3)sfx.beat('shuffle',state.cycles+':'+Math.floor(t/(t<.9?.42:.65)),'data',{level:.65});
@@ -187,17 +188,24 @@ export function miniScene(scene,canvas,wake,sfx){
    raw.forEach((v,i)=>{const target=rank.findIndex(q=>q.i===i),x=330+(i+(target-i)*ease)*19;toyProp(c,'datum-'+i,x,220,17,v*11,(c)=>path(c,[[x,220],[x,220-v*11]],sorting>0&&sorting<1?gold:ink,4));});
    label(c,'market data',68,265);label(c,'python',230,265);label(c,'walk-forward',378,265);
   }else if(scene==='smoothtato'){
-   toyProp(c,'preset-switch',420,55,26,30,(c)=>{path(c,[[407,53],[407,26],[433,27],[433,54],[407,53]],soft);path(c,[[420,34],[420,46]],gold,3);});
    const particles=n===0,props=n<2,fog=n<3;
-   if(fog){c.globalAlpha=state.transition*.22;for(let i=0;i<5;i++){const x=70+i*86+Math.sin(t+i)*13;path(c,[[x-50,117+i%2*26],[x-20,106+i%2*26],[x+23,114+i%2*26],[x+58,108+i%2*26]],soft,8);}c.globalAlpha=state.transition;}
-   if(props)for(const [x,y]of[[76,218],[390,221],[333,148]]){path(c,[[x-13,y],[x-18,y-23],[x-5,y-37],[x+14,y-18],[x+11,y],[x-13,y]],soft,.9);}
-   // Boss telegraph stays legible in the actual playable presets.
-   c.beginPath();c.ellipse(245,223,108,28,0,0,Math.PI*2);c.strokeStyle='#aa775d';c.lineWidth=1.4;c.stroke();
-   owl(c,240,234,'effect',104,{hat:'goldrim',mode:'rest'});
-   if(particles)for(let i=0;i<54;i++){const angle=i*.61+t*.9,r=42+i%8*13,x=240+Math.cos(angle)*r,y=168+Math.sin(angle)*r*.62;path(c,[[x-3,y+3],[x,y-5],[x+4,y]],i%2?gold:soft,1.3);}
-   label(c,presets[n],240,44,26);label(c,n?'boss telegraph stays':'particles / props / fog',240,295,19);
-   state.preset={name:presets[n],particles,props,fog,telegraph:true};
-
+   label(c,'remove graphics',122,40,19);label(c,'add cosmetics',354,40,19);
+   if(fog){c.globalAlpha=state.transition*.22;for(let i=0;i<4;i++){const x=65+i*37+Math.sin(t+i)*7;path(c,[[x-30,107+i%2*26],[x-12,99+i%2*26],[x+18,109+i%2*26],[x+34,104+i%2*26]],soft,6);}c.globalAlpha=state.transition;}
+   if(props)for(const x of [37,213])path(c,[[x-10,225],[x-14,205],[x-4,181],[x+10,207],[x+9,225],[x-10,225]],soft,.9);
+   c.beginPath();c.ellipse(123,234,79,20,0,0,Math.PI*2);c.strokeStyle='#aa775d';c.lineWidth=1.3;c.stroke();
+   owl(c,123,234,'effect-clear',95,{hat:'goldrim',mode:'rest'});
+   if(particles)for(let i=0;i<30;i++){const angle=i*.61+t*.9,r=31+i%7*9,x=123+Math.cos(angle)*r,y=177+Math.sin(angle)*r*.65;path(c,[[x-3,y+3],[x,y-5],[x+4,y]],i%2?gold:soft,1.2);}
+   const effect=Math.floor(state.clock/6.3)%3,style=auraStyles[effect],image=auraImages[effect],cy=225;
+   if(image?.complete&&image.naturalWidth)toyProp(c,'aura-gem',424,112,44,44,c=>{c.drawImage(image,402,68,44,44);});
+   for(let layer=0;layer<3;layer++){
+    const pts=[],radius=68+layer*8;
+    for(let j=0;j<=70;j++){const angle=j/70*Math.PI*2+t*(layer%2?.13:-.17),r=radius+(style.kind==='fire'?Math.sin(angle*13+t*6)*5:Math.sin(angle*7+t)*2);pts.push([350+Math.cos(angle)*r,cy+Math.sin(angle)*r*.29]);}
+    path(c,pts,layer===1?style.color:gold,layer===1?1.7:.9);
+   }
+   owl(c,350,225,'effect-aura',100,{hat:'goldrim',mode:'happy'});
+   for(let i=0;i<10;i++){const angle=i/10*Math.PI*2+t*.65,x=350+Math.cos(angle)*75,y=cy+Math.sin(angle)*22;if(style.kind==='fire')path(c,[[x-4,y],[x-2,y-12-10*Math.sin(t*6+i)],[x+4,y]],gold,1.2);else{c.beginPath();c.arc(x,y,3+i%3,0,Math.PI*2);c.strokeStyle=style.color;c.stroke();}}
+   label(c,presets[n],123,285,17);label(c,['celestial','celestial III','righteous fire'][effect],350,285,17);
+   state.preset={name:presets[n],particles,props,fog,telegraph:true};state.aura={name:style.name,imageLoaded:!!image?.naturalWidth};
   }else if(scene==='mtxtato'){
    const style=auraStyles[n],image=auraImages[n],cy=225;
    // The real catalogue image is part of the selector; the wearable effect is animated ink.

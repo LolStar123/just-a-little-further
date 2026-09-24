@@ -1,5 +1,5 @@
 // Project copy describes the work. Demo inputs are labelled in each runnable example.
-export const trail=["scraper", "pipeline", "poe", "tfl", "commute", "smoothtato", "mtxtato", "deadlock", "baxter", "botato", "halo", "liquidation"];
+export const trail=["scraper", "pipeline", "poe", "tfl", "commute", "smoothtato", "deadlock", "baxter", "botato", "halo", "liquidation"];
 export const projects={
   "ocr": {
   "title": "poe / OCR crafting prototype",
@@ -153,8 +153,8 @@ export const projects={
     "title": "smoothtato",
     "short": "Smoothtato",
     "category": "PATH OF EXILE / PERFORMANCE",
-    "caption": "Cuts Path of Exile's visual clutter with presets that carefully replace video game files.",
-    "description": "Choose a preset, inspect which effect categories it removes and keep the important encounter cues. Saved configurations make the changes repeatable; restoring Original brings the visuals back.",
+    "caption": "Removes unwanted graphics and adds cosmetic effects in Path of Exile, with presets that carefully replace game files.",
+    "description": "Choose which graphics to remove, match cosmetic effects to your skills, and save the combined setup as a reusable preset. Restore the original files when you want to switch back.",
     "scene": "smoothtato",
     "note": "",
     "url": "https://github.com/LolStar123/smoothtato-preview",
@@ -174,32 +174,6 @@ export const projects={
     ],
     "demoDescription": "Edit 68 real visual categories across five presets and export a desktop-compatible STATO1 configuration.",
     "demoScope": "Actual app settings and share-code format. The browser does not patch game files."
-  },
-  "mtxtato": {
-    "title": "mtxtato",
-    "short": "MTXtato",
-    "category": "PATH OF EXILE / COSMETICS",
-    "caption": "Matches skills with compatible cosmetic effects and keeps the swaps organised.",
-    "description": "Browse the effect catalogue, match an effect to its base skill and build the asset replacement plan. Compatibility checks keep a cosmetic selection tied to the skill it belongs to.",
-    "scene": "mtxtato",
-    "note": "",
-    "url": "https://github.com/LolStar123/mtxtato-catalogue",
-    "link": "github",
-    "detail": "Same skill. A completely different wardrobe. Browse 1,489 skill effects with real previews, build a loadout and export its app configuration.",
-    "github": "https://github.com/LolStar123/mtxtato-catalogue",
-    "demo": "https://lolstar123.github.io/mtxtato-catalogue/",
-    "links": [
-      {
-        "label": "demo",
-        "url": "https://lolstar123.github.io/mtxtato-catalogue/"
-      },
-      {
-        "label": "github",
-        "url": "https://github.com/LolStar123/mtxtato-catalogue"
-      }
-    ],
-    "demoDescription": "Browse 1,489 skill effects with real previews, build a loadout and export its app configuration.",
-    "demoScope": "Actual catalogue, mapping confidence and asset paths. No game-file patching in the browser."
   },
   "deadlock": {
     "title": "deadlock statistical analysis",

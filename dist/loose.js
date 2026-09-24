@@ -1,4 +1,3 @@
-import {pokerMarker} from './poker-markers.js';
 import {SceneSound} from './soundscape.js';
 import {musicPlayer} from './music-player.js';
 import {drawReferenceRock,rockReady} from './rock-reference.js';
@@ -23,17 +22,7 @@ const auraField=new AuraField();
 const hillSound=new SceneSound('hill',canvas),mix=hillSound.mix;musicPlayer(mix);
 let heardChips=0,heardMode='';
 const hero={x:0,y:0,vx:0,vy:0,size:110,pet:0,cheer:0,held:false,mode:'rest',phase:0,effort:0};
-document.querySelector('.project-knots').innerHTML=trail.map((id,i)=>`<button class="knot" data-project="${id}" aria-label="${i+1}. ${projects[id].title}"><span class="knot-dot" aria-hidden="true">${pokerMarker(i+1)}</span><span class="knot-name"><span class="wide-name">${projects[id].short||projects[id].title}</span><span class="small-name">${projects[id].short}</span></span></button>`).join('');
 let panelOpen=false,project=null,returnFocus=null;
-let trailIndex=0;
-function selectCreation(index){
-    trailIndex=(index+trail.length)%trail.length;const key=trail[trailIndex];
-    document.querySelectorAll('.knot').forEach(el=>el.setAttribute('aria-current',String(el.dataset.project===key)));
-}
-for(const el of document.querySelectorAll('.knot')){el.addEventListener('pointerenter',()=>selectCreation(trail.indexOf(el.dataset.project)));el.addEventListener('focus',()=>selectCreation(trail.indexOf(el.dataset.project)));}
-selectCreation(0);
-
-
 let pendingThought='',thoughtShown='',thoughtAt=-10,thoughtX=null,thoughtY=null;
 function status(text){pendingThought=text;}
 function positionThought(dt){
@@ -277,7 +266,7 @@ function setPause(value){paused=value;hillSound.active(!paused&&worldVisible&&!p
 
 
 function openPanel(key=null,trigger){
-    dispatchEvent(new CustomEvent('project-music',{detail:key}));
+    
     if(!panelOpen)returnFocus=trigger||document.activeElement;
     cancelGrab();cancelAnimationFrame(frame);frame=0;last=0;project=key;panelOpen=true;hillSound.active(false);
     const panel=$('#project-panel');panel.inert=false;document.body.classList.add('panel-open');mix.refresh();$('#open-index')?.setAttribute('aria-expanded','true');if(W<760)$('#world').inert=true;
@@ -287,13 +276,13 @@ function openPanel(key=null,trigger){
         $('#panel-content').innerHTML='<h2 id="panel-title">Following the<br>interesting bits.</h2><p>Research, games, little helpers. Roughly in the order they happened.</p><div class="project-list">'+trail.map(id=>{const p=projects[id];return `<button data-project="${id}">${p.title}<small>${p.caption}</small></button>`;}).join('')+'</div><p>Still figuring out where all of this leads.</p>';
     }else{
         const p=projects[key];$('#panel-content').innerHTML=`<button class="back-projects" id="back-projects">all the detours</button><h2 id="panel-title">${p.title}</h2><p>${p.description}</p>${p.detail?`<p>${p.detail}</p>`:""}${p.scene?`<iframe class="scene-frame" src="demo.html?scene=${p.scene}" title="${p.title} interactive illustration" loading="eager"></iframe>${p.note?`<p class="scene-note">${p.note}</p>`:""}`:""}<nav class="panel-project-links" aria-label="Project links">${(p.links||[]).map(link=>`<a class="more-scene" href="${link.url}" target="_blank" rel="noopener noreferrer">${link.label}</a>`).join('')}</nav>`;
-        if(['botato','smoothtato','mtxtato'].includes(key))$('#panel-content').insertAdjacentHTML('beforeend',document.querySelector('#project-'+key+' .poetato-sticker').outerHTML);
+        if(['botato','smoothtato'].includes(key))$('#panel-content').insertAdjacentHTML('beforeend',document.querySelector('#project-'+key+' .poetato-sticker').outerHTML);
         $('#back-projects').addEventListener('click',()=>openPanel(null));
         const scene=$('.scene-frame');if(scene)demoObserver.observe(scene);
     }
     panel.scrollTop=0;panel.scrollTop=0;$('#close-panel').focus({preventScroll:true});wake();
 }
-function closePanel(){dispatchEvent(new CustomEvent('project-music',{detail:null}));last=0;panelOpen=false;project=null;$('#world').inert=false;$('#project-panel').inert=true;document.body.classList.remove('panel-open');$('#open-index')?.setAttribute('aria-expanded','false');for(const el of document.querySelectorAll('.knot'))el.setAttribute('aria-expanded','false');if($('.scene-frame'))demoObserver.unobserve($('.scene-frame'));$('#panel-content').replaceChildren();mix.refresh();returnFocus?.focus({preventScroll:true});wake();}
+function closePanel(){last=0;panelOpen=false;project=null;$('#world').inert=false;$('#project-panel').inert=true;document.body.classList.remove('panel-open');$('#open-index')?.setAttribute('aria-expanded','false');for(const el of document.querySelectorAll('.knot'))el.setAttribute('aria-expanded','false');if($('.scene-frame'))demoObserver.unobserve($('.scene-frame'));$('#panel-content').replaceChildren();mix.refresh();returnFocus?.focus({preventScroll:true});wake();}
 document.addEventListener('click',e=>{const el=e.target.closest('[data-project]');if(el)openPanel(el.dataset.project,el);});
 $('#open-index')?.addEventListener('click',e=>panelOpen?closePanel():openPanel(null,e.currentTarget));$('#close-panel').addEventListener('click',closePanel);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panelOpen){e.preventDefault();closePanel();}});

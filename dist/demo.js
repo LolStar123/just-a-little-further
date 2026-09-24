@@ -7,7 +7,7 @@ import {drawMeowl} from './little-creatures.js';
 import {rocks,rockPath,routeThroughRocks,WIDTH,HEIGHT} from './rocky-path.js';
 import {hardware,line} from './creatures.js';
 
-const $=s=>document.querySelector(s),scene=new URLSearchParams(location.search).get('scene')||'halo';
+const $=s=>document.querySelector(s),requestedScene=new URLSearchParams(location.search).get('scene')||'halo',scene=requestedScene==='mtxtato'?'smoothtato':requestedScene;
 document.body.dataset.scene=scene;
 const sfx=new SceneSound(scene);let previousLotStage=-1;
 document.documentElement.classList.toggle('embedded',parent!==window);

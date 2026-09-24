@@ -13,11 +13,6 @@ if(!window.__buttonFeel){
         if(reduced.matches)return;
         const current=getComputedStyle(button).scale;
         animations.get(button)?.cancel();
-        button.querySelectorAll('.poker-card').forEach((card,i)=>{
-            const rotation=getComputedStyle(card).rotate,rest=Number(card.dataset.tilt||0),side=Math.random()<.5?-1:1,kick=12+Math.random()*19,lift=4+Math.random()*7;
-            card.getAnimations().forEach(a=>a.cancel());
-            card.animate([{rotate:rotation,translate:'0 0'},{rotate:(rest+side*kick)+'deg',translate:(side*(3+Math.random()*5))+'px -'+lift+'px',offset:.32},{rotate:(rest-side*5)+'deg',translate:'0 2px',offset:.7},{rotate:rest+'deg',translate:'0 0'}],{duration:press?420:330,easing:'cubic-bezier(.2,.8,.25,1)'});
-        });
         // Individual scale leaves positioning transforms (especially hill cards) intact.
         const a=button.animate(press?[{scale:current},{scale:'.94 .73',translate:'0 3px',offset:.14},{scale:'1.13 1.16',translate:'0 -2px',offset:.43},{scale:'1.025 .91',translate:'0 1px',offset:.66},{scale:'.985 1.04',translate:'0 0',offset:.84},{scale:'1',translate:'0 0'}]:[{scale:current},{scale:'1.035 .97',offset:.35},{scale:'.99 1.02',offset:.68},{scale:'1'}],{duration:press?480:310,easing:'ease-out'});
         animations.set(button,a);
