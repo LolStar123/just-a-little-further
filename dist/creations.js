@@ -231,7 +231,7 @@ export const projects={
     "title": "halo",
     "short": "HALO",
     "category": "AI / MEETING ASSISTANT",
-    "caption": "A meeting assistant that brings spoken questions, screen context and reference notes into one reading overlay.",
+    "caption": "ai powered meeting assistant. uses personal context to provide contextualised answers.",
     "description": "Transcribe the question, combine it with selected context and prepare a response. The overlay breaks that response into readable sentences so the next useful point stays in view.",
     "scene": "halo",
     "note": "",
