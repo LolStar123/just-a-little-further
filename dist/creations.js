@@ -205,7 +205,7 @@ export const projects={
     "title": "botato",
     "short": "Botato",
     "category": "PATH OF EXILE / AUTOMATION",
-    "caption": "Plans routes around obstacles and handles the repetitive movement and combat loops.",
+    "caption": "path of exile route optimisation and combat automation. end-to-end.",
     "description": "Read the current terrain and target, choose a traversable route and advance along it. If an obstacle changes the route, recalculate before moving; navigation feeds the wider automation loop.",
     "scene": "botato",
     "note": "",
