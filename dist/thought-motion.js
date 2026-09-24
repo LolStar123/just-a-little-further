@@ -5,7 +5,7 @@ export function thoughtPose(index,time){
   angle:Math.sin(time*(1.4+index*.17)+index*1.3)*(index<3?.19:.10)};
 }
 export function deadlockBlink(time){
- const phase=time%3.8;
+ const phase=time%3;
  const lid=start=>{const t=phase-start;if(t<0||t>.38)return 1;if(t<.09)return 1-t/.09;if(t<.23)return .025;return Math.max(.025,(t-.23)/.15);};
  return Math.max(.025,Math.min(lid(1.15),lid(1.7)));
 }

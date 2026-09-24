@@ -89,7 +89,7 @@ export function personalScene(scene,canvas,wake,sfx){
       const side=k%2?1:-1,rank=Math.floor(k/2),dealt=ease((q-.8-k*.095)/.34),separate=split*(1-dealt);
       const px=side*19*separate,py=-7+rank*.7-Math.sin(dealt*Math.PI)*9;
       c.save();c.translate(px,py);c.rotate(side*separate*.24);
-      c.beginPath();c.moveTo(-16,13);c.quadraticCurveTo(0,13-bridge,16,13);c.lineTo(16,-33);c.quadraticCurveTo(0,-34-bridge,-16,-33);c.closePath();c.fillStyle=paper;c.fill();c.strokeStyle=ink;c.lineWidth=.75;c.stroke();
+      c.beginPath();c.moveTo(-16,13);c.quadraticCurveTo(0,13-bridge,16,13);c.quadraticCurveTo(18,-9,15,-33);c.quadraticCurveTo(0,-35-bridge,-17,-32);c.closePath();c.fillStyle=paper;c.fill();c.strokeStyle=ink;c.lineWidth=1.05;c.stroke();
       c.save();c.translate(0,-bridge*.45);drawPokerFace(c,k===11?frontCard:POKER_PACK[(POKER_PACK.indexOf(frontCard)+k+1)%54]);c.restore();
       c.restore();
      }
