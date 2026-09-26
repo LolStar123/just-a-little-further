@@ -7,7 +7,7 @@ if(!window.__buttonFeel){
     const reduced=matchMedia('(prefers-reduced-motion: reduce)');
     const animations=new WeakMap();
     const css=document.createElement('style');
-    css.textContent='button{touch-action:manipulation}button:focus-visible{outline:2px solid #8b7248;outline-offset:5px}.cheer-bit{position:fixed;pointer-events:none;z-index:1001;color:#847348;font:22px Pen,cursive}.inline-project-link{color:inherit;text-decoration-line:underline;text-decoration-thickness:1px;text-decoration-style:wavy;text-underline-offset:3px}';
+    css.textContent='button{touch-action:manipulation}button:focus-visible{outline:2px solid #8b7248;outline-offset:5px}.cheer-bit{position:fixed;pointer-events:none;z-index:1001;color:#847348;font:22px Pen,cursive}.chapter-copy a,#panel-content a{text-decoration-line:underline;text-decoration-thickness:1px;text-decoration-style:solid;text-underline-offset:4px}.inline-project-link{color:inherit}';
     document.head.append(css);
     const gameTargets='.chapter-copy p,.chapter-copy small,.legal p,.scene-intro p,.project-note p,.halo-cue .cue-detail,#panel-content>p';
     const gameDestinations={deadlock:'https://store.steampowered.com/app/1422450/Deadlock/','path of exile':'https://www.pathofexile.com/'};
