@@ -260,7 +260,7 @@ export const projects={
   "liquidation": {
     "title": "the hardware hunt",
     "short": "hardware hunt",
-    "category": "AUCTION UNDERWRITING",
+    "category": "AUCTION STRATEGY",
     "caption": "wanted some lunch money so i made a python to codex pipeline to weigh up fees, taxes and margin and optimise auction flipping.",
     "description": "Track the lot, identify the hardware and estimate recoverable resale value. Include faults, buyer fees, VAT, transport and selling costs before setting a maximum hammer bid.",
     "scene": "liquidation",
