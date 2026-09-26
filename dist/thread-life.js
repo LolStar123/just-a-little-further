@@ -26,7 +26,12 @@ export function threadLife(svg,path){
     pet.addEventListener('pointermove',e=>{if(!petDrag)return;const now=performance.now();actor.drag(e.clientX-petDrag.x,e.clientY+scrollY-petDrag.y,(now-petLast)/1000);petLast=now;});
     const dropPet=()=>{if(!petDrag)return;const drag=petDrag;petDrag=null;actor.release();if(pet.hasPointerCapture(drag.id))pet.releasePointerCapture(drag.id);};
     pet.addEventListener('pointerup',dropPet);pet.addEventListener('pointercancel',dropPet);pet.addEventListener('lostpointercapture',dropPet);
-    addEventListener('meowl-cheer',()=>{actor?.cheer();sound.active(true);sound.play('meow',{id:'guide',level:.6});wake();});
+    addEventListener('meowl-cheer',()=>{
+        actor?.cheer();sound.active(true);sound.mix.enable(true);
+        const voice=()=>sound.play('meow',{id:'guide',level:.6});
+        sound.mix.context?.state==='running'?voice():sound.mix.context?.resume().then(voice).catch(()=>{});
+        wake();
+    });
     pet.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();actor?.hop();}if(e.key==='Escape')dropPet();});
     const sound=new SceneSound('guide',guide),words=guide.querySelector('p');
     const speechSizer=document.createElement('span'),speechInk=document.createElement('span');

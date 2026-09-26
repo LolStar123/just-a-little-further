@@ -9,7 +9,8 @@
   },
   "scripts": {
     "check": "node --check dist/boot.js && node --check dist/loose.js && node --check dist/hill-physics.js && node --check dist/aura-field.js && node --check dist/little-creatures.js && node --check dist/app.js && node --check dist/creatures.js && node --check dist/companion.js && node --check dist/pathfinding.js && node --check dist/library.js && node --check dist/rare-step-player.js && node --check dist/demo.js && node --check dist/pen-thread.js && node --check dist/creations.js && node --check dist/ink-path.js && node --check dist/mini-scenes.js && node --check dist/poe-statistics.js && node --check dist/match-statistics.js && node --check dist/rocky-path.js && node --check dist/demo.bundle.js && node --check dist/soundscape.js && node --check dist/music-player.js && node --check dist/recorded-sounds.js && node --check dist/music-parts.js && node --check dist/personal-scenes.js && node --check dist/poker-deck.js && node --check dist/thought-motion.js && node --check dist/toy-interactions.js && node --check dist/thread-life.js && node --check dist/button-feel.js && node --check dist/guide-motion.js && node --check dist/page-toys.js && node --check dist/scene-loading.js",
-    "build:demos": "esbuild dist/demo.js --bundle --format=esm --minify --target=es2022 --outfile=dist/demo.bundle.js && node tools/version-demo.mjs"
+    "build:demos": "esbuild dist/demo.js --bundle --format=esm --minify --target=es2022 --outfile=dist/demo.bundle.js && node tools/version-demo.mjs",
+    "test:loading": "python tools/verify_scene_loading.py"
   },
   "devDependencies": {
     "esbuild": "0.25.9"

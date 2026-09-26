@@ -262,7 +262,7 @@ canvas.addEventListener('keydown',e=>{
 $('#ruin').addEventListener('click',()=>{toyMotionRequested=true;if(paused)setPause(false);cancelGrab();physics.ruinDay();hillSound.play('swish',{level:.8});used();status('wait. what are you doing.');wake();});
 $('#help').addEventListener('click',()=>{toyMotionRequested=true;if(paused)setPause(false);cancelGrab();physics.helpRock();hero.cheer=3;hillSound.play('aura',{style:1,level:.8});used();status('okay. just this once.');wake();});
 $('#reset').addEventListener('click',()=>{cancelGrab();auraField.clear();physics.reset();hero.pet=0;hero.cheer=0;particles.length=0;ripples.length=0;scuffs.length=0;status('another morning. another go.');updateCharacters(0);wake();});
-$('#encourage').addEventListener('click',()=>{dispatchEvent(new Event('meowl-cheer'));if(paused)setPause(false);hero.cheer=3;hero.pet=0;used();status('go on, little guy.');playTone('pet');wake();});
+$('#encourage').addEventListener('click',()=>{dispatchEvent(new Event('meowl-cheer'));if(paused)setPause(false);hero.cheer=3;hero.pet=0;used();status('go on, little guy.');wake();});
 function setPause(value){paused=value;hillSound.active(!paused&&worldVisible&&!panelOpen);cancelGrab();if(paused){cancelAnimationFrame(frame);frame=0;}last=0;wake();}
 
 
@@ -294,18 +294,23 @@ new ResizeObserver(resize).observe(surface);
 ready.then(wake).catch(()=>{status('the creature artwork could not load. reload to try again.');});
 window.__hill=()=>({depth:{extra:extraDepth,paintTop,paintHeight},time,paused,aura:{count:auraField.particles.length,deflections:auraField.deflections,bounces:auraField.bounces},sound:mix.enabled,audio:mix.diagnostics(),pointerGrab:grab?.type||null,lastRelease,reducedMotion:reduce.matches,toyMotionRequested,assets:art.ready,hero:{...hero},physics:physics?.diagnostics(),particles:particles.length,scuffs:scuffs.length,panel:project,panelOpen,petCount,meanFrameMs:intervals.length?intervals.reduce((a,b)=>a+b,0)/intervals.length:0});
 
-const chapterObserver=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting){entry.target.classList.add('seen');for(const demo of entry.target.querySelectorAll('iframe[data-scene]')){demo.loading='eager';if(!demo.hasAttribute('src'))demo.src=demoUrl(demo.dataset.scene);}}}syncDemoVisibility();},{rootMargin:'550px 0px',threshold:0});
+function ensureDemoLoaded(demo){
+    if(!demo.dataset.scene||demo.hasAttribute('src'))return;
+    demo.loading='eager';
+    demo.src=demo.dataset.src||demoUrl(demo.dataset.scene);
+}
+const chapterObserver=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting){entry.target.classList.add('seen');entry.target.querySelectorAll('iframe[data-scene]').forEach(ensureDemoLoaded);}}syncDemoVisibility();},{rootMargin:'650px 0px',threshold:0});
 document.querySelectorAll('.sketch-chapter').forEach(el=>chapterObserver.observe(el));
 
 new IntersectionObserver(entries=>{worldVisible=entries[0].isIntersecting;hillSound.active(worldVisible&&!paused&&!panelOpen);if(!worldVisible){cancelAnimationFrame(frame);frame=0;last=0;cancelGrab();}else wake();},{threshold:0}).observe($('#world'));
 
-const demoObserver=new IntersectionObserver(entries=>{for(const e of entries)e.target.contentWindow?.postMessage({type:'demo-visibility',visible:e.isIntersecting},location.origin);},{threshold:0});
+const demoObserver=new IntersectionObserver(entries=>{for(const e of entries){if(e.isIntersecting)ensureDemoLoaded(e.target);e.target.contentWindow?.postMessage({type:'demo-visibility',visible:e.isIntersecting},location.origin);}},{rootMargin:'150px 0px',threshold:0});
 document.querySelectorAll('.sketch-demo').forEach(el=>demoObserver.observe(el));
 let demoSyncFrame=0;
 function syncDemoVisibility(){
-    if(demoSyncFrame)return;demoSyncFrame=requestAnimationFrame(()=>{demoSyncFrame=0;for(const demo of document.querySelectorAll('iframe[data-scene],.scene-frame')){if(!demo.contentWindow)continue;const r=demo.getBoundingClientRect();demo.contentWindow.postMessage({type:'demo-visibility',visible:r.bottom>0&&r.top<innerHeight&&r.right>0&&r.left<innerWidth},location.origin);}});
+    if(demoSyncFrame)return;demoSyncFrame=requestAnimationFrame(()=>{demoSyncFrame=0;for(const demo of document.querySelectorAll('iframe[data-scene],.scene-frame')){const r=demo.getBoundingClientRect(),near=r.bottom>-650&&r.top<innerHeight+650&&r.right>0&&r.left<innerWidth;if(near)ensureDemoLoaded(demo);if(!demo.contentWindow)continue;demo.contentWindow.postMessage({type:'demo-visibility',visible:r.bottom>0&&r.top<innerHeight&&r.right>0&&r.left<innerWidth},location.origin);if(near)demo.contentWindow.postMessage({type:'demo-probe'},location.origin);}});
 }
-for(const demo of document.querySelectorAll('.sketch-demo'))demo.addEventListener('load',syncDemoVisibility);
+for(const demo of document.querySelectorAll('.sketch-demo'))demo.addEventListener('load',()=>{demo.contentWindow?.postMessage({type:'demo-probe'},location.origin);syncDemoVisibility();});
 addEventListener('scroll',syncDemoVisibility,{passive:true});addEventListener('resize',syncDemoVisibility,{passive:true});addEventListener('pageshow',syncDemoVisibility);addEventListener('meowl-enter',syncDemoVisibility);
 window.addEventListener('message',e=>{
     if(e.origin!==location.origin||!['demo-ready','demo-layout'].includes(e.data?.type))return;

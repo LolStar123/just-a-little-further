@@ -28,7 +28,11 @@ function tick(now){
     wake();
 }
 function stop(){sfx.active(false);cancelAnimationFrame(frame);frame=0;last=0;}
-addEventListener('message',e=>{if(e.origin===location.origin&&e.source===parent&&e.data?.type==='demo-visibility'){visible=!!e.data.visible;if(visible)wake();else stop();}});
+addEventListener('message',e=>{
+    if(e.origin!==location.origin||e.source!==parent)return;
+    if(e.data?.type==='demo-visibility'){visible=!!e.data.visible;if(visible)wake();else stop();}
+    if(e.data?.type==='demo-probe')announceReady();
+});
 document.addEventListener('visibilitychange',()=>document.hidden?stop():wake());
 addEventListener('keydown',e=>{if(e.key==='Escape')parent.postMessage({type:'close-project'},location.origin);});
 function canvas(id){
@@ -221,8 +225,9 @@ sfx.mix.notify();
 window.__siteDiagnostics=()=>({...stats,audio:sfx.mix.diagnostics(),paused,time,phase:halo?(halo.done?3:1):0,halo,mini:mini?.state,game:robot?{...robot,position:[robot.x,robot.y]}:null,lot,activeCanvases:visible&&!paused?1:0,raf:!!frame});
 let reportedHeight=0;
 function reportLayout(){const height=Math.ceil(document.querySelector('#demo').getBoundingClientRect().height+4);if(height===reportedHeight)return;reportedHeight=height;parent.postMessage({type:'demo-layout',height},location.origin);}
+function announceReady(){parent.postMessage({type:'demo-ready'},location.origin);reportLayout();}
 new ResizeObserver(reportLayout).observe(document.querySelector('#demo'));
-parent.postMessage({type:'demo-ready'},location.origin);document.fonts.ready.then(reportLayout);reportLayout();wake();
+announceReady();document.fonts.ready.then(announceReady);addEventListener('pageshow',announceReady);wake();
 
 // Parent IntersectionObserver can miss a notification during a mobile frame load.
 const visibilityPoll=setInterval(()=>{const next=onScreen();visible=next;if(next&&!frame)wake();else if(!next&&frame)stop();},500);
