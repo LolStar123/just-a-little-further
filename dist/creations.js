@@ -49,7 +49,7 @@ export const projects={
     "title": "poe economy scraper",
     "short": "poe economy scraper",
     "category": "STATISTICS",
-    "caption": "rotating proxy scrapes the path of exile virtual economy to log detailed profit and risk statistics. i like optimising small things.",
+    "caption": "rotates a proxy and scrapes path of exile virtual economy to log profit and risk statistics. i like optimising small things.",
     "description": "Residential-proxy collection logs item prices for the wider pipeline. Variant probabilities and buy-in costs feed linked sheets for expected value, dispersion and profit factor. Missing prices stay visible instead of becoming invented bargains.",
     "scene": "poe",
     "note": "",
@@ -74,8 +74,8 @@ export const projects={
   "tfl": {
     "title": "tube reliability leaderboard",
     "short": "Tube ratings",
-    "category": "LONDON",
-    "caption": "ranks tube lines using live rating history, like chess elo. my teammate and i made this for the quantihack hackathon.",
+    "category": "PYTHON DATA PIPELINES",
+    "caption": "ranks tube lines using live rating history, like chess elo. made for quantihackathon.",
     "description": "Built with Benjamin Toze at QuantiHack 2026. Collect timestamped TfL arrival predictions, identify sampled stop outcomes and update bounded line ratings. Compare the live history with the original hackathon archive.",
     "scene": "tfl",
     "note": "",
@@ -104,7 +104,7 @@ export const projects={
   "commute": {
     "title": "commute cost optimiser",
     "short": "commute fares",
-    "category": "LONDON",
+    "category": "PYTHON DATA PIPELINES",
     "caption": "i commute a lot. this tool finds us the cheapest train combos.",
     "description": "Enter your journey and working pattern, then compare ticket costs with daily and weekly caps. The full calculator also handles zones, peak times, Railcards, annual leave and break-even points.",
     "scene": "commute",
@@ -130,7 +130,7 @@ export const projects={
   "smoothtato": {
     "title": "smoothtato",
     "short": "Smoothtato",
-    "category": "PERFORMANCE",
+    "category": ".NET + OBFUSCATION",
     "caption": "my pc sucked so i made a graphics changer app to boost performance and customise visuals in path of exile. few hundred users saving fps and lookin' fly.",
     "description": "Choose which graphics to remove, match cosmetic effects to your skills, and save the combined setup as a reusable preset. Restore the original files when you want to switch back.",
     "scene": "smoothtato",
@@ -156,7 +156,7 @@ export const projects={
   "deadlock": {
     "title": "deadlock statistical analysis",
     "short": "Deadlock analysis",
-    "category": "STATISTICS",
+    "category": "STATISTICS + COACHING",
     "caption": "top 100 deadlock player. optimised my gameplay using conditional probability analyses to maximise winrate. used data to help coach 7 players.",
     "description": "Collect match data, take comparable checkpoints and split matches by a condition. Compare win rates for economy, damage, objectives and other stats, with sample sizes and uncertainty beside each result.",
     "scene": "deadlock",
@@ -182,7 +182,7 @@ export const projects={
   "baxter": {
     "title": "baxter",
     "short": "Baxter",
-    "category": "PERSONAL ASSISTANT",
+    "category": "HARNESS ENGINEERING",
     "caption": "i love discord so i turned it into an llm harness. the bots scope, schedule, execute and verify.",
     "description": "I wired Claude into a Discord bot so I can hand off work where I already spend my time. Baxter scopes the request, schedules tasks and reserves the files they need. Work with conflicting edits waits its turn. A separate verification step checks the result before Baxter marks it done.",
     "scene": "baxter",
@@ -208,7 +208,7 @@ export const projects={
   "botato": {
     "title": "botato",
     "short": "Botato",
-    "category": "AUTOMATION",
+    "category": "REVERSE ENGINEERING",
     "caption": "path of exile route optimisation and combat automation. end-to-end. going public soon™.",
     "description": "Read the current terrain and target, choose a traversable route and advance along it. If an obstacle changes the route, recalculate before moving; navigation feeds the wider automation loop.",
     "scene": "botato",
@@ -234,7 +234,7 @@ export const projects={
   "halo": {
     "title": "halo",
     "short": "HALO",
-    "category": "MEETING ASSISTANT",
+    "category": "CONTEXT ENGINEERING",
     "caption": "ai powered meeting assistant. uses personal context to provide contextualised answers.",
     "description": "Transcribe the question, combine it with selected context and prepare a response. The overlay breaks that response into readable sentences so the next useful point stays in view.",
     "scene": "halo",
@@ -260,8 +260,8 @@ export const projects={
   "liquidation": {
     "title": "the hardware hunt",
     "short": "hardware hunt",
-    "category": "HARDWARE",
-    "caption": "weighs up fees, taxes and margin to optimise auction flipping.",
+    "category": "AUCTION UNDERWRITING",
+    "caption": "wanted some lunch money so i made a python to codex pipeline to weigh up fees, taxes and margin and optimise auction flipping.",
     "description": "Track the lot, identify the hardware and estimate recoverable resale value. Include faults, buyer fees, VAT, transport and selling costs before setting a maximum hammer bid.",
     "scene": "liquidation",
     "note": "",

@@ -9,10 +9,10 @@ export function inverse2([a,b,c,d]){const det=a*d-b*c;if(Math.abs(det)<1e-8)retu
 export function personalScene(scene,canvas,wake,sfx){
  const interests=scene==='interests',ink='#535248',paper='#eeeae0',olive='#60715d';
  document.querySelector('.caption').textContent=interests?'a few constants in my brain':'pixels, text, a stopping rule';
- document.querySelector('#scene').innerHTML='<canvas id="personal-art" class="toy mini-toy" aria-label="'+(interests?'A thought bubble of competitive games, poker and indomie':'OCR text normalisation example')+'"></canvas><p class="toy-note" id="personal-note"></p>';
+ document.querySelector('#scene').innerHTML='<canvas id="personal-art" class="toy mini-toy" aria-label="'+(interests?'A thought bubble of competitive games, poker, indomie and an electric guitar':'OCR text normalisation example')+'"></canvas><p class="toy-note" id="personal-note"></p>';
  const a=canvas('personal-art'),state={clock:0,scene},note=document.querySelector('#personal-note');
  let shuffleCycle=0,frontCard=interests?pickPokerCard():null;
- const seats=[[90,74],[244,74],[392,74],[143,179],[335,179]];
+ const seats=[[90,74],[244,74],[392,74],[90,179],[244,179],[392,179]];
  const eyePointer={x:0,y:0,active:false};
  if(interests){
   const follow=e=>{
@@ -26,13 +26,13 @@ export function personalScene(scene,canvas,wake,sfx){
   try{if(parent!==window)parent.addEventListener('pointermove',follow,{passive:true});}catch{}
   addEventListener('pagehide',()=>{try{if(parent!==window)parent.removeEventListener('pointermove',follow);}catch{}},{once:true});
  }
- const labels=[['top 100','deadlock'],['wealthiest','path of exile player'],['top 5000','dota 2'],['bath poker','tourney winner'],['indomie','sandwich']];
+ const labels=[['top 100','deadlock'],['wealthiest','path of exile player'],['top 5000','dota 2'],['bath poker','tourney winner'],['indomie','sandwich'],['electric','guitar']];
  const gameLinks=interests?['https://store.steampowered.com/app/1422450/Deadlock/','https://www.pathofexile.com/','https://www.dota2.com/'].map((href,i)=>{
   const link=document.createElement('a');link.href=href;link.target='_blank';link.rel='noopener noreferrer';link.textContent=labels[i][1];link.className='interest-game-link';
   Object.assign(link.style,{position:'absolute',zIndex:3,color:ink,fontFamily:'Reader,Georgia,serif',lineHeight:'1',whiteSpace:'nowrap',transform:'translate(-50%,-80%)',textDecoration:'underline',textDecorationThickness:'1px',textUnderlineOffset:'3px'});
   a.el.parentElement.style.position='relative';a.el.parentElement.append(link);return link;
  }):[];
- const atoms=labels.map((words,i)=>({words,x:94+(i%3)*145,y:70+Math.floor(i/3)*90,vx:(i%2?-1:1)*(21+i*3),vy:(i%3-1)*19,w:[116,165,116,158,112][i],h:48,spin:0}));
+ const atoms=labels.map((words,i)=>({words,x:94+(i%3)*145,y:70+Math.floor(i/3)*90,vx:(i%2?-1:1)*(21+i*3),vy:(i%3-1)*19,w:[116,165,116,158,112,116][i],h:48,spin:0}));
  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
  function moveAtoms(dt){
   for(const b of atoms){b.x+=b.vx*dt;b.y+=b.vy*dt;b.spin*=Math.exp(-dt*4);if(b.x-b.w/2<30){b.x=30+b.w/2;b.vx=Math.abs(b.vx);}if(b.x+b.w/2>450){b.x=450-b.w/2;b.vx=-Math.abs(b.vx);}if(b.y-b.h/2<35){b.y=35+b.h/2;b.vy=Math.abs(b.vy);}if(b.y+b.h/2>222){b.y=222-b.h/2;b.vy=-Math.abs(b.vy);}}
@@ -52,15 +52,15 @@ export function personalScene(scene,canvas,wake,sfx){
    const expansion=reduced.matches?1:Math.min(1,time/1.5),growth=1-Math.pow(1-expansion,3);
    c.save();c.translate(240,244);c.scale(.12+.88*growth,.12+.88*growth);c.translate(-240,-244);
    c.strokeStyle=ink;c.lineWidth=1.1;drawBubble(c);
-   const active=Math.floor(time/2.6)%5,phase=(time%2.6)/2.6;
+   const active=Math.floor(time/2.6)%6,phase=(time%2.6)/2.6;
    state.activeThought=active;state.thoughtMotion=seats.map((_,i)=>thoughtPose(i,time));
    // The words never move. The doodles do the daydreaming above each label.
    const thread=[[35,42],[68,23],[137,30],[201,14],[278,29],[339,13],[445,34],[453,113],[377,128],[313,120],[249,143],[182,120],[87,134],[47,215],[85,236],[194,246]];
    line(c,thread,'#b2aa98',.75);
-   for(let j=0;j<5;j++){
+   for(let j=0;j<6;j++){
     const [x,y]=seats[j],selected=j===active,{lift,angle,sway}=thoughtPose(j,time);
     c.save();c.translate(x+sway,y-30-lift);c.rotate(angle);c.strokeStyle=selected?olive:ink;c.lineWidth=1.5;
-    toyProp(c,['deadlock-emblem','divine-orb','dota-emblem','poker-hand','indomie-sandwich'][j],0,16,j===3?82:52,60,c=>{
+    toyProp(c,['deadlock-emblem','divine-orb','dota-emblem','poker-hand','indomie-sandwich','electric-guitar'][j],0,16,j===3?82:52,60,c=>{
     if(j===0){ // Deadlock's eight-part wheel and little watching eye.
      c.save();c.translate(0,-8);c.rotate(angle*.35);
      for(let k=0;k<8;k++){const angle=k*Math.PI/4+.04;const pts=[];for(let q=0;q<=5;q++){const t=angle+q*.11,r=20+(q%2?.7:-.5);pts.push([Math.cos(t)*r,Math.sin(t)*r]);}line(c,pts,ink,2);line(c,[[Math.cos(angle)*12,Math.sin(angle)*12],[Math.cos(angle)*21,Math.sin(angle)*21]],ink,1.3);}
@@ -99,7 +99,7 @@ export function personalScene(scene,canvas,wake,sfx){
      if(q>.8&&q<2.2)sfx.beat('poker-riffle',cycle+':'+Math.floor((q-.8)*5),'paper',{level:.12});
      if(q>3.65)sfx.beat('poker-square',cycle,'click',{level:.10});
      state.shuffle={phase:q,split,bridge,cards:54,visibleLayers:12,cycle,frontCard:frontCard.id,faceUp:true};
-    }else{
+    }else if(j===4){
      // Heat rises in separate drifting curls, with a few noodles refusing to stay put.
      for(let k=0;k<5;k++){
       const age=reduced.matches?.45:(time*.43+k*.21)%1,x=-15+k*7+Math.sin(time*1.4+k)*3,y=-22-age*32;
@@ -109,6 +109,18 @@ export function personalScene(scene,canvas,wake,sfx){
      for(let k=0;k<3;k++){const wiggle=reduced.matches?0:Math.sin(time*3+k*1.7)*2;c.beginPath();c.moveTo(-20,-6+k*3);c.bezierCurveTo(-10,-13+wiggle,0,3-k*2,8,-5+k);c.bezierCurveTo(13,-10+wiggle,21,0,25,-3+k*2);c.strokeStyle=k===1?olive:'#b59350';c.lineWidth=1.15;c.stroke();}
      for(let k=0;k<4;k++)line(c,[[-12+k*7,-15],[-10+k*7,-14]],'#ba9b60',.7);
      state.steamWisps=5;
+    }else{
+     // A tiny crooked electric guitar, scribbled in the same single-pen language.
+     c.save();c.rotate(-.13+angle*.22);
+     c.beginPath();c.moveTo(-3,-5);c.bezierCurveTo(-13,-14,-24,-8,-19,2);c.bezierCurveTo(-29,10,-21,23,-10,18);c.bezierCurveTo(-3,27,10,19,5,9);c.bezierCurveTo(15,4,12,-7,2,-5);c.closePath();c.fillStyle='#d6b39a';c.fill();c.strokeStyle=ink;c.lineWidth=1.65;c.stroke();
+     line(c,[[1,-3],[19,-28],[24,-24],[7,2]],ink,1.7);
+     line(c,[[19,-28],[22,-35],[30,-32],[29,-24],[24,-24]],ink,1.45);
+     line(c,[[-7,0],[3,8],[0,12],[-10,5],[-7,0]],'#8a6253',1.05);
+     line(c,[[-5,11],[1,14]],ink,1.8);c.beginPath();c.arc(5,12,1.8,0,Math.PI*2);c.stroke();
+     for(let k=0;k<4;k++)line(c,[[7+k*3,-10-k*4],[11+k*3,-7-k*4]],'#8b7248',.7);
+     line(c,[[-8,7],[26,-31]],'#eeeae0',.55);line(c,[[-5,9],[28,-29]],'#6f6b61',.48);
+     for(const [x,y] of [[24,-33],[29,-30],[27,-25]]){c.beginPath();c.arc(x,y,1.15,0,Math.PI*2);c.stroke();}
+     c.restore();state.guitar={strings:2,pickups:1,wobble:angle};
     }
     },{rescue:true});
     c.restore();atoms[j].words.forEach((word,i)=>{if(j>=3||i===0)text(c,word,x,y+i*20,18);});
