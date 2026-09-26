@@ -234,9 +234,14 @@ function workCostume(c,p,role,t){
         for(const side of [-1,1]){c.beginPath();c.ellipse(side*26,-1,5,11,side*.1,0,Math.PI*2);c.fillStyle='#767e77';c.fill();c.strokeStyle=ink;c.lineWidth=1.2;c.stroke();}
         pen([[-13,1],[-6,1]],1.8);pen([[6,1],[13,1]],1.8);
     }else if(role==='analyst'){
-        for(const side of [-1,1]){c.beginPath();c.ellipse(side*10,-1,9,8,side*.08,0,Math.PI*2);c.strokeStyle=ink;c.lineWidth=1.35;c.stroke();}
-        pen([[-1,-2],[1,-2]],1.2);pen([[-19,-2],[-27,-7]],.9);pen([[19,-2],[27,-7]],.9);
-        pen([[-5,-29],[0,-35],[6,-28]],.8,'#8a7858');
+        // Deliberately oversized, taped round glasses. They must read at the
+        // tiny embedded-demo scale before the little chart details do.
+        for(const side of [-1,1]){c.beginPath();c.ellipse(side*11,-1,10.5,9.5,side*.05,0,Math.PI*2);c.fillStyle='rgba(238,234,224,.34)';c.fill();c.strokeStyle=ink;c.lineWidth=2.1;c.stroke();}
+        pen([[-2,-2],[2,-2]],2.15);pen([[-21,-3],[-29,-8]],1.3);pen([[21,-3],[29,-8]],1.3);
+        c.save();c.translate(0,-2);c.rotate(.08);c.fillStyle='#d8cba9';c.fillRect(-2.2,-5,4.4,9);c.strokeStyle='#8c7e66';c.lineWidth=.55;c.strokeRect(-2.2,-5,4.4,9);c.restore();
+        // Pencil tucked behind one ear and two unruly head feathers.
+        pen([[21,-19],[30,-36]],2,'#a08a57');pen([[30,-36],[32,-40]],1.4,'#936957');
+        pen([[-8,-29],[-3,-37],[1,-29],[7,-38],[10,-29]],1,'#8a7858');
     }else if(role==='verifier'){
         c.beginPath();c.moveTo(-23,-17);c.lineTo(-19,-31);c.quadraticCurveTo(0,-40,20,-30);c.lineTo(23,-17);c.closePath();c.fillStyle='#737d7c';c.fill();c.strokeStyle=ink;c.lineWidth=1.3;c.stroke();
         c.beginPath();c.moveTo(-24,-17);c.quadraticCurveTo(17,-12,31,-19);c.quadraticCurveTo(12,-23,-24,-17);c.fillStyle=ink;c.fill();
@@ -249,8 +254,11 @@ function workCostume(c,p,role,t){
     }else if(role==='developer'){
         curve(c,[-17,-1],[-8,13],[0,6],1.2);curve(c,[0,6],[9,13],[16,-1],1.2);stroke(c,[[-5,9],[-7,21]],.8);stroke(c,[[6,9],[8,19]],.8);curve(c,[-12,26],[0,22],[12,26],1);
     }else if(role==='analyst'){
-        stroke(c,[[-8,8],[0,14],[8,8],[0,4],[-8,8]],1.05,'#a08a57');
-        stroke(c,[[-13,17],[-6,12],[2,19],[10,10],[16,14]],.75,'#8c7e66');
+        // Bow tie plus a pocket calculator with visibly separate keys.
+        stroke(c,[[-10,7],[0,13],[10,7],[0,3],[-10,7]],1.35,'#a08a57');
+        c.fillStyle=paper;c.fillRect(5,14,17,22);stroke(c,[[5,14],[22,14],[22,36],[5,36],[5,14]],1.15);
+        c.fillStyle='#8c7e66';c.fillRect(8,17,11,5);
+        for(let row=0;row<2;row++)for(let col=0;col<3;col++){c.beginPath();c.arc(9+col*4.3,27+row*4.2,1,0,TAU);c.fill();}
     }else if(role==='verifier'){
         stroke(c,[[-16,1],[0,8],[16,1]],1.1);stroke(c,[[6,10],[13,8],[18,12],[15,21],[10,23],[6,18],[6,10]],1.1,'#a08a57');stroke(c,[[-14,16],[-9,15],[-7,26],[-13,27],[-14,16]],1.2);stroke(c,[[-12,15],[-13,8]],1.1);
     }

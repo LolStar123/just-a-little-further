@@ -3,7 +3,8 @@ import {sharedMix} from './soundscape.js';
 import './button-feel.js';
 const overlay=document.querySelector('#little-boot');
 const button=overlay.querySelector('button'),status=overlay.querySelector('.boot-progress'),hint=overlay.querySelector('.push-hint'),c=overlay.querySelector('canvas').getContext('2d');
-let pushes=0,loaded=false,done=false,failed=false,shown=0,time=0,last=0,raf=0,keyboardEntry=false;
+let returning=false;try{returning=sessionStorage.getItem('meowl-entered')==='yes';}catch{}
+let pushes=returning?3:0,loaded=false,done=false,failed=false,shown=returning?1:0,time=0,last=0,raf=0,keyboardEntry=false;
 function stampPush(stage){
  const word=button.querySelector('.push-word'),ink=button.querySelector('.push-ink'),angle=[-4,3,-5,2][stage];
  word.textContent=['PUSH.','PUUUSH!','PUUUUUUSH!!!','made it.'][stage];word.style.rotate=angle+'deg';
@@ -13,7 +14,8 @@ function stampPush(stage){
   ink.animate([{opacity:.9,scale:'.85'},{opacity:.7,scale:'1.06',offset:.35},{opacity:.35,scale:'1'}],{duration:420,easing:'ease-out'});
  }
 }
-stampPush(0);
+stampPush(pushes);
+if(returning){button.hidden=true;hint.textContent='drawing the hill back in...';status.textContent='';}
 function inert(value){for(const e of document.querySelectorAll('#world,.sketchbook'))e.inert=value;}
 inert(true);button.focus({preventScroll:true});
 function drawEntrance(){
@@ -35,7 +37,7 @@ function drawEntrance(){
  pieces.forEach((el,i)=>{const delay=reduced?0:Math.min(1700,350+i*65);el.animate([{opacity:0,filter:reduced?'none':'blur(2px)'},{opacity:1,filter:'blur(0px)'}],{duration:reduced?180:850,delay,fill:'backwards',easing:'ease-out'});});
  window.__entrance={started:performance.now(),duration};setTimeout(()=>{window.__entrance.finished=true;},duration);
 }
-function finish(){if(!loaded||pushes<3||done)return;done=true;drawEntrance();document.documentElement.classList.remove('booting');inert(false);overlay.classList.add('finished');cancelAnimationFrame(raf);setTimeout(()=>{overlay.remove();if(keyboardEntry)document.querySelector('#help')?.focus({preventScroll:true});dispatchEvent(new Event('meowl-enter'));},250);}
+function finish(){if(!loaded||pushes<3||done)return;done=true;try{sessionStorage.setItem('meowl-entered','yes');}catch{}drawEntrance();document.documentElement.classList.remove('booting');inert(false);overlay.classList.add('finished');cancelAnimationFrame(raf);setTimeout(()=>{overlay.remove();if(keyboardEntry)document.querySelector('#help')?.focus({preventScroll:true});dispatchEvent(new Event('meowl-enter'));},250);}
 button.addEventListener('click',e=>{keyboardEntry=e.detail===0;sharedMix().enable(true);pushes=Math.min(3,pushes+1);const left=3-pushes;hint.textContent=left?'help meowl by clicking '+left+(left===1?' time':' times'):'you helped. little guy appreciates it.';status.textContent=pushes===3&&!loaded?'preparing the hill...':'';stampPush(pushes);finish();});
 function draw(now){
  const dt=Math.min(.04,(now-(last||now))/1000);last=now;time+=dt;shown+=(pushes/3-shown)*(1-Math.exp(-dt*8));c.clearRect(0,0,340,145);
