@@ -138,7 +138,7 @@ export function miniScene(scene,canvas,wake,sfx){
   audioEvents();
   const t=state.elapsed,n=state.choice,u=scene==='scraper'?(state.routeTime%2.5)/2.5:(t%5)/5,e=u*u*(3-2*u);
   if(scene==='poe'){
-   const family=families[n%3],count=Math.min(240,Math.floor(t*480)),key=n+':'+state.cycles;
+   const family=families[n%3],count=Math.min(240,Math.floor(t*80)),key=n+':'+state.cycles;
    if(priceKey!==key){priceKey=key;prices=priceSamples(n,state.cycles);priceIncoming=Array.from({length:4},(_,i)=>priceSamples(n,state.cycles+113+i)).flat();const all=[...prices,...priceIncoming].map(r=>r.value),hi=Math.max(...all);priceDomain=[-family.cost*1.6,hi*1.15];priceUpdates=0;priceCount=-1;}
    const entered=Math.max(0,Math.floor((t-.7)*20))*8;
    if(entered>priceUpdates){while(priceUpdates<entered){prices[priceUpdates%240]=priceIncoming[priceUpdates%priceIncoming.length];priceUpdates++;}priceCount=-1;}
