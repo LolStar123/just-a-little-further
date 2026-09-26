@@ -146,25 +146,19 @@ export function miniScene(scene,canvas,wake,sfx){
    if(priceCount&&priceUpdates!==state.audioPrices){const r=prices[(Math.max(1,priceUpdates)-1)%240];sfx.play('plink',{good:!!r.rare&&r.value>0});state.audioPrices=priceUpdates;}
    const d=priced,fmt=v=>v===null?'...':v.toFixed(2),xFor=v=>28+(v-priceDomain[0])/(priceDomain[1]-priceDomain[0])*424;
    state.metrics={ev:d.ev,netEV:d.netEV,sharpe:d.sharpe,profitFactor:d.profitFactor};
-   label(c,family.name,240,29,24);label(c,count+' sampled outcomes',132,61,17);label(c,'cost '+family.cost+'c',385,61,17);
-   ['net EV (c)','return:risk','profit factor'].forEach((v,i)=>label(c,v,85+i*155,96,16));
-   [d.netEV,d.sharpe,d.profitFactor].forEach((v,i)=>label(c,fmt(v),85+i*155,129,30));
+   label(c,family.name,240,29,24);label(c,'n = '+count,112,61,17);label(c,'cost = '+family.cost+'c',385,61,17);
+   label(c,'EV '+fmt(d.netEV)+'c   EV/σ '+fmt(d.sharpe)+'   PF '+fmt(d.profitFactor),240,108,18);
    const share=d.tailShare===null?'...':Math.round(d.tailShare*100)+'%';
-   label(c,'top 5% = '+share+' of the upside',240,165,18);
-   for(let i=0;i<3;i++){const r=prices[(Math.floor(t*5)+i)%prices.length],x=48+i*35,y=198+Math.sin(t*3+i)*3;page(c,x,y,25,31);}
-   label(c,Math.round(prices[Math.floor(t*5)%prices.length].price)+'c',96,247,15);
-   owl(c,229,242,'research',57,{hat:'goldrim',mode:'carry',cargo:(ctx,grip)=>page(ctx,grip.x-12,grip.y-20,24,28)});
-   label(c,'the roll you screenshot',364,246,15);
+   label(c,'top 5% → '+share+' of upside',240,141,17);
+   owl(c,229,215,'research',57,{hat:'goldrim',mode:'carry',cargo:(ctx,grip)=>page(ctx,grip.x-12,grip.y-20,24,28)});
    const peak=Math.max(1/family.cost*.45,...d.density.map(p=>p[1])),points=d.density.map(([x,y])=>[xFor(x),400-y/peak*125]);
    const perch=points.reduce((a,p)=>Math.abs(p[0]-229)<Math.abs(a[0]-229)?p:a,points[0]);
-   c.beginPath();c.moveTo(229,242);c.bezierCurveTo(215,264,247,280,...perch);c.strokeStyle=soft;c.lineWidth=.8;c.stroke();
-   // The longest tail really belongs to the best priced outcome in this window.
-   if(count){const best=Math.max(...prices.slice(0,count).map(r=>r.value)),bx=xFor(best);c.beginPath();c.moveTo(360,253);c.bezierCurveTo(395,271,bx,287,bx,397);c.strokeStyle=gold;c.lineWidth=.65;c.stroke();path(c,[[bx-3,388],[bx,384],[bx+3,388]],gold,.9);}
+   c.beginPath();c.moveTo(229,215);c.bezierCurveTo(215,247,247,272,...perch);c.strokeStyle=soft;c.lineWidth=.8;c.stroke();
    if(!woven)path(c,points,ink,1.15);
    // Rug ticks retain individual prices beneath the frequency landscape.
    for(const r of prices.slice(0,count)){const x=xFor(r.value);path(c,[[x,402],[x,407]],r.value<0?'#aa7562':r.rare?gold:'#879382',.55);}
    const zero=xFor(0);path(c,[[zero,396],[zero,411]],ink,.8);
-   label(c,'loss',43,426,14);label(c,'profit per outcome (c)',240,426,14);label(c,Math.round(priceDomain[1])+'c',439,426,14);
+   label(c,'loss',43,426,14);label(c,'net outcome (c)',240,426,14);label(c,Math.round(priceDomain[1])+'c',439,426,14);
    const thread=JSON.stringify(points.map(([x,y])=>[+(x*s+(a.w-480*s)/2).toFixed(2),+(y*s+(a.h-artHeight*s)/2).toFixed(2)]));
    if(a.el.dataset.threadPoints!==thread){a.el.dataset.threadPoints=thread;if(woven)parent.dispatchEvent(new Event('ink-anchors'));}
    state.priceDistribution={...d,points,domain:priceDomain,values:prices.slice(0,count).map(r=>r.value),windowUpdates:priceUpdates};
