@@ -300,16 +300,16 @@ export function miniScene(scene,canvas,wake,sfx){
    if(sample!==distributionCount){measured=distribution(matches,sample,domain);distributionCount=sample;}
    if(sample&&(windowUpdates!==state.audioMatches||sample!==state.audioCount)){const r=matches[(Math.max(1,windowUpdates||sample)-1)%400];sfx.play('plink',{good:r.won&&r.selected&&measured.sd>0&&r.value>measured.mean+1.6*measured.sd});state.audioMatches=windowUpdates;state.audioCount=sample;}
    const d=measured,fmt=v=>v===null?'...':v.toFixed(2),pct=d.probability===null?'...':Math.round(d.probability*100)+'%';
-   label(c,deadlockStats[n]+' ('+metric.unit+')',240,29,24);
-   label(c,sample+' matches',112,60,18);label(c,metric.condition,350,60,17);
+   const statTitle=metric.unit===metric.name?metric.name:deadlockStats[n]+' ('+metric.unit+')';
+   label(c,statTitle,240,29,24);
+   label(c,'n = '+sample,112,60,18);label(c,metric.condition,350,60,17);
    for(let i=0;i<total;i++){
     const x=47+i%20*6.3,y=83+Math.floor(i/20)*6.3;
     c.beginPath();c.arc(x,y,1.8,0,Math.PI*2);c.fillStyle=i>=sample?'#d5cfc0':!matches[i].selected?'#b3ac9d':matches[i].won?'#607c6b':'#aa7562';c.fill();
    }
    label(c,pct,350,107,37);label(c,d.wins+' of '+d.selected+' wins',350,132,17);
-   label(c,'mean '+fmt(d.mean),350,160,18);label(c,'stdev '+fmt(d.sd),350,185,18);label(c,'excess kurt. '+fmt(d.excess),350,210,17);
+   label(c,'x̄ '+fmt(d.mean)+'   σ '+fmt(d.sd)+'   κₑ '+fmt(d.excess),350,171,15);
    owl(c,218,190,'analyst',46,{mode:'carry',look:2,cargo:(ctx,grip)=>statProp(ctx,n,grip.x,grip.y)});
-   label(c,'raw sample frequencies',134,238,16);
    const peak=Math.max(1/(metric.spread*Math.sqrt(2*Math.PI))*1.15,...d.density.map(p=>p[1])),points=d.density.map(([x,y])=>[28+(x-domain[0])/(domain[1]-domain[0])*424,400-y/peak*150]);
    const perch=points.reduce((a,p)=>Math.abs(p[0]-257)<Math.abs(a[0]-257)?p:a,points[0]);c.beginPath();c.moveTo(218,190);c.bezierCurveTo(239,195,250,218,...perch);c.strokeStyle=soft;c.lineWidth=.8;c.stroke();
    // The parent traces these same points as part of the single landscape stroke.
@@ -317,7 +317,6 @@ export function miniScene(scene,canvas,wake,sfx){
    const px=v=>28+(v-domain[0])/(domain[1]-domain[0])*424;
    if(d.mean!==null){path(c,[[px(d.mean),400],[px(d.mean),404]],ink,1);}
    label(c,domain[0].toFixed(0),40,423,14);label(c,metric.unit,240,423,14);label(c,domain[1].toFixed(0),439,423,14);
-   label(c,'peak '+Math.max(...d.density.map(p=>p[1])).toFixed(3),360,239,14);
    const thread=JSON.stringify(points.map(([x,y])=>[+(x*s+(a.w-480*s)/2).toFixed(2),+(y*s+(a.h-artHeight*s)/2).toFixed(2)]));
    if(a.el.dataset.threadPoints!==thread){a.el.dataset.threadPoints=thread;if(woven)parent.dispatchEvent(new Event('ink-anchors'));}
    state.conditional={stat:deadlockStats[n],sample:d.selected,counted:sample,wins:d.wins,probability:d.probability,urn:n===5};
