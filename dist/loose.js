@@ -9,6 +9,8 @@ import {drawMeowl,ready,art} from './little-creatures.js';
 import {AuraField} from './aura-field.js';
 
 const $=s=>document.querySelector(s),canvas=$('#playground'),c=canvas.getContext('2d');
+const demoVersion=new URL(document.querySelector('link[rel="modulepreload"][href*="demo.bundle.js"]')?.href||location.href).searchParams.get('v')||'';
+const demoUrl=scene=>'demo.html?scene='+encodeURIComponent(scene)+(demoVersion?'&v='+encodeURIComponent(demoVersion):'');
 const surface=$('#interaction-surface');let worldVisible=true;
 const TAU=Math.PI*2,reduce=matchMedia('(prefers-reduced-motion: reduce)');
 let toyMotionRequested=false;
@@ -274,7 +276,7 @@ function openPanel(key=null,trigger){
     if(!key){
         $('#panel-content').innerHTML='<h2 id="panel-title">Following the<br>interesting bits.</h2><p>Research, games, little helpers. Roughly in the order they happened.</p><div class="project-list">'+trail.map(id=>{const p=projects[id];return `<button data-project="${id}">${p.title}<small>${p.caption}</small></button>`;}).join('')+'</div><p>Still figuring out where all of this leads.</p>';
     }else{
-        const p=projects[key];$('#panel-content').innerHTML=`<button class="back-projects" id="back-projects">all the detours</button><h2 id="panel-title">${p.title}</h2><p>${p.description}</p>${p.detail?`<p>${p.detail}</p>`:""}${p.scene?`<iframe class="scene-frame" src="demo.html?scene=${p.scene}" title="${p.title} interactive illustration" loading="eager"></iframe>${p.note?`<p class="scene-note">${p.note}</p>`:""}`:""}<nav class="panel-project-links" aria-label="Project links">${(p.links||[]).map(link=>`<a class="more-scene" href="${link.url}" target="_blank" rel="noopener noreferrer">${link.label}</a>`).join('')}</nav>`;
+        const p=projects[key];$('#panel-content').innerHTML=`<button class="back-projects" id="back-projects">all the detours</button><h2 id="panel-title">${p.title}</h2><p>${p.description}</p>${p.detail?`<p>${p.detail}</p>`:""}${p.scene?`<iframe class="scene-frame" src="${demoUrl(p.scene)}" title="${p.title} interactive illustration" loading="eager"></iframe>${p.note?`<p class="scene-note">${p.note}</p>`:""}`:""}<nav class="panel-project-links" aria-label="Project links">${(p.links||[]).map(link=>`<a class="more-scene" href="${link.url}" target="_blank" rel="noopener noreferrer">${link.label}</a>`).join('')}</nav>`;
         if(['botato','smoothtato'].includes(key))$('#panel-content .panel-project-links').outerHTML=document.querySelector('#project-'+key+' .poetato-links').outerHTML;
         $('#back-projects').addEventListener('click',()=>openPanel(null));
         const scene=$('.scene-frame');if(scene)demoObserver.observe(scene);
@@ -292,7 +294,7 @@ new ResizeObserver(resize).observe(surface);
 ready.then(wake).catch(()=>{status('the creature artwork could not load. reload to try again.');});
 window.__hill=()=>({depth:{extra:extraDepth,paintTop,paintHeight},time,paused,aura:{count:auraField.particles.length,deflections:auraField.deflections,bounces:auraField.bounces},sound:mix.enabled,audio:mix.diagnostics(),pointerGrab:grab?.type||null,lastRelease,reducedMotion:reduce.matches,toyMotionRequested,assets:art.ready,hero:{...hero},physics:physics?.diagnostics(),particles:particles.length,scuffs:scuffs.length,panel:project,panelOpen,petCount,meanFrameMs:intervals.length?intervals.reduce((a,b)=>a+b,0)/intervals.length:0});
 
-const chapterObserver=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting){entry.target.classList.add('seen');for(const demo of entry.target.querySelectorAll('iframe[data-scene]')){if(!demo.hasAttribute('src')){demo.loading='eager';demo.src='demo.html?scene='+demo.dataset.scene;}}}}},{rootMargin:'550px 0px',threshold:0});
+const chapterObserver=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting){entry.target.classList.add('seen');for(const demo of entry.target.querySelectorAll('iframe[data-scene]')){if(!demo.hasAttribute('src')){demo.loading='eager';demo.src=demoUrl(demo.dataset.scene);}}}}},{rootMargin:'550px 0px',threshold:0});
 document.querySelectorAll('.sketch-chapter').forEach(el=>chapterObserver.observe(el));
 
 new IntersectionObserver(entries=>{worldVisible=entries[0].isIntersecting;hillSound.active(worldVisible&&!paused&&!panelOpen);if(!worldVisible){cancelAnimationFrame(frame);frame=0;last=0;cancelGrab();}else wake();},{threshold:0}).observe($('#world'));
