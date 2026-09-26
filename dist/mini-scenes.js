@@ -8,6 +8,20 @@ const woven=!!window.frameElement?.classList.contains('sketch-demo');
 const ink='#535248',soft='#a19986',paper='#eeeae0',gold='#a08a57';
 const paperTitles=['fluid mechanics','options pricing','gamma scalping','market microstructure','stochastic calculus','optimal execution','statistical arbitrage','rough volatility','order flow','portfolio construction','causal inference','Bayesian learning','risk premia','limit order books','volatility surfaces','Monte Carlo methods','regime detection','information theory','mean reversion','momentum signals','jump diffusion','liquidity risk','agent simulations','extreme value theory','dynamic hedging','numerical optimisation','network effects','term structure','signal processing','entropy estimation','reinforcement learning','market impact'];
 const auraStyles=[{name:'Celestial Aura',file:'celestial_aura_effect.png',color:'#796098',kind:'orbit'},{name:'Celestial Aura III',file:'celestial_aura_effect_iii.png',color:'#8767a0',kind:'nova'},{name:'Divine Righteous Fire',file:'divine_righteous_fire_effect.png',color:'#b19150',kind:'fire'}];
+const controlSets={
+ poe:[['watcher\'s eye',0],['timeless',1],['sublime',2]],
+ scraper:[['fluid mechanics',0],['options pricing',1],['market microstructure',3]],
+ smoothtato:[['original',0],['performance',1],['barebones',3]],
+ tfl:[['1h',0],['24h',1],['7d',2]],
+ commute:[['1 day',0],['3 days',2],['5 days',4]],
+ deadlock:[['souls',0],['objectives',2],['deaths',4]],
+ baxter:[['research',0],['build',1],['audit',2]]
+};
+const poeVariants=[
+ ['clarity + precision','wrath + zealotry','hatred + discipline','grace + determination','vitality + anger','malevolence + haste'],
+ ['lethal pride #15083','brutal restraint #7621','glorious vanity #4432','elegant hubris #10820','militant faith #5184','lethal pride #13217'],
+ ['purity of fire','grace','determination','malevolence','discipline','hatred']
+];
 const specs={
  poe:['prices become probabilities','try another item family',''],
  scraper:['papers to walk-forward tests','collect another paper','sample reading list'],
@@ -29,15 +43,15 @@ export function miniScene(scene,canvas,wake,sfx){
   $('#scene').append(note);
  }
  const artHeight=['deadlock','poe'].includes(scene)?430:scene==='tfl'?380:330;
- const a=canvas('mini-art'),state={scene,choice:0,actions:0,cycles:0,elapsed:0,clock:0,routeTime:0,transition:1},note=$('#toy-note');
- let previous=null,paperBag=[];const counts={scraper:paperTitles.length,pipeline:5,smoothtato:4,mtxtato:3,tfl:6,commute:5,deadlock:6,baxter:4,poe:3};
+ const a=canvas('mini-art'),state={scene,choice:0,actions:0,cycles:0,elapsed:0,clock:0,routeTime:0,transition:1,rangeIndex:1,taskIndex:0},note=$('#toy-note');
+ let previous=null,paperBag=[];const counts={scraper:paperTitles.length,pipeline:5,smoothtato:4,mtxtato:3,tfl:11,commute:5,deadlock:6,baxter:4,poe:3};
  const duration={scraper:2.5,pipeline:4.2,smoothtato:5/1.5,mtxtato:5,tfl:7,commute:4.5,deadlock:6,baxter:10,poe:6}[scene]||5;
  const auraImages=['smoothtato','mtxtato'].includes(scene)?auraStyles.map(style=>{const image=new Image();image.onload=()=>{draw();wake();};image.src='assets/mtx/'+style.file;return image;}):[];
  const presets=['Original','Performance','League Start','Barebones'];
  const deadlockStats=metrics.map(m=>m.name);
- let priceKey='',prices=[],priceIncoming=[],priceDomain=[],priceUpdates=0,priceCount=-1,priced=null;
+ let priceKey='',prices=[],priceIncoming=[],priceDomain=[],priceUpdates=0,priceCount=-1,priced=null,priceBaseTick=0;
  let matchKey='',matches=[],incoming=[],domain=[],distributionCount=-1,measured=null,windowUpdates=0;
- state.ratings=Array(6).fill(1000);state.ratingTargets=Array(6).fill(1000);state.lastTrainEvent=-1;
+ state.ratings=Array(11).fill(1000);state.ratingTargets=Array(11).fill(1000);state.lastTrainEvent=-1;
  function caption(){
   const n=state.choice;
   note.textContent=({poe:["Watcher's Eye",'Timeless jewels','Sublime Vision'][n%3]+' prices feed risk sheets.',scraper:paperTitles[n]+': collecting paper '+(state.cycles+1)+'.',pipeline:'clean market data. test on the next unseen period.',smoothtato:presets[n]+': '+['all effects visible.','particles and bloom off.','decorative props and skill FX off.','shadows, reflections and fog off.'][n],mtxtato:auraStyles[n%3].name,tfl:['Central','Victoria','Northern'][n%3]+' is delayed. each checkpoint updates the ratings.',commute:(n%5+1)+' days: '+((n%5+1)*6===24?'both cost the same in this example.':((n%5+1)*6<24?'single journeys':'the weekly ticket')+' cost less in this example.'),deadlock:'',baxter:['baxter sorts the request','the product manager scopes it','the developer builds it','the verifier checks it'][Math.min(3,Math.floor(state.elapsed/2.4))]})[scene];
@@ -50,10 +64,28 @@ export function miniScene(scene,canvas,wake,sfx){
    state.choice=paperBag.pop();
   }else state.choice=choices[Math.floor(Math.random()*choices.length)];
   state.cycles++;if(manual)state.actions++;
-  if(scene!=='scraper'||!manual)state.elapsed=0;state.transition=['scraper','tfl'].includes(scene)?1:0;caption();draw();wake();
+  if(scene!=='scraper'||!manual)state.elapsed=0;state.transition=['scraper','tfl'].includes(scene)?1:0;syncPicker();caption();draw();wake();
  }
  caption();
- if(scene==='poe'||scene==='deadlock'){
+ let picker=null;
+ if(controlSets[scene]){
+  picker=document.createElement('div');picker.className='demo-picker';picker.setAttribute('role','group');picker.setAttribute('aria-label','demo input');
+  for(const [text,value] of controlSets[scene]){
+   const button=document.createElement('button');button.type='button';button.textContent=text;button.dataset.value=value;
+   button.addEventListener('click',()=>{
+    state.actions++;state.manualUntil=state.clock+10;
+    if(scene==='tfl')state.rangeIndex=value;
+    else if(scene==='baxter'){state.taskIndex=value;state.elapsed=0;state.cycles++;}
+    else{state.choice=value;state.elapsed=0;state.cycles++;state.transition=1;}
+    syncPicker();caption();draw();wake();
+   });
+   picker.append(button);
+  }
+  $('#scene').insertBefore(picker,a.el);
+ }
+ function syncPicker(){if(!picker)return;const selected=scene==='tfl'?state.rangeIndex:scene==='baxter'?state.taskIndex:state.choice;for(const button of picker.children)button.classList.toggle('selected',Number(button.dataset.value)===selected);}
+ syncPicker();
+ if(!woven&&(scene==='poe'||scene==='deadlock')){
   const details=document.createElement('details');details.className='stat-method';
   const summary=document.createElement('summary');summary.textContent=scene==='poe'?'from trade logs to a buying decision':'from match data to a useful comparison';
   const paragraph=document.createElement('p');paragraph.textContent=projects[scene].description;
@@ -138,30 +170,38 @@ export function miniScene(scene,canvas,wake,sfx){
   audioEvents();
   const t=state.elapsed,n=state.choice,u=scene==='scraper'?(state.routeTime%2.5)/2.5:(t%5)/5,e=u*u*(3-2*u);
   if(scene==='poe'){
-   const family=families[n%3],tested=Math.max(1,Math.floor(state.clock*40)),count=Math.min(240,tested),key=n+':'+state.cycles;
-   if(priceKey!==key){priceKey=key;prices=priceSamples(n,state.cycles);priceIncoming=Array.from({length:4},(_,i)=>priceSamples(n,state.cycles+113+i)).flat();const all=[...prices,...priceIncoming].map(r=>r.value),hi=Math.max(...all);priceDomain=[-family.cost*1.6,hi*1.15];priceUpdates=0;priceCount=-1;}
-   const entered=Math.max(0,Math.floor((t-.7)*20))*8;
-   if(entered>priceUpdates){while(priceUpdates<entered){prices[priceUpdates%240]=priceIncoming[priceUpdates%priceIncoming.length];priceUpdates++;}priceCount=-1;}
-   if(priceCount!==count){priced=priceSummary(prices,count,priceDomain,family.cost);priceCount=count;}
-   if(priceCount&&priceUpdates!==state.audioPrices){const r=prices[(Math.max(1,priceUpdates)-1)%240];sfx.play('plink',{good:!!r.rare&&r.value>0});state.audioPrices=priceUpdates;}
-   const d=priced,fmt=v=>v===null?'...':v.toFixed(2),xFor=v=>28+(v-priceDomain[0])/(priceDomain[1]-priceDomain[0])*424;
+   const family=families[n%3],streamTick=Math.floor(state.clock*2),tested=3741+streamTick,key=n+':'+state.cycles;
+   if(priceKey!==key){priceKey=key;prices=priceSamples(n,state.cycles);priceIncoming=Array.from({length:4},(_,i)=>priceSamples(n,state.cycles+113+i)).flat();const all=[...prices,...priceIncoming].map(r=>r.value),hi=Math.max(...all);priceDomain=[-family.cost*1.6,hi*1.15];priceUpdates=0;priceCount=-1;priceBaseTick=streamTick;}
+   const entered=Math.max(0,streamTick-priceBaseTick);
+   if(entered>priceUpdates){while(priceUpdates<entered){const r=priceIncoming[priceUpdates%priceIncoming.length];prices[priceUpdates%240]=r;priceUpdates++;}priceCount=-1;}
+   if(priceCount!==priceUpdates){priced=priceSummary(prices,240,priceDomain,family.cost);priceCount=priceUpdates;}
+   if(priceUpdates!==state.audioPrices){const r=prices[(Math.max(1,priceUpdates)-1)%240];sfx.play('plink',{good:!!r.rare&&r.value>0});state.audioPrices=priceUpdates;}
+   const d=priced,fmt=v=>v===null?'...':v.toFixed(2),xFor=v=>42+(v-priceDomain[0])/(priceDomain[1]-priceDomain[0])*396;
    state.metrics={ev:d.ev,netEV:d.netEV,sharpe:d.sharpe,profitFactor:d.profitFactor};
-   label(c,family.name,240,29,24);label(c,'n = '+tested,112,61,17);label(c,'cost = '+family.cost+'c',385,61,17);
-   label(c,'EV '+fmt(d.netEV)+'c   EV/σ '+fmt(d.sharpe)+'   PF '+fmt(d.profitFactor),240,108,18);
-   const share=d.tailShare===null?'...':Math.round(d.tailShare*100)+'%';
-   label(c,'top 5% → '+share+' of upside',240,141,17);
-   owl(c,229,215,'research',57,{hat:'goldrim',mode:'carry',cargo:(ctx,grip)=>page(ctx,grip.x-12,grip.y-20,24,28)});
-   const peak=Math.max(1/family.cost*.45,...d.density.map(p=>p[1])),points=d.density.map(([x,y])=>[xFor(x),400-y/peak*125]);
-   const perch=points.reduce((a,p)=>Math.abs(p[0]-229)<Math.abs(a[0]-229)?p:a,points[0]);
-   c.beginPath();c.moveTo(229,215);c.bezierCurveTo(215,247,247,272,...perch);c.strokeStyle=soft;c.lineWidth=.8;c.stroke();
+   label(c,'n = '+tested.toLocaleString('en-GB'),70,35,17);label(c,'EV '+fmt(d.netEV)+'c',230,35,18);label(c,'PF '+fmt(d.profitFactor),397,35,18);
+   const columns=[['variant',54],['buy',298],['sell',365],['net',432]];
+   for(const [text,x] of columns){c.fillStyle=soft;c.font='13px Reader,Georgia,serif';c.textAlign=x===54?'left':'right';c.fillText(text,x,72);}
+   path(c,[[48,82],[444,82]],soft,.8);
+   c.save();c.beginPath();c.rect(45,84,403,189);c.clip();
+   const phase=(state.clock*2)%1,rowH=29,latest=priceUpdates,rows=[];
+   for(let i=0;i<8;i++){
+    const age=7-i,index=((latest-age)%priceIncoming.length+priceIncoming.length)%priceIncoming.length,r=priceIncoming[index],y=278-(age+phase)*rowH;
+    const variants=poeVariants[n%3],variant=variants[((latest-age)%variants.length+variants.length)%variants.length];
+    if(y<76||y>290)continue;rows.push({variant,buy:family.cost,sell:r.price,net:r.value,y});
+    c.globalAlpha=.45+.55*Math.max(0,1-age/7);path(c,[[48,y+9],[444,y+9]],'#c7bead',.55);
+    c.fillStyle=ink;c.font='14px Reader,Georgia,serif';c.textAlign='left';c.fillText(variant,54,y);
+    c.textAlign='right';c.fillText(family.cost+'c',298,y);c.fillText(r.price.toFixed(1)+'c',365,y);c.fillStyle=r.value>=0?'#60715d':'#936957';c.fillText((r.value>=0?'+':'')+r.value.toFixed(1)+'c',432,y);
+   }
+   c.restore();c.globalAlpha=state.transition;
+   c.fillStyle=soft;c.font='12px Reader,Georgia,serif';c.textAlign='center';c.fillText('illustrative data / 2 rows per second',240,302);
+   owl(c,66,344,'research',52,{hat:'goldrim',mode:'carry',speed:34,cargo:(ctx,grip)=>page(ctx,grip.x-12,grip.y-20,24,28)});
+   const peak=Math.max(1/family.cost*.45,...d.density.map(p=>p[1])),points=d.density.map(([x,y])=>[xFor(x),405-y/peak*78]);
+   c.beginPath();c.moveTo(91,344);c.bezierCurveTo(132,336,150,366,...points[0]);c.strokeStyle=soft;c.lineWidth=.75;c.stroke();
    if(!woven)path(c,points,ink,1.15);
-   // Rug ticks retain individual prices beneath the frequency landscape.
-   for(const r of prices.slice(0,count)){const x=xFor(r.value);path(c,[[x,402],[x,407]],r.value<0?'#aa7562':r.rare?gold:'#879382',.55);}
-   const zero=xFor(0);path(c,[[zero,396],[zero,411]],ink,.8);
-   label(c,'loss',43,426,14);label(c,'net outcome (c)',240,426,14);label(c,Math.round(priceDomain[1])+'c',439,426,14);
+   const zero=xFor(0);path(c,[[zero,395],[zero,410]],ink,.8);label(c,'rolling outcome',240,426,14);
    const thread=JSON.stringify(points.map(([x,y])=>[+(x*s+(a.w-480*s)/2).toFixed(2),+(y*s+(a.h-artHeight*s)/2).toFixed(2)]));
    if(a.el.dataset.threadPoints!==thread){a.el.dataset.threadPoints=thread;if(woven)parent.dispatchEvent(new Event('ink-anchors'));}
-   state.priceDistribution={...d,points,domain:priceDomain,values:prices.slice(0,count).map(r=>r.value),windowUpdates:priceUpdates,totalCount:tested};
+   state.priceDistribution={...d,points,domain:priceDomain,values:prices.map(r=>r.value),windowUpdates:priceUpdates,totalCount:tested};state.sheet={family:family.name,rows,rate:2,illustrative:true};
    note.textContent='';note.hidden=true;
   }else if(scene==='scraper'){
    label(c,'collect papers',117,34,20);label(c,'test the idea',359,34,20);
@@ -170,16 +210,16 @@ export function miniScene(scene,canvas,wake,sfx){
    const outbound=u<.65,travel=outbound?u/.65:1-(u-.65)/.35,x=72+108*travel*travel*(3-2*travel);state.runner={x,phase:u,outbound};
    owl(c,x,247,'mini',65,{mode:outbound?'carry':'scurry',overhead:outbound,effort:.84,speed:outbound?150:210,facing:outbound?1:-1,emotion:'worried',cargo:outbound?(ctx,grip)=>page(ctx,grip.x-30,grip.y-63,60,66):null});
    const phase=state.clock%4.2,cycle=Math.floor(state.clock/4.2),progress=Math.min(1,phase/3.5);
-   const values=Array.from({length:8},(_,i)=>Math.sin(i*1.1+cycle)*19+Math.cos(i*.6+cycle)*14+45);
+   const values=Array.from({length:8},(_,i)=>Math.sin(i*1.1+cycle+n*.37)*19+Math.cos(i*.6+cycle-n*.19)*14+45);
    path(c,[[263,92],[263,167],[463,167]],soft,.8);
    path(c,values.slice(0,Math.max(2,Math.ceil(progress*8))).map((v,i)=>[270+i*26,163-v]),ink,1.4);
    path(c,[[366,81],[367,169]],gold,1);
    label(c,'train',307,190,15);label(c,'unseen',419,190,15);
    owl(c,355+Math.sin(state.clock*2)*7,247,'sort',66,{mode:'push',effort:.6,speed:15});
-   state.pipeline={raw:values,progress};
+   const unseen=values.slice(5).reduce((sum,value)=>sum+value,0)/3-values.slice(0,5).reduce((sum,value)=>sum+value,0)/5;state.pipeline={raw:values,progress,paper:paperTitles[n],unseen};
    label(c,paperTitles[n],240,291,19);
    state.papersCollected=Math.floor((state.routeTime+.875)/2.5);
-   label(c,state.papersCollected+' papers collected',120,318,15);label(c,'walk-forward',359,318,15);
+   label(c,state.papersCollected+' papers collected',120,318,15);label(c,'walk-forward '+(unseen>=0?'+':'')+unseen.toFixed(1)+'%',359,318,15);
 
   }else if(scene==='pipeline'){
    const shuffle=Math.floor(t/.42),raw=[7,2,9,4,6,3].map((v,i)=>(v+n*(i+1))%10+1),rank=[...raw].map((v,i)=>({v,i})).sort((a,b)=>a.v-b.v);
@@ -230,14 +270,14 @@ export function miniScene(scene,canvas,wake,sfx){
    state.aura={name:style.name,imageLoaded:!!image?.naturalWidth};
 
   }else if(scene==='tfl'){
-   const names=['central','victoria','northern','jubilee','district','piccadilly'],colors=['#a76b5e','#7099a3','#72716b','#93948d','#7b8d6c','#6d7f9e'];
-   label(c,'reliability elo',397,24,16);
-   for(let i=0;i<6;i++){
-    const y=51+i*32;path(c,[[132,y],[339,y]],colors[i],1.2);
-    for(let j=0;j<4;j++){c.beginPath();c.arc(140+j*63,y,2,0,Math.PI*2);c.fillStyle=paper;c.fill();c.stroke();}
-    const phase=(state.routeTime/4+i*.19)%1,x=140+(i===n%6?Math.min(phase,.40):phase)*189;
-    toyProp(c,'train-'+i,x,y-2,25,16,(c)=>path(c,[[x-10,y-12],[x+10,y-11],[x+11,y-2],[x-9,y-2],[x-10,y-12]],ink,1.3));
-    label(c,names[i],64,y+4,16);label(c,String(Math.round(state.ratings[i])),408,y+5,20);
+   const names=['bakerloo','central','circle','district','h&c','jubilee','metropolitan','northern','piccadilly','victoria','w&c'],colors=['#866b55','#a76b5e','#a99758','#7b8d6c','#b58e98','#93948d','#766086','#72716b','#6d7f9e','#7099a3','#78a69d'];
+   const range=['1h','24h','7d'][state.rangeIndex];label(c,'reliability elo · '+range,390,24,16);
+   for(let i=0;i<11;i++){
+    const y=40+i*17.4;path(c,[[132,y],[339,y]],colors[i],1.05);
+    for(let j=0;j<4;j++){c.beginPath();c.arc(140+j*63,y,1.45,0,Math.PI*2);c.fillStyle=paper;c.fill();c.stroke();}
+    const phase=(state.routeTime/4+i*.11)%1,x=140+(i===n%11?Math.min(phase,.40):phase)*189;
+    toyProp(c,'train-'+i,x,y-1,20,11,(c)=>path(c,[[x-8,y-8],[x+8,y-8],[x+9,y-1],[x-8,y-1],[x-8,y-8]],ink,1.1));
+    label(c,names[i],66,y+3,12);label(c,String(Math.round(state.ratings[i])),408,y+4,14);
    }
    const q=state.routeTime%8,round=Math.floor(state.routeTime/8),days=[1,5,2,4,3][round%5],pay=days*6,weekly=24;
    const tie=pay===weekly,winning=pay<=weekly?0:1,reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -276,7 +316,7 @@ export function miniScene(scene,canvas,wake,sfx){
    path(c,[[132,51],[123,153],[128,218],[51,243],[52,335],[65,354]],soft,.65);
    sfx.chirp('tflconductor',state.clock,[14,22]);
    if(moving)sfx.beat('fare-waddle',Math.floor(state.routeTime*3),'step',{level:.25});
-   state.commute={days,pay,weekly,cheapest:Math.min(pay,weekly),phase:q,stamped,conductorX:cx,tie};
+   state.commute={days,pay,weekly,cheapest:Math.min(pay,weekly),phase:q,stamped,conductorX:cx,tie};state.reliability={range,ratings:[...state.ratings]};
    note.textContent='';
   }else if(scene==='commute'){
    const days=n%5+1,pay=days*6,weekly=24,max=32;
@@ -317,6 +357,7 @@ export function miniScene(scene,canvas,wake,sfx){
    state.distribution={...d,metric:metric.name,unit:metric.unit,values:matches.slice(0,sample).map(m=>m.value),points,windowUpdates,densityScale:peak};
   }else{
    const names=['baxter','product manager','developer','verifier'],home=[49,174,299,424],leg=Math.min(2,Math.floor(t/2.4)),q=Math.min(1,(t-leg*2.4)/2.4),travel=Math.min(1,q/.78),ease=travel*travel*(3-2*travel),done=t>=7.2;
+   label(c,['research brief','ship a feature','audit a workflow'][state.taskIndex],240,35,17);
    const carrier=done?3:leg,positions=[...home];
    // Each helper walks back to their desk after passing the sheet wing to wing.
    for(let i=0;i<carrier;i++){const returned=Math.min(1,Math.max(0,(t-(i+1)*2.4)/1.2));positions[i]=home[i+1]-42+(home[i]-(home[i+1]-42))*returned;}
@@ -333,11 +374,11 @@ export function miniScene(scene,canvas,wake,sfx){
   }
   c.restore();
  }
- return{state,draw,advance(dt){const movementDt=toyBusy(a.el)?0:dt;state.elapsed+=movementDt;state.routeTime+=movementDt;state.clock+=dt;state.transition=Math.min(1,state.transition+dt/.45);if(state.elapsed>=duration)change();if(scene==='baxter')caption();
+ return{state,draw,advance(dt){const movementDt=toyBusy(a.el)?0:dt;state.elapsed+=movementDt;state.routeTime+=movementDt;state.clock+=dt;state.transition=Math.min(1,state.transition+dt/.45);if(state.elapsed>=duration&&state.clock>=(state.manualUntil||0))change();if(scene==='baxter')caption();
   if(scene==='tfl'){
-   const event=Math.floor(state.routeTime/.8);
+   const interval=[.45,.8,1.4][state.rangeIndex],event=Math.floor(state.routeTime/interval);
    if(event!==state.lastTrainEvent){
-    state.lastTrainEvent=event;const loser=state.choice,winner=(loser+1+event%5)%6,expected=1/(1+10**((state.ratingTargets[loser]-state.ratingTargets[winner])/400)),delta=18*(1-expected);
+    state.lastTrainEvent=event;const loser=state.choice,winner=(loser+1+event%10)%11,expected=1/(1+10**((state.ratingTargets[loser]-state.ratingTargets[winner])/400)),delta=18*[1.3,1,.72][state.rangeIndex]*(1-expected);
     state.ratingTargets[winner]+=delta;state.ratingTargets[loser]-=delta;state.ratingTargets=state.ratingTargets.map(v=>Math.max(100,Math.min(3500,v+(1000-v)*.002)));
    }
    state.ratings=state.ratings.map((v,i)=>v+(state.ratingTargets[i]-v)*(1-Math.exp(-dt*7)));

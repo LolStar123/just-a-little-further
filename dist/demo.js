@@ -54,39 +54,63 @@ function sceneAudio(){
 }
 
 if(scene==='halo'){
-    $('.caption').textContent='a very fictional interview';
-    $('#scene').innerHTML=`<div class="call"><p class="question">“Tell me about something you’ve built.”</p><div class="portrait"><canvas id="candidate-art" aria-hidden="true"></canvas><p id="thought">there was definitely a thought here.</p></div><div class="cue"><header><strong>HALO</strong><span class="timer" aria-label="Example response time">0.00s</span></header><p class="answer">finding a thread…</p><div class="progress" aria-hidden="true"><span></span></div></div></div>`;
+    $('.caption').textContent='meeting context, in miniature';
+    $('#scene').innerHTML='<div class="call halo-call"><div class="halo-toolbar"><div class="halo-modes" role="group" aria-label="HALO input mode"><button type="button" data-mode="visual">visual</button><button type="button" data-mode="audio">audio</button></div><button type="button" class="halo-next">next question</button></div><p class="question"></p><div class="portrait"><canvas id="candidate-art" aria-hidden="true"></canvas><p id="thought"></p></div><div class="cue"><header><strong class="halo-stage">listening</strong><span class="timer" aria-label="Simulated response time">0.00s</span></header><div class="halo-reading"><p class="answer">matching the question to saved context...</p><aside class="sentence-card"><small>now</small><p id="sentence">keep the thread.</p></aside></div><div class="progress" aria-hidden="true"><span></span></div></div></div>';
     const scenarios=[
-        {question:'Tell me about something you have built.',thought:'where do i even start?',answer:'Start with Botato. You built it to handle the repetitive bits in Path of Exile.',after:'oh. right. that thing i built.'},
-        {question:'What draws you to working with AI?',thought:'a normal question. words, please.',answer:'Talk about HALO: audio, screen context and one useful sentence when your brain goes blank.',after:'something useful. that is the point.'},
-        {question:'How do you decide whether a hardware lot is worth buying?',thought:'there is a spreadsheet in my head somewhere.',answer:'Start with the checks: condition, fees, resale evidence and the risk of faulty parts.',after:'the numbers. and what they leave out.'},
-        {question:'What do you do when a project gets stuck?',thought:'ironic timing.',answer:'Pick one concrete bug. Explain what you observed, what you changed and how you checked it.',after:'one small thing at a time.'},
-        {question:'What have you been tinkering with lately?',thought:'how much time have you got?',answer:'The little meowl website. A boulder you can help push, drawn creatures and actual pathfinding.',after:'okay. this one i could talk about.'}
+        {question:'Tell me about something you have built.',thought:'where do i even start?',fast:'botato / repetitive route decisions / pathfinding / end-to-end result',clever:'botato / read terrain and target / collision-check the route / recalculate when obstacles move / end-to-end automation',sentence:'start with why you built botato.'},
+        {question:'What draws you to working with AI?',thought:'a normal question. words, please.',fast:'tools become useful when they know the person and the moment',clever:'HALO / selected context / fast first answer / deeper replacement / one useful sentence stays in view',sentence:'context turns a generic answer into your answer.'},
+        {question:'How do you value a hardware lot?',thought:'there is a spreadsheet in my head somewhere.',fast:'condition / fees / resale evidence / fault risk',clever:'identify parts / price recoverable units / deduct fees, VAT and transport / set a maximum hammer bid',sentence:'begin with recoverable resale value.'},
+        {question:'What do you do when a project gets stuck?',thought:'ironic timing.',fast:'observe one bug / change one cause / rerun the same check',clever:'isolate the failure / keep the working build / change one variable / verify the exact path that broke',sentence:'shrink the problem before fighting it.'},
+        {question:'How did data improve your Deadlock play?',thought:'okay. this one has numbers.',fast:'condition / sample size / win-rate change / uncertainty',clever:'compare like-for-like checkpoints / split by condition / show n beside win rate / treat association as evidence',sentence:'ask what changes the odds.'}
     ];
-    halo={elapsed:0,duration:0,done:false,sound:false,clicks:0,scenario:-1,scenarioCount:scenarios.length};
-    const a=canvas('candidate-art'),timer=$('.timer'),bar=$('.progress span');
+    halo={elapsed:0,duration:0,done:false,clever:false,mode:'visual',sound:false,clicks:0,scenario:-1,scenarioCount:scenarios.length,stage:'waiting'};
+    const a=canvas('candidate-art'),timer=$('.timer'),bar=$('.progress span'),stage=$('.halo-stage'),answer=$('.answer'),sentence=$('#sentence');
     function click(){if(sfx.play('click'))halo.clicks++;sfx.play('slurp');}
-    addEventListener('sound-state',()=>{halo.sound=sfx.mix.enabled;});
+    function renderMode(){document.querySelectorAll('.halo-modes button').forEach(button=>button.classList.toggle('selected',button.dataset.mode===halo.mode));}
+    function setAnswer(kind){
+        const item=scenarios[halo.scenario];halo.stage=kind;
+        if(kind==='fast'){stage.textContent=halo.mode==='audio'?'answer':'fast answer';stage.dataset.stage='fast';answer.textContent=item.fast;sentence.textContent=item.sentence;}
+        else{stage.textContent='clever answer';stage.dataset.stage='clever';answer.textContent=item.clever;sentence.textContent=item.sentence;}
+        $('.call').classList.add('done');
+    }
     function nextScenario(){
         const choices=scenarios.map((_,i)=>i).filter(i=>i!==halo.scenario);
         halo.scenario=choices[Math.floor(Math.random()*choices.length)];halo.round=(halo.round||0)+1;
-        halo.elapsed=0;halo.hold=0;halo.duration=Math.round((3.5+Math.random()*1.5)*100)/100;halo.done=false;
-        $('.call').classList.remove('done');$('.question').textContent='\u201c'+scenarios[halo.scenario].question+'\u201d';
-        $('.answer').textContent='finding a thread...' ;$('#thought').textContent=scenarios[halo.scenario].thought;
-        timer.textContent='0.00s';bar.style.transform='scaleX(0)';wake();
+        halo.elapsed=0;halo.hold=0;halo.duration=Math.round((3.5+Math.random()*1.5)*100)/100;halo.cleverDelay=1.7+Math.random()*1.4;halo.done=false;halo.clever=false;halo.stage='waiting';
+        $('.call').classList.remove('done');stage.textContent=halo.mode==='audio'?'listening':'reading context';stage.dataset.stage='waiting';
+        $('.question').textContent='\u201c'+scenarios[halo.scenario].question+'\u201d';answer.textContent='matching the question to saved context...';sentence.textContent='keep the thread.';$('#thought').textContent=scenarios[halo.scenario].thought;
+        timer.textContent='0.00s';bar.style.transform='scaleX(0)';renderMode();wake();
     }
+    document.querySelectorAll('.halo-modes button').forEach(button=>button.addEventListener('click',()=>{halo.mode=button.dataset.mode;sfx.play('click');nextScenario();}));
+    $('.halo-next').addEventListener('click',()=>{sfx.play('click');nextScenario();});
+    addEventListener('sound-state',()=>{halo.sound=sfx.mix.enabled;});
     nextScenario();
     advance=dt=>{
-        if(halo.done){halo.hold=(halo.hold||0)+dt;if(halo.hold>2.6)nextScenario();return;}halo.elapsed=Math.min(halo.duration,halo.elapsed+dt);
+        if(halo.done){
+            halo.hold=(halo.hold||0)+dt;
+            if(halo.mode==='visual'&&!halo.clever&&halo.hold>=halo.cleverDelay){halo.clever=true;setAnswer('clever');sfx.play('click');}
+            const finish=halo.mode==='visual'?halo.cleverDelay+4.1:5.2;if(halo.hold>finish)nextScenario();return;
+        }
+        halo.elapsed=Math.min(halo.duration,halo.elapsed+dt);
         const label=halo.elapsed.toFixed(2)+'s';if(timer.textContent!==label)timer.textContent=label;
-        bar.style.transform=`scaleX(${halo.elapsed/halo.duration})`;
-        if(halo.elapsed>=halo.duration){halo.done=true;$('.call').classList.add('done');$('.answer').textContent=scenarios[halo.scenario].answer;$('#thought').textContent=scenarios[halo.scenario].after;click();}
+        bar.style.transform='scaleX('+(halo.elapsed/halo.duration)+')';
+        if(halo.elapsed>=halo.duration){halo.done=true;halo.hold=0;setAnswer('fast');click();}
     };
     draw=()=>{a.clear();drawMeowl(a.c,a.w*.5,a.h-4,89,{id:'interview',time,mode:halo.done&&halo.hold>.26?'happy':'nervous',look:halo.done?2:0,voice:sfx.mouth('interview'),drool:halo.done?Math.max(0,1-halo.hold/.26):Math.min(1,halo.elapsed/2.8)});const x=a.w*.76,y=a.h-15;toyProp(a.c,'cue-note',x,y,30,28,(c)=>{line(c,[[x-14,y-28],[x+14,y-27],[x+13,y],[x-15,y],[x-14,y-28]],'#a19986',1);line(c,[[x-8,y-19],[x+8,y-19],[x-7,y-13],[x+5,y-13]],'#a19986',.8);});};
 }else if(scene==='botato'||scene==='liquidation'){
     const bot=scene==='botato';$('.caption').textContent=bot?'a tiny detour of its own':'the hunt, in miniature';
     $('#scene').innerHTML=`<canvas class="toy" id="${bot?'botato-art':'liquidation-art'}" tabindex="0" aria-label="${bot?'Meowl pathfinder. Tap the floor or move the divine orb.':'A meowl inspects hardware from a liquidation lot.'}"></canvas><p class="toy-note" id="toy-note"></p>`;
     const a=canvas(bot?'botato-art':'liquidation-art'),note=$('#toy-note');
+    const hardwareLots=[
+        {name:'gpu lot',resale:620,fault:.14,fees:.24,shipping:32},
+        {name:'workstation',resale:880,fault:.20,fees:.24,shipping:48},
+        {name:'mixed parts',resale:410,fault:.11,fees:.24,shipping:26}
+    ];
+    if(!bot){
+        const picker=document.createElement('div');picker.className='demo-picker lot-picker';picker.setAttribute('role','group');picker.setAttribute('aria-label','auction lot');
+        hardwareLots.forEach((item,index)=>{const button=document.createElement('button');button.type='button';button.textContent=item.name;button.classList.toggle('selected',index===0);button.addEventListener('click',()=>{lot.choice=index;picker.querySelectorAll('button').forEach((b,i)=>b.classList.toggle('selected',i===index));sfx.play('click');wake();});picker.append(button);});
+        $('#scene').insertBefore(picker,a.el);
+    }
     if(bot){
         robot={x:40,y:220,cameraX:240,cameraY:320,target:[885,560],route:[],blocked:[],rocks:rocks.map(r=>r.points),routeMs:0};
         const silhouettes=rocks.map(rockPath);let terrain=null,terrainWidth=0,terrainHeight=0,draggedLoot=null,lastLootRoute=-1;
@@ -170,7 +194,7 @@ if(scene==='halo'){
             }
         };
     }else{
-        lot={index:30,elapsed:0,stage:1,x:75,y:280,vx:0,vy:0,carrying:true,camera:1,placed:30};
+        lot={index:30,elapsed:0,stage:1,x:75,y:280,vx:0,vy:0,carrying:true,camera:1,placed:30,choice:0};
         // Successive supported shells contain 1, 3, 5 ... cards. There is no final lap/reset.
         const slot=index=>{const radius=Math.floor(Math.sqrt(index)),offset=index-radius*radius,row=Math.floor(offset/2);return{x:310+(radius-row)*(offset%2?1:-1)*24,y:280-row*22};};
 
@@ -195,7 +219,10 @@ if(scene==='halo'){
             for(let i=first;i<lot.index;i++){const p=slot(i);hardware(c,p.x,p.y,'gpu',.44,0,'gpu-'+i);}
             line(c,[[17,283],[17,244],[67,246],[67,283],[17,283]],'#6f624d',1.2);
             const pose=drawMeowl(c,lot.x,lot.y,75,{voice:sfx.mouth('hunt'),id:'hunt',time,mode:lot.carrying?'carry':'scurry',speed:Math.hypot(lot.vx,lot.vy),facing:lot.vx<0?-1:1,emotion:'determined',effort:.82,chase:false,cargo:lot.carrying?(ctx,grip)=>hardware(ctx,grip.x,grip.y-8,'gpu',.8,0,'gpu-'+lot.index):null});
-            lot.grips=pose.hands;c.restore();note.textContent=lot.placed+' gpus checked and stacked. just one more lot.';
+            lot.grips=pose.hands;c.restore();
+            const item=hardwareLots[lot.choice],recoverable=item.resale*(1-item.fault),maxHammer=Math.floor((recoverable-item.shipping)/(1+item.fees));lot.bid={...item,recoverable,maxHammer};
+            c.fillStyle='#535248';c.textAlign='left';c.font='16px Reader,Georgia,serif';c.fillText(item.name,12,21);c.font='13px Reader,Georgia,serif';c.fillStyle='#817968';c.fillText('resale £'+item.resale+'  ·  fault '+Math.round(item.fault*100)+'%',12,43);c.fillStyle='#60715d';c.font='18px Reader,Georgia,serif';c.fillText('max hammer £'+maxHammer,12,68);
+            note.textContent=lot.placed+' gpus checked and stacked.';
         };
     }
 }
