@@ -9,15 +9,15 @@ const ink='#535248',soft='#a19986',paper='#eeeae0',gold='#a08a57';
 const paperTitles=['fluid mechanics','options pricing','gamma scalping','market microstructure','stochastic calculus','optimal execution','statistical arbitrage','rough volatility','order flow','portfolio construction','causal inference','Bayesian learning','risk premia','limit order books','volatility surfaces','Monte Carlo methods','regime detection','information theory','mean reversion','momentum signals','jump diffusion','liquidity risk','agent simulations','extreme value theory','dynamic hedging','numerical optimisation','network effects','term structure','signal processing','entropy estimation','reinforcement learning','market impact'];
 const auraStyles=[{name:'Celestial Aura',file:'celestial_aura_effect.png',color:'#796098',kind:'orbit'},{name:'Celestial Aura III',file:'celestial_aura_effect_iii.png',color:'#8767a0',kind:'nova'},{name:'Divine Righteous Fire',file:'divine_righteous_fire_effect.png',color:'#b19150',kind:'fire'}];
 const specs={
- poe:['prices become probabilities','try another item family','sample prices / no live trade quotes'],
+ poe:['prices become probabilities','try another item family',''],
  scraper:['papers to walk-forward tests','collect another paper','sample reading list'],
  pipeline:['market data to walk-forward tests','shuffle the data','sample market data'],
  smoothtato:['less clutter. more wardrobe.','change the preset','presets from the app'],
  mtxtato:['a little aura goes a long way','change the effect','effects from the app catalogue'],
  tfl:['the Tube gets a leaderboard','delay a different line','sample service history'],
- commute:['a week of getting there','add a commute day','example fares / check current prices before buying'],
- deadlock:['what actually changes the odds?','','sample matches / association, not causation'],
- baxter:['one helper is never enough','send another task','example task / no live agent run']
+ commute:['a week of getting there','add a commute day',''],
+ deadlock:['what actually changes the odds?','',''],
+ baxter:['one helper is never enough','send another task','']
 };
 export function miniScene(scene,canvas,wake,sfx){
  const $=s=>document.querySelector(s),spec=specs[scene]||specs.pipeline;
@@ -40,7 +40,7 @@ export function miniScene(scene,canvas,wake,sfx){
  state.ratings=Array(6).fill(1000);state.ratingTargets=Array(6).fill(1000);state.lastTrainEvent=-1;
  function caption(){
   const n=state.choice;
-  note.textContent=({poe:["Watcher's Eye",'Timeless jewels','Sublime Vision'][n%3]+' / prices to risk sheets.',scraper:paperTitles[n]+' / collecting paper '+(state.cycles+1)+'.',pipeline:'clean market data. test on the next unseen period.',smoothtato:presets[n]+': '+['all effects visible.','particles and bloom off.','decorative props and skill FX off.','shadows, reflections and fog off.'][n],mtxtato:auraStyles[n%3].name,tfl:['Central','Victoria','Northern'][n%3]+' is delayed. each checkpoint updates the ratings.',commute:(n%5+1)+' days: '+((n%5+1)*6===24?'both cost the same in this example.':((n%5+1)*6<24?'single journeys':'the weekly ticket')+' cost less in this example.'),deadlock:'',baxter:['baxter sorts the request','the product manager scopes it','the developer builds it','the verifier checks it'][Math.min(3,Math.floor(state.elapsed/2.4))]})[scene];
+  note.textContent=({poe:["Watcher's Eye",'Timeless jewels','Sublime Vision'][n%3]+' prices feed risk sheets.',scraper:paperTitles[n]+': collecting paper '+(state.cycles+1)+'.',pipeline:'clean market data. test on the next unseen period.',smoothtato:presets[n]+': '+['all effects visible.','particles and bloom off.','decorative props and skill FX off.','shadows, reflections and fog off.'][n],mtxtato:auraStyles[n%3].name,tfl:['Central','Victoria','Northern'][n%3]+' is delayed. each checkpoint updates the ratings.',commute:(n%5+1)+' days: '+((n%5+1)*6===24?'both cost the same in this example.':((n%5+1)*6<24?'single journeys':'the weekly ticket')+' cost less in this example.'),deadlock:'',baxter:['baxter sorts the request','the product manager scopes it','the developer builds it','the verifier checks it'][Math.min(3,Math.floor(state.elapsed/2.4))]})[scene];
  }
  function change(manual=false){
   if(!['scraper','tfl'].includes(scene)){previous=document.createElement('canvas');previous.width=a.el.width;previous.height=a.el.height;previous.getContext('2d').drawImage(a.el,0,0);}
@@ -147,7 +147,7 @@ export function miniScene(scene,canvas,wake,sfx){
    const d=priced,fmt=v=>v===null?'...':v.toFixed(2),xFor=v=>28+(v-priceDomain[0])/(priceDomain[1]-priceDomain[0])*424;
    state.metrics={ev:d.ev,netEV:d.netEV,sharpe:d.sharpe,profitFactor:d.profitFactor};
    label(c,family.name,240,29,24);label(c,count+' sampled outcomes',132,61,17);label(c,'cost '+family.cost+'c',385,61,17);
-   ['net EV / c','return / risk','profit factor'].forEach((v,i)=>label(c,v,85+i*155,96,16));
+   ['net EV (c)','return:risk','profit factor'].forEach((v,i)=>label(c,v,85+i*155,96,16));
    [d.netEV,d.sharpe,d.profitFactor].forEach((v,i)=>label(c,fmt(v),85+i*155,129,30));
    const share=d.tailShare===null?'...':Math.round(d.tailShare*100)+'%';
    label(c,'top 5% = '+share+' of the upside',240,165,18);
@@ -164,7 +164,7 @@ export function miniScene(scene,canvas,wake,sfx){
    // Rug ticks retain individual prices beneath the frequency landscape.
    for(const r of prices.slice(0,count)){const x=xFor(r.value);path(c,[[x,402],[x,407]],r.value<0?'#aa7562':r.rare?gold:'#879382',.55);}
    const zero=xFor(0);path(c,[[zero,396],[zero,411]],ink,.8);
-   label(c,'loss',43,426,14);label(c,'profit per outcome / c',240,426,14);label(c,Math.round(priceDomain[1])+'c',439,426,14);
+   label(c,'loss',43,426,14);label(c,'profit per outcome (c)',240,426,14);label(c,Math.round(priceDomain[1])+'c',439,426,14);
    const thread=JSON.stringify(points.map(([x,y])=>[+(x*s+(a.w-480*s)/2).toFixed(2),+(y*s+(a.h-artHeight*s)/2).toFixed(2)]));
    if(a.el.dataset.threadPoints!==thread){a.el.dataset.threadPoints=thread;if(woven)parent.dispatchEvent(new Event('ink-anchors'));}
    state.priceDistribution={...d,points,domain:priceDomain,values:prices.slice(0,count).map(r=>r.value),windowUpdates:priceUpdates};
@@ -185,7 +185,7 @@ export function miniScene(scene,canvas,wake,sfx){
    state.pipeline={raw:values,progress};
    label(c,paperTitles[n],240,291,19);
    state.papersCollected=Math.floor((state.routeTime+.875)/2.5);
-   label(c,state.papersCollected+' papers collected',120,318,15);label(c,'walk-forward / costs',359,318,15);
+   label(c,state.papersCollected+' papers collected',120,318,15);label(c,'walk-forward',359,318,15);
 
   }else if(scene==='pipeline'){
    const shuffle=Math.floor(t/.42),raw=[7,2,9,4,6,3].map((v,i)=>(v+n*(i+1))%10+1),rank=[...raw].map((v,i)=>({v,i})).sort((a,b)=>a.v-b.v);
@@ -300,13 +300,13 @@ export function miniScene(scene,canvas,wake,sfx){
    if(sample!==distributionCount){measured=distribution(matches,sample,domain);distributionCount=sample;}
    if(sample&&(windowUpdates!==state.audioMatches||sample!==state.audioCount)){const r=matches[(Math.max(1,windowUpdates||sample)-1)%400];sfx.play('plink',{good:r.won&&r.selected&&measured.sd>0&&r.value>measured.mean+1.6*measured.sd});state.audioMatches=windowUpdates;state.audioCount=sample;}
    const d=measured,fmt=v=>v===null?'...':v.toFixed(2),pct=d.probability===null?'...':Math.round(d.probability*100)+'%';
-   label(c,deadlockStats[n]+' / '+metric.unit,240,29,24);
+   label(c,deadlockStats[n]+' ('+metric.unit+')',240,29,24);
    label(c,sample+' matches',112,60,18);label(c,metric.condition,350,60,17);
    for(let i=0;i<total;i++){
     const x=47+i%20*6.3,y=83+Math.floor(i/20)*6.3;
     c.beginPath();c.arc(x,y,1.8,0,Math.PI*2);c.fillStyle=i>=sample?'#d5cfc0':!matches[i].selected?'#b3ac9d':matches[i].won?'#607c6b':'#aa7562';c.fill();
    }
-   label(c,pct,350,107,37);label(c,d.wins+' / '+d.selected+' wins',350,132,17);
+   label(c,pct,350,107,37);label(c,d.wins+' of '+d.selected+' wins',350,132,17);
    label(c,'mean '+fmt(d.mean),350,160,18);label(c,'stdev '+fmt(d.sd),350,185,18);label(c,'excess kurt. '+fmt(d.excess),350,210,17);
    owl(c,218,190,'analyst',46,{mode:'carry',look:2,cargo:(ctx,grip)=>statProp(ctx,n,grip.x,grip.y)});
    label(c,'raw sample frequencies',134,238,16);

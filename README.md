@@ -1,6 +1,6 @@
 # just a little further
 
-A little meowl pushing a boulder, and twelve things I have been tinkering with, plus the other constants in my brain.
+A little meowl pushing a boulder through nine project stops, plus the other constants in my brain.
 
 **[Visit the website](https://lolstar123.github.io/just-a-little-further/)** · [All project repositories and demos](https://github.com/LolStar123)
 
@@ -21,7 +21,7 @@ After editing an embedded project scene, run `npm run build:demos`.
 
 | Source | Responsibility |
 | --- | --- |
-| [dist/index.html](dist/index.html) | The page, twelve projects and the interests thought bubble |
+| [dist/index.html](dist/index.html) | The page, nine project stops and the interests thought bubble |
 | [dist/creations.js](dist/creations.js) | Project descriptions, GitHub links and working demos |
 | [dist/hill-physics.js](dist/hill-physics.js) | Boulder, terrain erosion and the meowl's movement |
 | [dist/little-creatures.js](dist/little-creatures.js) | Shared drawn characters and poses |
