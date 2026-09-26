@@ -1,6 +1,7 @@
 """Stress the embedded-scene handshake and the cheer audio route."""
 import functools
 import http.server
+import os
 import threading
 import time
 from pathlib import Path
@@ -42,11 +43,14 @@ def visit_every_scene(page):
     assert page.locator(".scene-loading").count() == 0
 
 
-server = http.server.ThreadingHTTPServer(
-    ("127.0.0.1", 0), functools.partial(Quiet, directory=str(ROOT / "dist"))
-)
-threading.Thread(target=server.serve_forever, daemon=True).start()
-url = f"http://127.0.0.1:{server.server_port}/index.html"
+server = None
+url = os.environ.get("SITE_URL")
+if not url:
+    server = http.server.ThreadingHTTPServer(
+        ("127.0.0.1", 0), functools.partial(Quiet, directory=str(ROOT / "dist"))
+    )
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    url = f"http://127.0.0.1:{server.server_port}/index.html"
 
 try:
     with sync_playwright() as playwright:
@@ -88,4 +92,5 @@ try:
         browser.close()
         print("PASS: every scene loads on cold and cached desktop/mobile visits; cheer audio belongs only to the guide")
 finally:
-    server.shutdown()
+    if server:
+        server.shutdown()
