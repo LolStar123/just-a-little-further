@@ -35,8 +35,7 @@ export function miniScene(scene,canvas,wake,sfx){
  const auraImages=['smoothtato','mtxtato'].includes(scene)?auraStyles.map(style=>{const image=new Image();image.onload=()=>{draw();wake();};image.src='assets/mtx/'+style.file;return image;}):[];
  const presets=['Original','Performance','League Start','Barebones'];
  const deadlockStats=metrics.map(m=>m.name);
- const priceStreams=[[],[],[]],priceBatches=[0,0,0];
- let priceKey='',prices=[],priceDomain=[],priceCount=-1,priced=null;
+ let priceKey='',prices=[],priceIncoming=[],priceDomain=[],priceUpdates=0,priceCount=-1,priced=null;
  let matchKey='',matches=[],incoming=[],domain=[],distributionCount=-1,measured=null,windowUpdates=0;
  state.ratings=Array(6).fill(1000);state.ratingTargets=Array(6).fill(1000);state.lastTrainEvent=-1;
  function caption(){
@@ -139,15 +138,15 @@ export function miniScene(scene,canvas,wake,sfx){
   audioEvents();
   const t=state.elapsed,n=state.choice,u=scene==='scraper'?(state.routeTime%2.5)/2.5:(t%5)/5,e=u*u*(3-2*u);
   if(scene==='poe'){
-   const familyIndex=n%3,family=families[familyIndex],count=Math.max(1,Math.floor(state.clock*8)*5),key=String(familyIndex);
-   if(priceKey!==key){priceKey=key;prices=priceStreams[familyIndex];priceDomain=[-family.cost*1.6,(Math.max(...family.values)*1.6-family.cost)*1.12];priceCount=-1;}
-   while(prices.length<count+240)prices.push(...priceSamples(familyIndex,priceBatches[familyIndex]++));
+   const family=families[n%3],tested=Math.max(1,Math.floor(state.clock*40)),count=Math.min(240,tested),key=n+':'+state.cycles;
+   if(priceKey!==key){priceKey=key;prices=priceSamples(n,state.cycles);priceIncoming=Array.from({length:4},(_,i)=>priceSamples(n,state.cycles+113+i)).flat();const all=[...prices,...priceIncoming].map(r=>r.value),hi=Math.max(...all);priceDomain=[-family.cost*1.6,hi*1.15];priceUpdates=0;priceCount=-1;}
+   const entered=Math.max(0,Math.floor((t-.7)*20))*8;
+   if(entered>priceUpdates){while(priceUpdates<entered){prices[priceUpdates%240]=priceIncoming[priceUpdates%priceIncoming.length];priceUpdates++;}priceCount=-1;}
    if(priceCount!==count){priced=priceSummary(prices,count,priceDomain,family.cost);priceCount=count;}
-   const audioTick=Math.floor(count/4);
-   if(priceCount&&audioTick!==state.audioPrices){const r=prices[count-1];sfx.play('plink',{good:!!r.rare&&r.value>0});state.audioPrices=audioTick;}
+   if(priceCount&&priceUpdates!==state.audioPrices){const r=prices[(Math.max(1,priceUpdates)-1)%240];sfx.play('plink',{good:!!r.rare&&r.value>0});state.audioPrices=priceUpdates;}
    const d=priced,fmt=v=>v===null?'...':v.toFixed(2),xFor=v=>28+(v-priceDomain[0])/(priceDomain[1]-priceDomain[0])*424;
    state.metrics={ev:d.ev,netEV:d.netEV,sharpe:d.sharpe,profitFactor:d.profitFactor};
-   label(c,family.name,240,29,24);label(c,'n = '+count,112,61,17);label(c,'cost = '+family.cost+'c',385,61,17);
+   label(c,family.name,240,29,24);label(c,'n = '+tested,112,61,17);label(c,'cost = '+family.cost+'c',385,61,17);
    label(c,'EV '+fmt(d.netEV)+'c   EV/σ '+fmt(d.sharpe)+'   PF '+fmt(d.profitFactor),240,108,18);
    const share=d.tailShare===null?'...':Math.round(d.tailShare*100)+'%';
    label(c,'top 5% → '+share+' of upside',240,141,17);
@@ -162,7 +161,7 @@ export function miniScene(scene,canvas,wake,sfx){
    label(c,'loss',43,426,14);label(c,'net outcome (c)',240,426,14);label(c,Math.round(priceDomain[1])+'c',439,426,14);
    const thread=JSON.stringify(points.map(([x,y])=>[+(x*s+(a.w-480*s)/2).toFixed(2),+(y*s+(a.h-artHeight*s)/2).toFixed(2)]));
    if(a.el.dataset.threadPoints!==thread){a.el.dataset.threadPoints=thread;if(woven)parent.dispatchEvent(new Event('ink-anchors'));}
-   state.priceDistribution={...d,points,domain:priceDomain,values:prices.slice(0,count).map(r=>r.value),windowUpdates:count};
+   state.priceDistribution={...d,points,domain:priceDomain,values:prices.slice(0,count).map(r=>r.value),windowUpdates:priceUpdates,totalCount:tested};
    note.textContent='';note.hidden=true;
   }else if(scene==='scraper'){
    label(c,'collect papers',117,34,20);label(c,'test the idea',359,34,20);
