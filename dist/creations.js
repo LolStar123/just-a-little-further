@@ -208,7 +208,7 @@ export const projects={
   "botato": {
     "title": "botato",
     "short": "Botato",
-    "category": "REVERSE ENGINEERING",
+    "category": "REVERSE ENGINEERING + IDA",
     "caption": "path of exile route optimisation and combat automation. end-to-end. going public soon™.",
     "description": "Read the current terrain and target, choose a traversable route and advance along it. If an obstacle changes the route, recalculate before moving; navigation feeds the wider automation loop.",
     "scene": "botato",
