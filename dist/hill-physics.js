@@ -34,6 +34,7 @@ export class HillPhysics {
         Composite.add(this.engine.world,this.rock);
         this.rock.collisionFilter.category=2;
         this.reposition=null;this.intercept=null;this.lane=0;this.facing=1;this.repositionCount=0;
+        this.rockOverlapAge=0;this.overlapRecoveries=0;this.interactionRevision=0;
         this.catchGap=0;this.lastGripAt=-100;this.lastGroundAt=-100;this.gripGrace=false;this.catchArmed=false;this.catchBeat=0;this.catchImpactAt=-100;this.catchSpeed=0;
         this.stepUntil=0;this.nextStep=0;
         this.drag=null;this.dragSamples=[];this.impactCount=0;this.maxIndent=0;this.catchCount=0;this.maxSlide=0;
@@ -273,7 +274,10 @@ export class HillPhysics {
         // Phone hills previously let the stone settle flush against the left wall,
         // leaving less room than a complete meowl needs to get behind it. Reserve
         // one real foothold at the bottom so the catch-and-push loop can continue.
-        this.downhillReserve=this.w<760?Math.max(this.actorWidth/2+3,this.actorSize*.58)+this.actorWidth/2+5:0;
+        // Keep one complete downhill foothold on every viewport. Without it the
+        // desktop stone can settle against the wall with no physically possible
+        // route behind it after a user drag.
+        this.downhillReserve=Math.max(this.actorWidth/2+3,this.actorSize*.58)+this.actorWidth/2+5;
         const x=this.rock.position.x-this.radius-size*.32;
         this.actor=Bodies.rectangle(x,this.ground(x)-this.actorHeight/2,this.actorWidth,this.actorHeight,{chamfer:{radius:size*.14},friction:.72,frictionStatic:.9,frictionAir:.009,restitution:0,inertia:Infinity,label:'meowl'});
         Body.setMass(this.actor,size*size*.0022);this.strength=this.actor.mass*(this.w<760?.0108*1.224:.0096*1.05);this.baseStrength=this.strength;Body.setInertia(this.actor,Infinity);Composite.add(this.engine.world,this.actor);
@@ -314,6 +318,37 @@ export class HillPhysics {
         this.actor.collisionFilter.mask=0xFFFFFFFF;this.actor.friction=.86;
         this.mode='anticipate';this.effort=.65;this.workAge=0;
     }
+    actorInsideRock(){
+        return !!(this.actor&&!this.splat&&Vertices.contains(this.rock.vertices,this.actor.position));
+    }
+    actorRockClearance(){
+        return this.actor?this.rock.bounds.min.x-this.actor.bounds.max.x:Infinity;
+    }
+    separateActorFromRock(){
+        const a=this.actor,b=this.rock;if(!a||this.splat||this.drag?.bodyB===a)return false;
+        const margin=Math.max(this.actorWidth/2+3,this.actorSize*.58);
+        const x=clamp(b.bounds.min.x-this.actorWidth/2-7,margin,this.w*.963-margin);
+        // This is a penetration correction, not navigation. It only runs after
+        // Matter has left the actor's centre inside the stone for several frames.
+        Body.setPosition(a,{x,y:this.ground(x)-this.actorHeight/2-2});
+        Body.setVelocity(a,{x:Math.min(-.8,a.velocity.x),y:0});
+        Body.setAngularVelocity(a,0);a.collisionFilter.mask=0xFFFFFFFF;
+        this.rockOverlapAge=0;this.overlapRecoveries++;this.plantIntercept();
+        return true;
+    }
+    resolveActorRockOverlap(dt){
+        if(!this.actor||this.splat||this.drag||this.actorFlight||this.actor.isStatic){this.rockOverlapAge=0;return;}
+        if(!this.interactionRevision){this.rockOverlapAge=0;return;}
+        // Matter owns ordinary catches and impacts. The watchdog is only for the
+        // deliberately collision-free foreground bypass, where its solver cannot
+        // separate the two bodies for us.
+        if(!this.reposition&&this.actor.collisionFilter.mask===0xFFFFFFFF){this.rockOverlapAge=0;return;}
+        if(!this.actorInsideRock()){this.rockOverlapAge=0;return;}
+        this.rockOverlapAge+=dt;
+        // A valid push only touches the shell. Centre penetration means a drag or
+        // bypass transition produced an impossible state and must be unwound.
+        if(this.rockOverlapAge>.10&&(this.reposition?.total||0)>.75)this.separateActorFromRock();
+    }
     waitForRock(dt){
         const a=this.actor,b=this.rock,r=this.intercept;r.age+=dt;
         this.lane*=Math.exp(-dt*16);this.facing=1;this.mode='anticipate';this.effort=.7;
@@ -334,7 +369,7 @@ export class HillPhysics {
     }
     recoverSide(dt){
         const a=this.actor,b=this.rock,r=this.reposition;
-        r.age+=dt;this.catchActive=false;this.contact=false;this.effort=0;
+        r.age+=dt;r.total=(r.total||0)+dt;this.catchActive=false;this.contact=false;this.effort=0;
         a.friction=.05;a.frictionStatic=.1;
         // Step into the foreground passing lane. Only the boulder is bypassed;
         // ground and walls remain solid. Rejoin its lane before bracing.
@@ -364,7 +399,7 @@ export class HillPhysics {
             if(!this.drag&&this.grounded&&b.position.x>a.position.x&&b.bounds.min.x<a.bounds.max.x+12){
                 Body.applyForce(b,{x:b.bounds.min.x+4,y:b.position.y+this.radius*.4},{x:this.strength*pulse,y:-this.strength*.12});
             }
-            if(a.bounds.max.x<b.bounds.min.x-5||(a.position.x<b.position.x-this.radius*.25&&r.age>.25)){this.plantIntercept();return;}
+            if(this.actorRockClearance()>5){this.plantIntercept();return;}
         }
         this.pushForce=clamp((desired-a.velocity.x)*a.mass*.0028,-this.strength*1.35,this.strength*.8);
         Body.applyForce(a,a.position,{x:this.pushForce,y:0});
@@ -378,19 +413,22 @@ export class HillPhysics {
             const f=this.actorFlight;f.age+=dt;this.contact=false;this.gripGrace=false;this.grounded=false;this.pushForce=0;this.effort=0;this.lane=0;
             if(f.age<.7){this.mode='tossed';return;}
             f.phase='flutter';this.mode='flutter';a.collisionFilter.mask=0xFFFFFFFF;
-            const tx=f.homeX??=clamp(b.bounds.min.x-this.actorWidth*.7-14,this.actorWidth*.7+8,this.w-this.actorWidth);
+            const safeHome=clamp(b.bounds.min.x-this.actorWidth*.7-14,this.actorWidth*.7+8,this.w-this.actorWidth);
+            f.homeX=f.homeX===undefined?safeHome:f.homeX+(safeHome-f.homeX)*(1-Math.exp(-dt*5));
+            const tx=f.homeX;
             const homeY=this.ground(tx)-this.actorHeight/2-3;
             const crossing=(a.position.x>b.bounds.min.x&&tx<b.bounds.min.x)||(a.position.x<b.bounds.max.x&&tx>b.bounds.max.x);
             const clearance=Math.min(b.bounds.min.y,this.ground(a.position.x),this.ground(tx))-this.actorHeight*.65-16;
             const blocked=crossing&&a.bounds.max.y>b.bounds.min.y-10;
             const targetX=blocked?a.position.x:tx,targetY=blocked?clearance:homeY;
             const dx=targetX-a.position.x,dy=targetY-a.position.y,d=Math.hypot(tx-a.position.x,homeY-a.position.y);
-            const speed=Math.hypot(a.velocity.x,a.velocity.y),lift=Math.sin(this.time*19)*Math.min(1,d/80)*.00018;
+            const speed=Math.hypot(a.velocity.x,a.velocity.y),urgency=clamp((f.age-2.1)/1.8,0,1),lift=Math.sin(this.time*19)*Math.min(1,d/80)*.00018;
             // Desired velocities are Matter's pixels per nominal 60 Hz step.
-            const vx=clamp(dx*.055,-7.5,7.5),vy=clamp(dy*.055,-7.5,7.5);
-            Body.applyForce(a,a.position,{x:a.mass*(vx-a.velocity.x)*.0008,y:a.mass*((vy-a.velocity.y)*.0008-this.engine.gravity.y*this.engine.gravity.scale+lift)});
+            const vx=clamp(dx*(.055+urgency*.025),-7.5,7.5),vy=clamp(dy*(.055+urgency*.025),-7.5,7.5),steer=.0008+urgency*.00045;
+            Body.applyForce(a,a.position,{x:a.mass*(vx-a.velocity.x)*steer,y:a.mass*((vy-a.velocity.y)*steer-this.engine.gravity.y*this.engine.gravity.scale+lift)});
             if(Math.abs(dx)>14)this.facing=dx<0?-1:1;
-            if(d<5&&speed<.8){this.actorFlight=null;a.collisionFilter.mask=0xFFFFFFFF;this.mode='recover';this.recoverUntil=this.time+.35;this.lastGripAt=-100;this.nextTrip=this.time+2;}
+            const feetGap=this.ground(a.position.x)-(a.position.y+this.actorHeight/2),landed=Math.abs(feetGap)<10&&Math.abs(a.velocity.y)<1.8&&!this.actorInsideRock();
+            if((d<7&&speed<1.25)||(f.age>2.8&&landed)){this.actorFlight=null;a.collisionFilter.mask=0xFFFFFFFF;this.mode='recover';this.recoverUntil=this.time+.35;this.lastGripAt=-100;this.nextTrip=this.time+2;}
             return;
         }
         if(this.splat){
@@ -574,7 +612,7 @@ export class HillPhysics {
             }
             if(gap<5&&!this.drag)b.torque-=b.angularVelocity*b.inertia*.000045;
             for(const body of [b,this.actor])if(body){const speed=Math.hypot(body.velocity.x,body.velocity.y);if(speed>24)Body.setVelocity(body,{x:body.velocity.x/speed*24,y:body.velocity.y/speed*24});Body.setAngularVelocity(body,clamp(body.angularVelocity,-.30,.30));}
-            Engine.update(this.engine,1000/180);this.containRock();this.containMeowl();this.accumulator-=step;
+            Engine.update(this.engine,1000/180);this.containRock();this.containMeowl();this.resolveActorRockOverlap(step);this.accumulator-=step;
             for(let i=this.chips.length-1;i>=0;i--)if(this.time-this.chips[i].born>12){Composite.remove(this.engine.world,this.chips[i].body);this.chips.splice(i,1);}
         }
     }
@@ -622,9 +660,15 @@ export class HillPhysics {
     }
     grab(body,x,y){
         if(body===this.actor&&this.splat)this.unsplat(false);
-        this.release(false);if(body===this.actor){this.actorFlight=null;this.trip=null;this.springUntil=0;this.reposition=null;this.contact=false;this.gripGrace=false;this.lane=0;body.collisionFilter.mask=0xFFFFFFFF;}const dx=x-body.position.x,dy=y-body.position.y;
+        this.release(false);this.interactionRevision++;
+        // Pointer ownership cancels the autonomous contact plan. In particular,
+        // a rock grab must never leave the actor in its collision-free passing lane.
+        this.catchActive=false;this.catchArmed=false;this.intercept=null;this.reposition=null;this.contact=false;this.gripGrace=false;this.lane=0;this.rockOverlapAge=0;
+        if(this.actor)this.actor.collisionFilter.mask=0xFFFFFFFF;
+        if(body===this.actor){this.actorFlight=null;this.trip=null;this.springUntil=0;}
+        const dx=x-body.position.x,dy=y-body.position.y;
         this.drag=Constraint.create({pointA:{x,y},bodyB:body,pointB:{x:dx,y:dy},stiffness:body===this.rock?.065:.7,damping:body===this.rock?.38:.85,length:0});
-        this.catchArmed=false;this.dragSamples=[{x,y,t:performance.now()}];Composite.add(this.engine.world,this.drag);this.catchActive=false;this.intercept=null;return this.drag;
+        this.dragSamples=[{x,y,t:performance.now()}];Composite.add(this.engine.world,this.drag);return this.drag;
     }
     move(x,y){
         if(!this.drag)return;
@@ -640,8 +684,11 @@ export class HillPhysics {
     release(flick=true){
         if(!this.drag)return;const b=this.drag.bodyB,s=this.dragSamples,first=s[0],last=s.at(-1);
         if(flick&&s.length>1&&last.t-first.t>8&&performance.now()-last.t<85){const scale=1000/(60*(last.t-first.t)),weight=b===this.rock?.45:1,limit=b===this.rock?9:19;Body.setVelocity(b,{x:clamp((last.x-first.x)*scale*weight,-limit,limit),y:clamp((last.y-first.y)*scale*weight,-limit,limit)});}
-        if(b===this.actor){if(!flick||!last||performance.now()-last.t>=85)Body.setVelocity(b,{x:0,y:0});this.actorFlight={age:0,phase:'ballistic'};b.collisionFilter.mask=0xFFFFFFFF;this.mode='tossed';this.contact=false;this.gripGrace=false;this.trip=null;this.reposition=null;}
+        if(b===this.actor){if(!flick||!last||performance.now()-last.t>=85)Body.setVelocity(b,{x:0,y:0});this.actorFlight={age:0,phase:'ballistic'};b.collisionFilter.mask=0xFFFFFFFF;this.mode='tossed';this.contact=false;this.gripGrace=false;this.trip=null;this.reposition=null;this.intercept=null;this.catchActive=false;this.catchArmed=false;this.lane=0;}
         Composite.remove(this.engine.world,this.drag);this.drag=null;this.dragSamples=[];
+        if(b===this.rock&&!this.splat&&this.actorInsideRock()){
+            this.actor.collisionFilter.mask=0xFFFFFFFD;this.reposition={phase:'startle',age:0,total:0};this.intercept=null;this.catchActive=false;this.catchArmed=false;this.lane=0;
+        }
     }
     liftRock(){this.release(false);Body.setPosition(this.rock,{x:clamp(this.rock.position.x+35,this.radius,this.w-this.radius),y:Math.max(this.radius+95,this.rock.position.y-125)});Body.setVelocity(this.rock,{x:.8,y:-2});}
     helpRock(){
@@ -659,11 +706,11 @@ export class HillPhysics {
         Body.setPosition(this.rock,{x:this.startX,y:this.ground(this.startX)-this.radius-5});Body.setVelocity(this.rock,{x:0,y:0});Body.setAngularVelocity(this.rock,0);Body.setAngle(this.rock,0);
         if(this.actor){const x=this.rock.position.x-this.radius-this.actorSize*.32;Body.setPosition(this.actor,{x,y:this.ground(x)-this.actorHeight/2});Body.setVelocity(this.actor,{x:0,y:0});}
         this.catchActive=false;this.catchArmed=false;this.lastGripAt=-100;this.lastGroundAt=-100;this.gripGrace=false;this.catchAge=0;this.celebrate=0;this.effort=0;this.restUntil=0;this.workAge=0;this.stroke=0;this.pushForce=0;this.recoverUntil=0;this.mode='walk';
-        this.reposition=null;this.intercept=null;this.catchGap=0;this.catchImpactAt=-100;this.lane=0;this.facing=1;if(this.actor)this.actor.collisionFilter.mask=0xFFFFFFFF;
+        this.reposition=null;this.intercept=null;this.catchGap=0;this.catchImpactAt=-100;this.lane=0;this.facing=1;this.rockOverlapAge=0;this.overlapRecoveries=0;if(this.actor)this.actor.collisionFilter.mask=0xFFFFFFFF;
         this.emotion='calm';this.emotionSince=this.time;this.setbackAt=-100;this.earnedX=this.rock.position.x;this.nextPanicHop=0;this.panicHops=0;
         this.trip=null;this.tripCount=0;this.nextTrip=0;this.assist=null;this.strength=this.baseStrength;
         this.stepUntil=0;this.nextStep=0;
     }
     dispose(){this.release(false);Events.off(this.engine);Composite.clear(this.engine.world,false);Engine.clear(this.engine);}
-    diagnostics(){return{actorFlight:this.actorFlight?{...this.actorFlight}:null,actorMask:this.actor?.collisionFilter.mask,rockMask:this.rock.collisionFilter.mask,downhillReserve:this.downhillReserve,slabs:this.slabs.length,terrainBreaks:this.terrainBreaks,terrainFaults:this.faults.length,terrainVersion:this.terrainVersion,erosion:this.nodes.map(n=>n.eroded),structuralDamage:this.nodes.map(n=>n.damage),intercept:this.intercept?{...this.intercept}:null,catchBeat:this.catchBeat,catchArmed:this.catchArmed,catchImpactAge:this.time-this.catchImpactAt,catchSpeed:this.catchSpeed,catchGap:this.catchGap,assisting:!!this.assist,powerLeft:this.assist?Math.max(0,this.assist.until-this.time):0,tripCount:this.tripCount,emotion:this.emotion,emotionAge:this.time-this.emotionSince,panicHops:this.panicHops,setbackAge:this.time-this.setbackAt,splatAge:this.splat?.age||0,flattened:!!this.splat,position:{...this.rock.position},velocity:{...this.rock.velocity},angle:this.rock.angle,radius:this.radius,outline:this.outline(),area:this.rock.area,originalArea:this.originalArea,chipCount:this.chipCount,chips:this.chips.length,lastChipArea:this.lastChipArea||0,ground:this.ground(this.rock.position.x),dragging:!!this.drag,impacts:this.impactCount,maxIndent:this.maxIndent,indent:this.nodes.map(n=>n.y),steps:this.steps,catchCount:this.catchCount,maxSlide:this.maxSlide,contact:this.contact,gripGrace:this.gripGrace,mode:this.mode,catchAge:this.catchAge,stroke:this.stroke,workAge:this.workAge,pushForce:this.pushForce,strength:this.strength,mass:this.rock.mass,actorMass:this.actor?.mass,facing:this.facing,lane:this.lane,reposition:this.reposition?{...this.reposition}:null,repositionCount:this.repositionCount,actor:this.actor?{position:{...this.actor.position},velocity:{...this.actor.velocity}}:null};}
+    diagnostics(){return{actorFlight:this.actorFlight?{...this.actorFlight}:null,actorMask:this.actor?.collisionFilter.mask,rockMask:this.rock.collisionFilter.mask,actorInsideRock:this.actorInsideRock(),rockOverlapAge:this.rockOverlapAge,overlapRecoveries:this.overlapRecoveries,interactionRevision:this.interactionRevision,downhillReserve:this.downhillReserve,slabs:this.slabs.length,terrainBreaks:this.terrainBreaks,terrainFaults:this.faults.length,terrainVersion:this.terrainVersion,erosion:this.nodes.map(n=>n.eroded),structuralDamage:this.nodes.map(n=>n.damage),intercept:this.intercept?{...this.intercept}:null,catchBeat:this.catchBeat,catchArmed:this.catchArmed,catchImpactAge:this.time-this.catchImpactAt,catchSpeed:this.catchSpeed,catchGap:this.catchGap,assisting:!!this.assist,powerLeft:this.assist?Math.max(0,this.assist.until-this.time):0,tripCount:this.tripCount,emotion:this.emotion,emotionAge:this.time-this.emotionSince,panicHops:this.panicHops,setbackAge:this.time-this.setbackAt,splatAge:this.splat?.age||0,flattened:!!this.splat,position:{...this.rock.position},velocity:{...this.rock.velocity},angle:this.rock.angle,radius:this.radius,outline:this.outline(),area:this.rock.area,originalArea:this.originalArea,chipCount:this.chipCount,chips:this.chips.length,lastChipArea:this.lastChipArea||0,ground:this.ground(this.rock.position.x),dragging:!!this.drag,impacts:this.impactCount,maxIndent:this.maxIndent,indent:this.nodes.map(n=>n.y),steps:this.steps,catchCount:this.catchCount,maxSlide:this.maxSlide,contact:this.contact,gripGrace:this.gripGrace,mode:this.mode,catchAge:this.catchAge,stroke:this.stroke,workAge:this.workAge,pushForce:this.pushForce,strength:this.strength,mass:this.rock.mass,actorMass:this.actor?.mass,facing:this.facing,lane:this.lane,reposition:this.reposition?{...this.reposition}:null,repositionCount:this.repositionCount,actor:this.actor?{position:{...this.actor.position},velocity:{...this.actor.velocity}}:null};}
 }

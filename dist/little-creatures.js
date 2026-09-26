@@ -200,8 +200,12 @@ function goldrim(c,p){
     curve(c,[11,-33],[22,-24],[20,-10],.9);curve(c,[25,-22],[29,-5],[24,10],.85);
     c.restore();
 }
-function wing(c,shoulder,tip,bend,near){
-    const dx=tip[0]-shoulder[0],dy=tip[1]-shoulder[1],length=Math.max(12,Math.hypot(dx,dy));
+function wing(c,shoulder,tip,bend,near,maxLength=48){
+    let dx=tip[0]-shoulder[0],dy=tip[1]-shoulder[1],distance=Math.hypot(dx,dy)||1;
+    // Final drawing-space bone limit. Contact targets and spring interpolation
+    // cannot turn a wing into elastic rope, even for one bad physics frame.
+    if(distance>maxLength){dx*=maxLength/distance;dy*=maxLength/distance;distance=maxLength;}
+    const length=Math.max(12,distance);
     c.save();c.translate(...shoulder);c.rotate(Math.atan2(dy,dx));
     // Broad folded flight feathers, tapering to a long tip rather than a hand.
     const breadth=near?19:16;
@@ -370,7 +374,7 @@ target.hip=[-12,-9];target.chest=[-4,-40];target.head=[2,-66];target.feet=[-26,1
     if(o.rock?.contact&&face===1&&['push','brace','slide','heave'].includes(mode)){
         for(let i=0;i<2;i++){const desiredY=y+hands[i][1]*scale,contactX=rockEdge(o.rock.vertices,desiredY,x+hands[i][0]*scale);if(contactX>=x-size*.05&&contactX<x+size*.7)hands[i]=local(contactX-2*scale,desiredY);}
     }
-    for(let i=0;i<2;i++){const shoulder=[p.chest[0]+(i?16:-17),p.chest[1]+(i?8:5)],dx=hands[i][0]-shoulder[0],dy=hands[i][1]-shoulder[1],d=Math.hypot(dx,dy),reach=o.overhead||air?79:loaded?39:48;if(d>reach){hands[i]=[shoulder[0]+dx/d*reach,shoulder[1]+dy/d*reach];}}
+    for(let i=0;i<2;i++){const shoulder=[p.chest[0]+(i?16:-17),p.chest[1]+(i?8:5)],dx=hands[i][0]-shoulder[0],dy=hands[i][1]-shoulder[1],d=Math.hypot(dx,dy),reach=o.overhead||air?64:loaded?34:44;if(d>reach){hands[i]=[shoulder[0]+dx/d*reach,shoulder[1]+dy/d*reach];}}
     c.save();c.translate(x,y);c.scale(scale*face,scale);c.lineCap='round';c.lineJoin='round';
     const guideScamper=o.id==='guide'&&mode==='scurry'&&Math.abs(o.speed||0)>35;
     const guideAir=o.id==='guide'&&air&&!['pole','hang'].includes(o.parkour?.kind);
@@ -392,13 +396,13 @@ target.hip=[-12,-9];target.chest=[-4,-40];target.head=[2,-66];target.feet=[-26,1
     }else if(guideAir&&['walljump','wallkick','leap','triple','kong'].includes(o.parkour?.kind)){
         for(let i=0;i<2;i++)curve(c,[p.hip[0]-19-i*7,p.hip[1]+12+i*5],[p.hip[0]-27-i*8,p.hip[1]+8+i*5],[p.hip[0]-35-i*9,p.hip[1]+11+i*5],.85,faint);
     }
-    const shoulders=[[p.chest[0]-17,p.chest[1]+5],[p.chest[0]+16,p.chest[1]+8]];
-    wing(c,shoulders[0],hands[0],1,false);
+    const shoulders=[[p.chest[0]-17,p.chest[1]+5],[p.chest[0]+16,p.chest[1]+8]],wingLimit=loaded?34:air?64:44;
+    wing(c,shoulders[0],hands[0],1,false,wingLimit);
     silhouette(c,p,t,effort);
     drawFace(c,p,t,mode,effort,o.look||0,seed,o.emotion,o.emotionAge||0,o.voice||0,o.drool||0);
     if(o.hat==='goldrim')goldrim(c,p);
     if(o.costume)workCostume(c,p,o.costume,t);
-    wing(c,shoulders[1],hands[1],-1,true);
+    wing(c,shoulders[1],hands[1],-1,true,wingLimit);
     if(o.parkour?.kind==='cheer'){
         for(const [j,hand]of hands.entries()){
             c.save();c.translate(...hand);c.rotate(Math.sin(t*20+j)*.4);
