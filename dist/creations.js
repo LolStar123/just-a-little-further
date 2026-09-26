@@ -49,7 +49,7 @@ export const projects={
     "title": "poe economy scraper",
     "short": "poe economy scraper",
     "category": "STATISTICS",
-    "caption": "rotates a proxy and scrapes path of exile virtual economy to log profit and risk statistics. i like optimising small things.",
+    "caption": "scrapes path of exile's virtual economy through rotating proxies, logging profit and risk statistics. i like optimising small things.",
     "description": "Residential-proxy collection logs item prices for the wider pipeline. Variant probabilities and buy-in costs feed linked sheets for expected value, dispersion and profit factor. Missing prices stay visible instead of becoming invented bargains.",
     "scene": "poe",
     "note": "",
