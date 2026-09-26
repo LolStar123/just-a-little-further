@@ -261,7 +261,7 @@ export const projects={
     "title": "the hardware hunt",
     "short": "hardware hunt",
     "category": "AUCTION STRATEGY",
-    "caption": "wanted some lunch money so i made a python to codex pipeline to weigh up fees, taxes and margin and optimise auction flipping.",
+    "caption": "python + codex pipeline weighs up fees, taxes and margin to optimise auction flipping. tbh i just want spare computer parts.",
     "description": "Track the lot, identify the hardware and estimate recoverable resale value. Include faults, buyer fees, VAT, transport and selling costs before setting a maximum hammer bid.",
     "scene": "liquidation",
     "note": "",
