@@ -98,7 +98,8 @@ export function sceneryCommands(w,h,offset,groundAt){
 const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg'),path=document.createElementNS(ns,'path');
 svg.classList.add('pen-thread');svg.setAttribute('aria-hidden','true');svg.append(path);document.body.prepend(svg);
 const life=threadLife(svg,path);
-let pending=0,hill=[],mountainOffset=0;
+let pending=0,hill=[],mountainOffset=0,resolveLineReady;
+export const lineReady=new Promise(resolve=>{resolveLineReady=resolve;});
 export function setHillContour(points,offset=0){hill=points;mountainOffset=offset;schedule();}
 // Continue uphill out of the page, then let the pen wander down the sketchbook.
 // Both renderers use these controls so the canvas/SVG seam has one tangent.
@@ -108,8 +109,8 @@ export function hillExit(w,start,slope,fullHeight,margin,stageHeight){
     const upper=[
         [x+reach,y+reach*slope,lane,y+drop*.09,lane,y+drop*.23],
         [lane,y+drop*.39,w*.87,y+drop*.42,w*.88,y+drop*.57],
-        [w*.89,y+drop*.72,w*.97,y+drop*.72,w*.965,y+drop*.82],
-        [w*.958,y+drop*.97,w*.81,guard-40,w*.79,guard-9],
+        [w*.895,y+drop*.70,w*.955,y+drop*.73,w*.955,y+drop*.83],
+        [w*.955,y+drop*.94,w*.82,guard-40,w*.79,guard-9],
         [w*.77,guard+22,lane,guard-3,lane,guard+28]
     ];
     // Stay outside the creation controls, then spend the empty lower margin
@@ -122,8 +123,8 @@ export function hillExit(w,start,slope,fullHeight,margin,stageHeight){
         [w*.79,fullHeight+10,w-margin,fullHeight+42,w-margin,fullHeight+112]
     ];
     return [...upper,
-        [lane,stage-68,w*.957,fullHeight-143,w*.974,fullHeight-112],
-        [w*.998,fullHeight-68,w*.80,fullHeight-65,w*.73,fullHeight-22],
+        [lane,fullHeight-126,w*.96,fullHeight-118,w*.94,fullHeight-112],
+        [w*.92,fullHeight-92,w*.80,fullHeight-65,w*.73,fullHeight-22],
         [w*.64,fullHeight+33,w*.76,fullHeight+105,w*.85,fullHeight+59],
         [w*.94,fullHeight+13,w*.84,fullHeight-30,w*.80,fullHeight+4],
         [w*.75,fullHeight+47,w-margin,fullHeight+69,w-margin,fullHeight+112]
@@ -329,6 +330,7 @@ function layout(){
     svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.style.height=h+'px';
     life.update(points,tugStart,guideEntries);
     svg.dataset.joins='mountains hill '+[...document.querySelectorAll('.sketch-demo')].map(f=>f.dataset.scene).join(' ');
+    if(resolveLineReady){resolveLineReady();resolveLineReady=null;}
 }
 const observer=new ResizeObserver(schedule);observer.observe(document.querySelector('.sketchbook'));
 for(const f of document.querySelectorAll('.sketch-demo')){observer.observe(f);f.addEventListener('load',schedule);}

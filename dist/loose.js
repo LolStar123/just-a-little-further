@@ -304,6 +304,6 @@ document.querySelectorAll('.sketch-demo').forEach(el=>demoObserver.observe(el));
 window.addEventListener('message',e=>{
     if(e.origin!==location.origin||!['demo-ready','demo-layout'].includes(e.data?.type))return;
     const f=[...document.querySelectorAll('iframe')].find(f=>f.contentWindow===e.source);if(!f)return;
-    if(e.data.type==='demo-layout'&&Number.isFinite(e.data.height)&&e.data.height>=180&&e.data.height<=1800){const height=e.data.height+'px';if(f.style.height!==height)f.style.height=height;}
+    if(e.data.type==='demo-layout'&&!['halo','baxter'].includes(f.dataset.scene)&&Number.isFinite(e.data.height)&&e.data.height>=180&&e.data.height<=1800){const height=e.data.height+'px';if(f.style.height!==height)f.style.height=height;}
     const r=f.getBoundingClientRect();e.source.postMessage({type:'demo-visibility',visible:r.bottom>0&&r.top<innerHeight},location.origin);
 });

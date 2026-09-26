@@ -96,21 +96,11 @@ if(scene==='halo'){
         bar.style.transform='scaleX('+(halo.elapsed/halo.duration)+')';
         if(halo.elapsed>=halo.duration){halo.done=true;halo.hold=0;setAnswer('fast');click();}
     };
-    draw=()=>{a.clear();drawMeowl(a.c,a.w*.5,a.h-4,89,{id:'interview',time,mode:halo.done&&halo.hold>.26?'happy':'nervous',look:halo.done?2:0,voice:sfx.mouth('interview'),drool:halo.done?Math.max(0,1-halo.hold/.26):Math.min(1,halo.elapsed/2.8)});const x=a.w*.76,y=a.h-15;toyProp(a.c,'cue-note',x,y,30,28,(c)=>{line(c,[[x-14,y-28],[x+14,y-27],[x+13,y],[x-15,y],[x-14,y-28]],'#a19986',1);line(c,[[x-8,y-19],[x+8,y-19],[x-7,y-13],[x+5,y-13]],'#a19986',.8);});};
+    draw=()=>{a.clear();drawMeowl(a.c,a.w*.5,a.h-3,78,{id:'interview',time,mode:halo.done&&halo.hold>.26?'happy':'nervous',look:halo.done?2:0,voice:sfx.mouth('interview'),drool:halo.done?Math.max(0,1-halo.hold/.26):Math.min(1,halo.elapsed/2.8)});const x=a.w*.76,y=a.h-12;toyProp(a.c,'cue-note',x,y,30,28,(c)=>{line(c,[[x-14,y-28],[x+14,y-27],[x+13,y],[x-15,y],[x-14,y-28]],'#a19986',1);line(c,[[x-8,y-19],[x+8,y-19],[x-7,y-13],[x+5,y-13]],'#a19986',.8);});};
 }else if(scene==='botato'||scene==='liquidation'){
     const bot=scene==='botato';$('.caption').textContent=bot?'a tiny detour of its own':'the hunt, in miniature';
     $('#scene').innerHTML=`<canvas class="toy" id="${bot?'botato-art':'liquidation-art'}" tabindex="0" aria-label="${bot?'Meowl pathfinder. Tap the floor or move the divine orb.':'A meowl inspects hardware from a liquidation lot.'}"></canvas><p class="toy-note" id="toy-note"></p>`;
     const a=canvas(bot?'botato-art':'liquidation-art'),note=$('#toy-note');
-    const hardwareLots=[
-        {name:'gpu lot',resale:620,fault:.14,fees:.24,shipping:32},
-        {name:'workstation',resale:880,fault:.20,fees:.24,shipping:48},
-        {name:'mixed parts',resale:410,fault:.11,fees:.24,shipping:26}
-    ];
-    if(!bot){
-        const picker=document.createElement('div');picker.className='demo-picker lot-picker';picker.setAttribute('role','group');picker.setAttribute('aria-label','auction lot');
-        hardwareLots.forEach((item,index)=>{const button=document.createElement('button');button.type='button';button.textContent=item.name;button.classList.toggle('selected',index===0);button.addEventListener('click',()=>{lot.choice=index;picker.querySelectorAll('button').forEach((b,i)=>b.classList.toggle('selected',i===index));sfx.play('click');wake();});picker.append(button);});
-        $('#scene').insertBefore(picker,a.el);
-    }
     if(bot){
         robot={x:40,y:220,cameraX:240,cameraY:320,target:[885,560],route:[],blocked:[],rocks:rocks.map(r=>r.points),routeMs:0};
         const silhouettes=rocks.map(rockPath);let terrain=null,terrainWidth=0,terrainHeight=0,draggedLoot=null,lastLootRoute=-1;
@@ -194,7 +184,8 @@ if(scene==='halo'){
             }
         };
     }else{
-        lot={index:30,elapsed:0,stage:1,x:75,y:280,vx:0,vy:0,carrying:true,camera:1,placed:30,choice:0};
+        const valuationFor=index=>{const noise=n=>{const x=Math.sin((index+1)*n)*43758.5453;return x-Math.floor(x);},resale=Math.round(360+noise(12.9898)*540),fault=.06+noise(37.719)*.20,fees=.19+noise(73.113)*.07,shipping=Math.round(18+noise(91.731)*46),recoverable=resale*(1-fault),maxHammer=Math.floor((recoverable-shipping)/(1+fees));return{resale,fault,fees,shipping,recoverable,maxHammer};};
+        lot={index:30,elapsed:0,stage:1,x:75,y:280,vx:0,vy:0,carrying:true,camera:1,placed:30,bid:valuationFor(30),quoteVersion:0};
         // Successive supported shells contain 1, 3, 5 ... cards. There is no final lap/reset.
         const slot=index=>{const radius=Math.floor(Math.sqrt(index)),offset=index-radius*radius,row=Math.floor(offset/2);return{x:310+(radius-row)*(offset%2?1:-1)*24,y:280-row*22};};
 
@@ -205,7 +196,7 @@ if(scene==='halo'){
             const dx=target.x-lot.x,dy=target.y-lot.y,d=Math.hypot(dx,dy),pace=time<(lot.hurryUntil||0)?210:130;
             lot.vx+=(dx/(d||1)*Math.min(pace,d*5)-lot.vx)*(1-Math.exp(-dt*10));lot.vy+=(dy/(d||1)*Math.min(pace,d*5)-lot.vy)*(1-Math.exp(-dt*10));
             lot.x+=lot.vx*dt;lot.y+=lot.vy*dt;
-            if(d<2&&Math.hypot(lot.vx,lot.vy)<15){if(lot.carrying){lot.index++;lot.placed++;sfx.play('place',{level:.65});}lot.carrying=!lot.carrying;}
+            if(d<2&&Math.hypot(lot.vx,lot.vy)<15){if(lot.carrying){lot.index++;lot.placed++;sfx.play('place',{level:.65});}else{lot.bid=valuationFor(lot.index);lot.quoteVersion++;}lot.carrying=!lot.carrying;}
             const radius=Math.ceil(Math.sqrt(lot.index+1)),zoom=Math.min(1.12,470/(330+radius*24),250/(radius*22+80));lot.camera+=(zoom-lot.camera)*(1-Math.exp(-dt*1.2));
             lot.stage=lot.carrying?2:1;lot.carrierPosition=[lot.x,lot.y];
         };
@@ -220,8 +211,6 @@ if(scene==='halo'){
             line(c,[[17,283],[17,244],[67,246],[67,283],[17,283]],'#6f624d',1.2);
             const pose=drawMeowl(c,lot.x,lot.y,75,{voice:sfx.mouth('hunt'),id:'hunt',time,mode:lot.carrying?'carry':'scurry',speed:Math.hypot(lot.vx,lot.vy),facing:lot.vx<0?-1:1,emotion:'determined',effort:.82,chase:false,cargo:lot.carrying?(ctx,grip)=>hardware(ctx,grip.x,grip.y-8,'gpu',.8,0,'gpu-'+lot.index):null});
             lot.grips=pose.hands;c.restore();
-            const item=hardwareLots[lot.choice],recoverable=item.resale*(1-item.fault),maxHammer=Math.floor((recoverable-item.shipping)/(1+item.fees));lot.bid={...item,recoverable,maxHammer};
-            c.fillStyle='#535248';c.textAlign='left';c.font='16px Reader,Georgia,serif';c.fillText(item.name,12,21);c.font='13px Reader,Georgia,serif';c.fillStyle='#817968';c.fillText('resale £'+item.resale+'  ·  fault '+Math.round(item.fault*100)+'%',12,43);c.fillStyle='#60715d';c.font='18px Reader,Georgia,serif';c.fillText('max hammer £'+maxHammer,12,68);
             note.textContent=lot.placed+' gpus checked and stacked.';
         };
     }

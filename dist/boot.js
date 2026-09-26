@@ -48,5 +48,6 @@ function draw(now){
  drawMeowl(c,x-27,ground(x-27),52,{id:'boot',time,mode:pushes===3?'happy':'push',effort:.85,stroke:time%1,ground});if(!done)raf=requestAnimationFrame(draw);
 }
 raf=requestAnimationFrame(draw);
-Promise.all([import('./hill-physics.js'),import('./loose.js'),document.fonts.ready]).then(()=>{loaded=true;status.textContent='';finish();}).catch(error=>{failed=true;console.error(error);status.textContent='the hill could not load.';const retry=document.createElement('a');retry.href='';retry.textContent='reload';status.append(' ',retry);inert(false);});
+const pageReady=import('./loose.js').then(()=>import('./pen-thread.js')).then(module=>module.lineReady);
+Promise.all([import('./hill-physics.js'),pageReady,document.fonts.ready]).then(()=>{loaded=true;status.textContent='';finish();}).catch(error=>{failed=true;console.error(error);status.textContent='the hill could not load.';const retry=document.createElement('a');retry.href='';retry.textContent='reload';status.append(' ',retry);inert(false);});
 window.__boot=()=>({completed:loaded?3:0,total:3,pushes,visible:!done,done,failed});

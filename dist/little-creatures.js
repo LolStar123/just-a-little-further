@@ -233,6 +233,10 @@ function workCostume(c,p,role,t){
         c.beginPath();c.moveTo(-25,-1);c.bezierCurveTo(-34,-37,32,-41,28,-1);c.strokeStyle=ink;c.lineWidth=2;c.stroke();
         for(const side of [-1,1]){c.beginPath();c.ellipse(side*26,-1,5,11,side*.1,0,Math.PI*2);c.fillStyle='#767e77';c.fill();c.strokeStyle=ink;c.lineWidth=1.2;c.stroke();}
         pen([[-13,1],[-6,1]],1.8);pen([[6,1],[13,1]],1.8);
+    }else if(role==='analyst'){
+        for(const side of [-1,1]){c.beginPath();c.ellipse(side*10,-1,9,8,side*.08,0,Math.PI*2);c.strokeStyle=ink;c.lineWidth=1.35;c.stroke();}
+        pen([[-1,-2],[1,-2]],1.2);pen([[-19,-2],[-27,-7]],.9);pen([[19,-2],[27,-7]],.9);
+        pen([[-5,-29],[0,-35],[6,-28]],.8,'#8a7858');
     }else if(role==='verifier'){
         c.beginPath();c.moveTo(-23,-17);c.lineTo(-19,-31);c.quadraticCurveTo(0,-40,20,-30);c.lineTo(23,-17);c.closePath();c.fillStyle='#737d7c';c.fill();c.strokeStyle=ink;c.lineWidth=1.3;c.stroke();
         c.beginPath();c.moveTo(-24,-17);c.quadraticCurveTo(17,-12,31,-19);c.quadraticCurveTo(12,-23,-24,-17);c.fillStyle=ink;c.fill();
@@ -244,6 +248,9 @@ function workCostume(c,p,role,t){
         stroke(c,[[-11,1],[-9,18],[0,20]],.8);c.fillStyle=paper;c.fillRect(-15,17,11,13);stroke(c,[[-15,17],[-4,17],[-4,30],[-15,29],[-15,17]],.8);stroke(c,[[-12,22],[-7,22],[-12,25],[-8,25]],.7);
     }else if(role==='developer'){
         curve(c,[-17,-1],[-8,13],[0,6],1.2);curve(c,[0,6],[9,13],[16,-1],1.2);stroke(c,[[-5,9],[-7,21]],.8);stroke(c,[[6,9],[8,19]],.8);curve(c,[-12,26],[0,22],[12,26],1);
+    }else if(role==='analyst'){
+        stroke(c,[[-8,8],[0,14],[8,8],[0,4],[-8,8]],1.05,'#a08a57');
+        stroke(c,[[-13,17],[-6,12],[2,19],[10,10],[16,14]],.75,'#8c7e66');
     }else if(role==='verifier'){
         stroke(c,[[-16,1],[0,8],[16,1]],1.1);stroke(c,[[6,10],[13,8],[18,12],[15,21],[10,23],[6,18],[6,10]],1.1,'#a08a57');stroke(c,[[-14,16],[-9,15],[-7,26],[-13,27],[-14,16]],1.2);stroke(c,[[-12,15],[-13,8]],1.1);
     }
