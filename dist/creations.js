@@ -234,7 +234,7 @@ export const projects={
   "halo": {
     "title": "halo",
     "short": "HALO",
-    "category": "CONTEXT ENGINEERING",
+    "category": "LOW-LATENCY INFERENCE",
     "caption": "ai powered meeting assistant. uses personal context to provide contextualised answers through a mix of local and hosted llms.",
     "description": "Transcribe the question, combine it with selected context and prepare a response. The overlay breaks that response into readable sentences so the next useful point stays in view.",
     "scene": "halo",
