@@ -95,24 +95,23 @@ try:
             and first["netEV"] != last["netEV"]
             and first["points"] != last["points"],
         )
-        y_values = [point[1] for point in last["points"]]
-        turns = sum(
-            1
-            for i in range(1, len(y_values) - 1)
-            if (y_values[i] - y_values[i - 1])
-            * (y_values[i + 1] - y_values[i])
-            < 0
-        )
+        points = last["points"]
+        x_values = [point[0] for point in points]
+        y_values = [point[1] for point in points]
         check(
-            "rolling trace is visibly jagged",
-            max(y_values) - min(y_values) > 35 and turns >= 8,
+            "distribution remains the full statistically shaped KDE",
+            len(points) == 121
+            and all(b > a for a, b in zip(x_values, x_values[1:]))
+            and max(y_values) - min(y_values) > 20
+            and max(y_values) <= 405
+            and min(y_values) >= 327,
         )
         sheet = page.evaluate("window.__siteDiagnostics().mini.sheet")
         check(
             "table is calmer than the calculation stream",
             len(sheet["rows"]) <= 3
             and sheet["rate"] == 2.8
-            and sheet["calculationRate"] == 18,
+            and sheet["calculationRate"] == 30,
         )
         old_choice = page.evaluate("window.__siteDiagnostics().mini.choice")
         page.wait_for_timeout(6200)
@@ -155,9 +154,9 @@ try:
                         .map(path => path.getAttribute('d')).join('|')
                 })"""
             )
-            check(f"{width} rolling trace has 32 outcomes", len(json.loads(after["points"])) == 32)
-            check(f"{width} rolling trace advances", before["points"] != after["points"])
-            check(f"{width} rolling trace drives the page stroke", before["path"] != after["path"])
+            check(f"{width} distribution keeps its full resolution", len(json.loads(after["points"])) == 121)
+            check(f"{width} distribution advances", before["points"] != after["points"])
+            check(f"{width} distribution drives the page stroke", before["path"] != after["path"])
             page.screenshot(path=str(ROOT / "output" / f"poe-risk-{width}.png"))
         check("no browser exceptions", not errors)
         browser.close()
