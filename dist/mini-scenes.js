@@ -170,32 +170,33 @@ export function miniScene(scene,canvas,wake,sfx){
    if(entered>priceUpdates){while(priceUpdates<entered){const r=priceIncoming[priceUpdates%priceIncoming.length];prices[priceUpdates%240]=r;priceUpdates++;}priceCount=-1;}
    if(priceCount!==priceUpdates){priced=priceSummary(prices,240,priceDomain,family.cost);priceCount=priceUpdates;}
    if(priceUpdates!==state.audioPrices){const r=prices[(Math.max(1,priceUpdates)-1)%240];sfx.play('plink',{good:!!r.rare&&r.value>0});state.audioPrices=priceUpdates;}
-   const d=priced,fmt=v=>v===null?'...':v.toFixed(2),xFor=v=>42+(v-priceDomain[0])/(priceDomain[1]-priceDomain[0])*396;
+   const d=priced,fmt=v=>v===null?'...':v.toFixed(2);
    state.metrics={ev:d.ev,netEV:d.netEV,sharpe:d.sharpe,profitFactor:d.profitFactor};
    label(c,'n = '+tested.toLocaleString('en-GB'),70,35,17);label(c,'EV '+fmt(d.netEV)+'c',230,35,18);label(c,'PF '+fmt(d.profitFactor),397,35,18);
-   const columns=[['variant',54],['sell',365],['net',432]];
+   const columns=[['recent variant',54],['net',432]];
    for(const [text,x] of columns){c.fillStyle=soft;c.font='13px Reader,Georgia,serif';c.textAlign=x===54?'left':'right';c.fillText(text,x,72);}
    path(c,[[48,82],[444,82]],soft,.8);
-   c.save();c.beginPath();c.rect(45,84,403,189);c.clip();
-   const phase=(state.clock*streamRate)%1,rowH=34,latest=priceUpdates,rows=[];
-   for(let i=0;i<5;i++){
-    const age=4-i,index=((latest-age)%priceIncoming.length+priceIncoming.length)%priceIncoming.length,r=priceIncoming[index],y=256-(age+phase)*rowH;
-    const variants=poeVariants[n%3],variant=variants[((latest-age)%variants.length+variants.length)%variants.length];
-    if(y<76||y>290)continue;rows.push({variant,buy:family.cost,sell:r.price,net:r.value,y});
-    c.globalAlpha=.52+.48*Math.max(0,1-age/4);path(c,[[48,y+11],[444,y+11]],'#c7bead',.55);
-    c.fillStyle=ink;c.font='14px Reader,Georgia,serif';c.textAlign='left';c.fillText(variant,54,y);
-    c.textAlign='right';c.fillText(r.price.toFixed(1)+'c',365,y);c.fillStyle=r.value>=0?'#60715d':'#936957';c.fillText((r.value>=0?'+':'')+r.value.toFixed(1)+'c',432,y);
+   c.save();c.beginPath();c.rect(45,84,403,166);c.clip();
+   const tableRate=2.8,tableTick=Math.floor(state.clock*tableRate),phase=(state.clock*tableRate)%1,rowH=55,rows=[];
+   for(let i=0;i<3;i++){
+    const age=2-i,index=((tableTick-age)%priceIncoming.length+priceIncoming.length)%priceIncoming.length,r=priceIncoming[index],y=224-(age+phase)*rowH;
+    const variants=poeVariants[n%3],variant=variants[((tableTick-age)%variants.length+variants.length)%variants.length];
+    if(y<76||y>250)continue;rows.push({variant,net:r.value,y});
+    c.globalAlpha=.58+.42*Math.max(0,1-age/2);path(c,[[48,y+15],[444,y+15]],'#c7bead',.55);
+    c.fillStyle=ink;c.font='15px Reader,Georgia,serif';c.textAlign='left';c.fillText(variant,54,y);
+    c.textAlign='right';c.fillStyle=r.value>=0?'#60715d':'#936957';c.fillText((r.value>=0?'+':'')+r.value.toFixed(1)+'c',432,y);
    }
    c.restore();c.globalAlpha=state.transition;
    owl(c,66,344,'research',52,{hat:'goldrim',mode:'carry',speed:34,cargo:(ctx,grip)=>page(ctx,grip.x-12,grip.y-20,24,28)});
-   const recent=Array.from({length:48},(_,i)=>prices[((priceUpdates-i-1)%prices.length+prices.length)%prices.length]),visual=priceSummary(recent,48,priceDomain,family.cost);
-   const peak=Math.max(1/family.cost*.45,...visual.density.map(p=>p[1])),points=visual.density.map(([x,y])=>[xFor(x),405-y/peak*78]);
+   const recent=Array.from({length:32},(_,i)=>prices[((priceUpdates-31+i)%prices.length+prices.length)%prices.length]),outcomes=recent.map(r=>r.value);
+   const magnitudes=outcomes.map(Math.abs).sort((a,b)=>a-b),scale=Math.max(1,family.cost,magnitudes[Math.floor(magnitudes.length*.78)]||1),clip=scale*1.6;
+   const points=outcomes.map((value,i)=>[96+i/31*348,373-Math.max(-clip,Math.min(clip,value))/clip*43]);
    c.beginPath();c.moveTo(91,344);c.bezierCurveTo(132,336,150,366,...points[0]);c.strokeStyle=soft;c.lineWidth=.75;c.stroke();
    if(!woven)path(c,points,ink,1.15);
-   const zero=xFor(0);path(c,[[zero,395],[zero,410]],ink,.8);label(c,'recent outcomes',240,426,14);
+   path(c,[[96,373],[444,373]],soft,.55);label(c,'recent outcomes',240,426,14);
    const thread=JSON.stringify(points.map(([x,y])=>[+(x*s+(a.w-480*s)/2).toFixed(2),+(y*s+(a.h-artHeight*s)/2).toFixed(2)]));
    if(a.el.dataset.threadPoints!==thread){a.el.dataset.threadPoints=thread;if(woven)parent.dispatchEvent(new Event('ink-anchors'));}
-   state.priceDistribution={...d,points,domain:priceDomain,values:prices.map(r=>r.value),windowUpdates:priceUpdates,totalCount:tested};state.sheet={family:family.name,rows,rate:streamRate,illustrative:true};
+   state.priceDistribution={...d,points,domain:priceDomain,values:prices.map(r=>r.value),windowUpdates:priceUpdates,totalCount:tested};state.sheet={family:family.name,rows,rate:tableRate,calculationRate:streamRate,illustrative:true};
    note.textContent='';note.hidden=true;
   }else if(scene==='scraper'){
    label(c,'collect papers',117,34,20);label(c,'test the idea',359,34,20);
