@@ -51,6 +51,7 @@ Browser checks use Python Playwright and an installed Google Chrome, in a separa
 ```sh
 npm run test:loading
 python tools/verify_portfolio.py
+python tools/verify_caption_bounds.py
 ```
 
 The loading check covers cold and cached desktop/phone visits. The portfolio check covers keyboard entry, phone jump links, scrolling, boulder dragging, all visible scenes, sound controls, continuous-line joins and reduced motion. It saves screenshots and a JSON report under the ignored `output/portfolio-review/` directory. Saved screenshots still require visual inspection.

@@ -24,3 +24,11 @@ Short interface labels and repository documentation do not honestly support the 
 Three generic phrases rejected: “innovative solutions”, “a diverse portfolio”, “a passion for technology”.
 
 Automated audio checks verify routing and volume state, not listening quality. Chrome is the browser verified in this pass. The inherited project panel has no exposed entrance on the current hillside; the native phone details control is the visible navigation surface reviewed here.
+
+## First-frame caption regression
+
+A longer typed phrase could retain the previous phrase's cached height until ResizeObserver ran. A dirty flag now measures after full-text, typed-text or viewport-width changes and before positioning that frame; idle frames reuse the measured box.
+
+The targeted 320/390px stress check uses 9-126 character phrases and audits rectangles before ResizeObserver delivery. The earlier module reproduced two play-control overlaps; the corrected module produced no violations across 48 visible samples. A same-context revisit with the legacy modules cached for 600 seconds fetched the new keyed pen and guide modules while reusing cached boot code, retained one pen/guide, and produced no violations across 50 visible samples.
+
+An entry import map pins only the pen module; that parent imports the keyed guide module. This keeps static and dynamic imports on the same pen instance without changing boot or character motion. `python tools/verify_caption_bounds.py` runs the focused current-code check; its optional legacy/priming arguments accept separately retained source snapshots for regression and cache checks.

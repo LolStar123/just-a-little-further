@@ -1,4 +1,4 @@
-import {threadLife} from './thread-life.js';
+import {threadLife} from './thread-life.js?v=d930d782763a';
 // One landscape-to-footer stroke, rebuilt only when layout changes.
 export const mountainPoints=[[0,.73],[.035,.724],[.07,.70],[.093,.68],[.112,.699],[.151,.65],[.181,.673],[.213,.61],[.242,.655],[.267,.634],[.304,.681],[.341,.67],[.38,.703],[.43,.705],[.47,.72]];
 export function sceneryCommands(w,h,offset,groundAt){

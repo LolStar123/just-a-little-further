@@ -37,7 +37,7 @@ export function threadLife(svg,path){
     const speechSizer=document.createElement('span'),speechInk=document.createElement('span');
     speechSizer.className='speech-size';speechInk.className='speech-ink';speechSizer.setAttribute('aria-hidden','true');speechInk.setAttribute('aria-hidden','true');words.setAttribute('role','note');words.append(speechSizer,speechInk);
     let speechText='',speechLetters=[],speechCount=0,typeAt=0,lastKick=0;
-    let speechWidth=235,speechHeight=78;
+    let speechWidth=235,speechHeight=78,speechNeedsMeasure=true,speechViewWidth=0;
     let speechObstacles=[],speechBoundsAt=0,speechScroll=-1;
     words.style.bottom='auto';words.style.left='0';words.style.top='0';
     new ResizeObserver(()=>{speechWidth=words.offsetWidth;speechHeight=words.offsetHeight;}).observe(words);
@@ -164,9 +164,13 @@ export function threadLife(svg,path){
             const airborne=actor.kind==='pole'||['air','fly','flutter','thrown','held','hang','cheer'].includes(actor.mode),mode=actor.mode==='held'?'held':airborne?'air':actor.mode==='crouch'?'anticipate':actor.mode==='land'?'brace':'scurry';
             drawMeowl(c,72,112,55,{id:'guide',hovered:actor.hovered,time,mode,air:airborne,parkour:actor.pose,effort:airborne||Math.hypot(actor.vx,actor.vy)>180?.88:.25,sweat:airborne||Math.hypot(actor.vx,actor.vy)>180,emotion:actor.mode==='thrown'?'panic':'relieved',speed:Math.hypot(actor.vx,actor.vy),facing:actor.facing,voice:sound.mouth('guide'),landed:actor.mode==='land'?1:0});c.restore();
             if(actor.kind==='grind'){c.strokeStyle='#a08a57';c.lineWidth=.8;for(let i=0;i<4;i++){const u=(time*4+i*.23)%1;c.globalAlpha=1-u;c.beginPath();c.moveTo(72-actor.facing*u*24,112+u*3);c.lineTo(72-actor.facing*(u*24+5),112+u*6);c.stroke();}c.globalAlpha=1;sound.beat('grind',Math.floor(time*2),'friction',{level:.2});}
-            if(speechText!==actor.text){speechText=actor.text;speechLetters=Array.from(speechText);speechCount=0;typeAt=now;speechSizer.textContent=speechText;speechInk.textContent='';words.setAttribute('aria-label',speechText);}
-            if(now>=typeAt&&speechCount<speechLetters.length){const letter=speechLetters[speechCount++];speechInk.textContent=speechLetters.slice(0,speechCount).join('');if(speechCount%2===0&&letter.trim())sound.play('click',{id:'typing',level:.055});typeAt=now+(/[.!?]/.test(letter)?115:letter===','?100:48);}
+            if(speechText!==actor.text){speechText=actor.text;speechLetters=Array.from(speechText);speechCount=0;typeAt=now;speechSizer.textContent=speechText;speechInk.textContent='';words.setAttribute('aria-label',speechText);speechNeedsMeasure=true;}
+            if(now>=typeAt&&speechCount<speechLetters.length){const letter=speechLetters[speechCount++];speechInk.textContent=speechLetters.slice(0,speechCount).join('');if(speechCount%2===0&&letter.trim())sound.play('click',{id:'typing',level:.055});typeAt=now+(/[.!?]/.test(letter)?115:letter===','?100:48);speechNeedsMeasure=true;}
             words.classList.toggle('typing',speechCount<speechLetters.length);
+            // Measure after text/wrapping changes, before positioning this frame.
+            // ResizeObserver alone reports a new phrase too late for its first paint.
+            if(viewWidth!==speechViewWidth){speechViewWidth=viewWidth;speechNeedsMeasure=true;}
+            if(speechNeedsMeasure){speechWidth=words.offsetWidth;speechHeight=words.offsetHeight;speechNeedsMeasure=false;}
             // Move only the words. The guide retains its world-space momentum.
             // Cache reading/control bounds, refreshing immediately when scrolling.
             if(now>speechBoundsAt||speechScroll!==scrollY){
