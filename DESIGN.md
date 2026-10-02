@@ -1,41 +1,45 @@
 # Just a little further
 
-A personal sketchbook about Atul's projects and interests: paper, a wandering pen, a stubborn meowl and a boulder. Project copy explains work, evidence and outputs. Rendering techniques belong here or in the colophon.
+Atul's personal sketchbook: a stubborn meowl pushes a boulder, and one wandering pen line leads into his projects. The page's job is to make the work easy to find without sanding off its personality.
 
-## Visual system
+## The page
 
-`dist/friend-review.css` owns paper `#eeeae0`, ink `#3b3a36`, muted `#69675e`, olive `#60715d`, ochre `#8b7248` and clay `#936957`. Handwriting uses locally hosted Nothing You Could Do; reading copy uses Newsreader. Keep paragraphs readable. Colour distinguishes useful controls and data.
+Keep the existing wonky title and hillside. The entrance requires three deliberate pushes, with readiness tracked separately from the push count. The hero has profile links, quiet music/effects sliders and the four playground controls. No quote block, hill poker-card navigation or Poetato Discord link belongs here.
 
-The short hero contains the name, UCL economics, profile links, audio sliders, title, attributed thought and hill. The first project peeks below. Tube reliability comes first below the hill. Hill markers preserve the previous sequence; OCR is temporarily archived. Playing cards replace numbers, with combined ranks above ten.
+Below the hill, nine project stops cover ten projects: Tube reliability and commute costs share a London drawing; research, PoE prices, Smoothtato, Deadlock, Baxter, Botato, HALO and hardware follow. The last scene is the interests thought bubble. Keep current user-confirmed captions, public source links and demo scope distinct from illustrative scene data.
 
-Twelve project sections accompany an interests thought bubble. Its labels stay readable while themed doodles animate. The heading is only 'off the clock' with cycling dots. OCR source remains archived, outside the page and navigation.
+Desktop keeps the alternating sketchbook reading flow. On screens at or below 760px, place one native folded `details` jump list after the invitation and before the first project. It sticks 8px from the viewport top only within the sketchbook. It links to existing chapters, closes on selection or Escape and moves focus to the chosen chapter. It adds no second project drawer or hero index. Chapter scroll margins leave the folded control visible above the destination.
 
-## The continuous pen
+## Type, colour and spacing
 
-Shared geometry connects hill, scenery, chapter floors, statistical curves and invented signature. The wide SVG hit path is transparent. Tugs taper along 900 pixels of arc length on each side with zero endpoint slope and curvature; chapter floors return to their base geometry after release. Use broad curls and continuous tangents, never sharp sawtooth fillers. Data-derived curves retain measured values.
+- Paper `#eeeae0`, ink `#3b3a36`, muted ink `#69675e`, olive `#60715d`, ochre `#8b7248` and clay `#936957`. Text uses ink or muted ink at full opacity; avoid fading source links into the paper. The project-label ink is `#56674e`.
+- Locally hosted Nothing You Could Do carries the handwriting; Newsreader carries reading copy and project headings. DM Serif Display carries the title; IBM Plex Sans carries small utility lettering. Bundled font licenses and the colophon establish attribution.
+- Project headings use 34-46px Newsreader with a 1.08 line height. Body copy uses 20px/1.5 on desktop and 18px/1.5 on phones, with a roughly 32-36-character measure. Handwriting stays in notes, labels on drawings and the guide's character.
+- Preserve air for broad pen loops between chapters. Phone layouts stack copy before each scene. Do not crop or compress working illustrations to shorten the page.
+- Project links have 44px hit areas, visible underlines and strong focus outlines. A hover or focus thickens the underline. Muted source links retain full opacity. Phone jump links also reserve 44px; native details and anchors work without their enhancement module.
 
-The guide travels in world coordinates, using the line for footholds rather than snapping to an arc-length position. Geometry selects climbing, grinding, leaps and shortcuts. Botato has a scroll-released ledge hang. Throws keep momentum and gravity for 0.7 seconds before winged recovery. Keyboard tug handles sit between chapters. Scene picking uses painter order and transformed bounds. Thrown helpers and props enter a shared page-wide Matter world, outside iframe clipping. They collide with sampled line segments, text and other objects. All recovery is collision-free for both helper and item, from dispatch through restoration. Normal collision physics resumes after restoration and a fresh throw. The shared layer stays above open panels and discards bodies belonging to closed panels.
+## Continuous pen and physics
 
-## Motion and physics
+Shared geometry joins the hill, scenery, chapter floors, statistical curves and signature. The SVG hit path stays transparent. Tugs taper over 900 pixels of arc length each side with zero endpoint slope and curvature; chapter floors settle back after release. Use broad curls and continuous tangents. Data-derived curves preserve measured values.
 
-Matter.js 0.20.0 provides stylised game physics. Structural faults accumulate damage; impacts expose new layers without the old shallow erosion ceiling. Unsupported ridges accumulate stress and fail after adjacent erosion. Irregular ledges use the sampled surface and a jagged fracture outline, hang briefly, then detach and tumble. Their removal bounds memory while erosion remains. Reset clears bodies and constraints. Damage beyond the visible ridge is excluded.
+The guide moves in world coordinates, choosing footholds, climbs, grinds, leaps and shortcuts from geometry. Botato has a scroll-released ledge hang. Throws retain momentum and gravity before winged recovery. Scene picking uses painter order and transformed bounds. Thrown helpers and props enter a shared page-wide Matter world rather than clipping at iframe edges. Recovery stays collision-free until restoration; fresh throws restore normal collisions. Closed panels discard their bodies.
 
-Bound leg and torso reach. A hand-held rock can pancake meowl. Keep full-screen impact frames removed. Scenes autoplay and vary only while visible. Pointer cancellation releases capture. Blank canvas supports mobile scrolling. Iframes reserve height, report their measured size and recover missed observer notifications through a visibility watchdog.
+Matter.js 0.20.0 supplies stylised physics. Impacts expose deeper terrain layers, unsupported ridges fail under stress, and jagged ledges detach and tumble. Reset clears bodies and constraints. Bound leg/torso reach and keep the hill actor's throw/recovery state exclusive. A stable landing foothold prevents the actor chasing a moving target. No full-screen impact flashes.
 
-Buttons deform without overwriting positioning transforms. Only short annotations wobble between three rotations. Reduced motion removes decorative button and annotation movement; the explicitly requested physics playground remains available. Hidden tabs suspend rendering and audio.
+Blank canvas permits phone scrolling; dragging an actual prop captures the pointer until release or cancellation. Iframes reserve height, report actual layout and recover missed observer messages through readiness probes. Scenes play and vary while visible; hidden tabs suspend rendering and audio.
 
-## Audio and entrance
+## Motion and sound
 
-Three pushes unlock audio and enter. Push count and actual module readiness remain distinct; no artificial loading delay. Keyboard activation works. Main music stays quiet. Project panels crossfade to original synthesised motifs, restoring the main track on close. The music slider controls both.
+Keep motion tied to the drawings and controls. Buttons deform without replacing positioning transforms. Small annotations can wobble; reading copy remains still. Reduced motion removes decorative button, annotation and entrance effects. The explicitly activated physics playground remains available. The GitHub profile separately supplies still SVGs for reduced motion.
 
-Mechanical key recordings are credited to MattRuthSound under CC BY 4.0. Six kitten phrases are edits of three licensed recordings. Mouth envelopes remain independent. Scene audio follows viewport proximity and stops offscreen.
+Guide speech uses the full phrase as an invisible size reference while typing, so its box stays steady. Captions clamp to the visual viewport and avoid the title, play controls, project copy, invitation, jump control and hill actors. Phone speech waits briefly if there is no nearby clear patch; never move the guide's physical position to solve a text collision. The hill meowl's thought has close above-head and below-foot candidates. Reduced motion also removes its text bounce and breathing offset.
 
-## Evidence and limits
+Three entrance pushes unlock sound. Main music stays quiet; project panels crossfade to their original synth themes and return to the main track on close. Music and effects have separate sliders. Scene audio follows viewport proximity and stops offscreen. Mechanical keys credit MattRuthSound under CC BY 4.0; the kitten phrases are licensed recording edits. Mouth envelopes remain independent.
 
-`docs/reference-notes.md` logs ten posts, captions, loaded replies, expanded resources, frame-based media review and the installed skill. Hidden/unexpanded replies are not claimed as inspected. Temporary reference media was deleted.
+## Review and limits
 
-`docs/friend-review.md`, `docs/guide-polish.md` and `docs/guide-followup.md` track the requests. Private browser evidence is under `output/friend-review/` and `output/card-polish/`. Syntax, visual, interaction and audio checks are separate evidence. Automated playback is not a listening test.
+Acceptance is fixed before review: working loader/controls; every scene ready and advancing; continuous line joins; readable desktop and 320/390px phone layouts; native phone jump navigation; keyboard focus; reduced motion; public links; no browser errors. Review in three bounded passes: functionality, design-system adherence, then rendered craft. Screenshots under `output/portfolio-review/` are local evidence and are not publication assets by default.
 
-The title is centred and intentionally wonky. Card suits use black spades, blue clubs, bright red hearts and orange diamonds. Guide speech has a fixed-size typewriter box anchored every frame, with quiet typing clicks. The guide overlay clips at viewport edges without changing world-space motion.
+`docs/reference-notes.md` preserves earlier inspected references and their limits. The requested Fable URL returned HTTP 429, including in a headless attempt; it is not an inspected visual reference. This revision keeps the existing hillside identity and applies deliberate, small interactions rather than importing an unverified reference.
 
-The hill actor has an exclusive throw/recovery state: no pushing or terrain foot planting during flight. It selects a stable foothold rather than chasing a moving landing target. Hard held-rock impacts use constraint displacement as well as pre-step velocity. The loose cliff-exit segment is tug-enabled by path index while the physical ridge remains pinned. Cheer gives the guide a large ballistic bounce and two drawn pom-poms. Pending scenes show a small original stagehand until the real ready message. Research annotations sit as small crooked margin asides.
+Automated audio diagnostics establish routing and slider state, not a listening test. A static profile preview checks artwork/layout selection locally; the final GitHub rendering requires a publication check. Long phone length remains intentional because every scene keeps its playable space; the jump list supplies a direct route through it.

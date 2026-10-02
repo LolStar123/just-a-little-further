@@ -37,7 +37,8 @@ export function threadLife(svg,path){
     const speechSizer=document.createElement('span'),speechInk=document.createElement('span');
     speechSizer.className='speech-size';speechInk.className='speech-ink';speechSizer.setAttribute('aria-hidden','true');speechInk.setAttribute('aria-hidden','true');words.setAttribute('role','note');words.append(speechSizer,speechInk);
     let speechText='',speechLetters=[],speechCount=0,typeAt=0,lastKick=0;
-    let speechWidth=235,speechHeight=78,invitationBounds=null;
+    let speechWidth=235,speechHeight=78;
+    let speechObstacles=[],speechBoundsAt=0,speechScroll=-1;
     words.style.bottom='auto';words.style.left='0';words.style.top='0';
     new ResizeObserver(()=>{speechWidth=words.offsetWidth;speechHeight=words.offsetHeight;}).observe(words);
     let guideEntries={},tubeEntryDone=false,tugStart=0,base=[],lengths=[],total=0,travel=0,time=0,last=0,raf=0,drag=null,anchor=0,dx=0,dy=0,vx=0,vy=0,pullX=0,pullY=0,shape=[],handles=[],sceneRects=[];
@@ -166,20 +167,30 @@ export function threadLife(svg,path){
             if(speechText!==actor.text){speechText=actor.text;speechLetters=Array.from(speechText);speechCount=0;typeAt=now;speechSizer.textContent=speechText;speechInk.textContent='';words.setAttribute('aria-label',speechText);}
             if(now>=typeAt&&speechCount<speechLetters.length){const letter=speechLetters[speechCount++];speechInk.textContent=speechLetters.slice(0,speechCount).join('');if(speechCount%2===0&&letter.trim())sound.play('click',{id:'typing',level:.055});typeAt=now+(/[.!?]/.test(letter)?115:letter===','?100:48);}
             words.classList.toggle('typing',speechCount<speechLetters.length);
-            // The caption shares the actor transform on every frame, including flips and jumps.
+            // Move only the words. The guide retains its world-space momentum.
+            // Cache reading/control bounds, refreshing immediately when scrolling.
+            if(now>speechBoundsAt||speechScroll!==scrollY){
+                speechScroll=scrollY;speechBoundsAt=now+120;
+                speechObstacles=[...document.querySelectorAll('.introduction,.bottom-edge,.projects-invitation,.small-jump,.chapter-copy,.meowl-thought,.grab-zone,.sound-settings')].map(el=>el.getBoundingClientRect()).filter(r=>r.width&&r.bottom>0&&r.top<innerHeight).map(r=>({left:r.left-8,right:r.right+8,top:r.top+scrollY-8,bottom:r.bottom+scrollY+8}));
+            }
             const w=speechWidth,h=speechHeight,guideLeft=actor.x-72,guideTop=actor.y-112;
-            const captionX=Math.max(8,Math.min(innerWidth-w-8,actor.x-w/2));
-            let captionY=Math.max(scrollY+8,actor.y-152);
-            if(invitationBounds){const r=invitationBounds,top=r.top;if(captionX+w>r.left&&captionX<r.right&&captionY+h>top-10&&captionY<top+r.height+10)captionY=Math.max(scrollY+8,top-h-14);}
-            words.style.transform=`translate(${captionX-guideLeft}px,${captionY-guideTop}px)`;
+            const minX=viewLeft+12,maxX=viewLeft+viewWidth-w-12,minY=viewTop+12,maxY=viewBottom-h-12;
+            const above=actor.y-78-h,below=actor.y+16;
+            const candidates=[[actor.x-w/2,above],[actor.x-w/2,below],[actor.x-w-45,actor.y-80],[actor.x+45,actor.y-80]];
+            for(const r of speechObstacles)candidates.push([actor.x-w/2,r.top-h-2],[actor.x-w/2,r.bottom+2]);
+            for(let y=minY;y<=maxY;y+=h+12)candidates.push([actor.x-w/2,y]);
+            const positions=candidates.map(([x,y])=>{x=Math.max(minX,Math.min(maxX,x));y=Math.max(minY,Math.min(maxY,y));const overlap=speechObstacles.reduce((sum,r)=>sum+Math.max(0,Math.min(x+w,r.right)-Math.max(x,r.left))*Math.max(0,Math.min(y+h,r.bottom)-Math.max(y,r.top)),0);return{x,y,overlap,distance:Math.hypot(x+w/2-actor.x,y+h/2-(actor.y-75))};}).sort((a,b)=>a.overlap-b.overlap||a.distance-b.distance);
+            const caption=positions[0];
+            // A crowded phone entrance can wait for a nearby clear patch of paper.
+            // Distant floating words would look as though the hill meowl said them.
+            words.style.visibility=caption.overlap>0||(viewWidth<=760&&caption.distance>160)?'hidden':'visible';
+            words.style.transform=`translate(${caption.x-guideLeft}px,${caption.y-guideTop}px)`;
             if(!sound.nextMeows.has('guide'))sound.nextMeows.set('guide',time+1.5);sound.chirp('guide',time,[10,17],true,{level:.55});
             if(actor.mode==='run'&&actor.kind!=='pole')sound.beat('feet',Math.floor(time*3.4),'step',{level:.35});
         }
         wake();
     }
     function update(points,startIndex=0,entries={}){
-        const invitation=document.querySelector('.projects-invitation')?.getBoundingClientRect();
-        invitationBounds=invitation?{left:invitation.left,right:invitation.right,top:invitation.top+scrollY,height:invitation.height}:null;
         if(base.length===points.length&&tugStart===startIndex&&points.every((p,i)=>p[0]===base[i][0]&&p[1]===base[i][1]))return;
         const oldTotal=total,oldLengths=lengths,oldEntries={start:tugStart,...guideEntries,end:Math.max(0,base.length-1)};
         const mapArc=value=>{
