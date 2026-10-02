@@ -4,7 +4,7 @@ The hill, title, user-confirmed project captions, sound and automatic scenes rem
 
 ## Checks
 
-- `npm ci`, `npm run check` and `npm run build:demos` pass. Rebuilding the scene bundle leaves its checked-in bytes and cache key unchanged.
+- `npm ci`, `npm run check` and `npm run build:demos` pass. The later HALO provider-qualifier trim regenerated the embedded bundle and refreshed its cache key.
 - `npm run test:loading` passes cold and cached desktop/phone visits, with delayed scene requests and the correct guide-only cheer audio route.
 - `python tools/verify_portfolio.py` passes at 1440px, 390px, 320px and reduced-motion 390px. It exercises actual keyboard entrance, all four hill controls, boulder capture/release, both audio sliders, native jump opening/closing, focus, scrolling and continuous-line joins.
 - All ten embedded scenes load and advance their clocks and rendered frames. Additional phone checks cover the scraper's automatic cycle, HALO's audio/next-question controls and Botato's keyboard destination change.
